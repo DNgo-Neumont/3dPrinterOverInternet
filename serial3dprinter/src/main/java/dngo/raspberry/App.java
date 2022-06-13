@@ -42,14 +42,16 @@ public class App
 
         portSelected.setBaudRate(250000);
         portSelected.openPort();
+        BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
         try{
-            while(portSelected.bytesAvailable() == 0) Thread.sleep(20);
-            byte[] readBuffer = new byte[portSelected.bytesAvailable()];
-            portSelected.readBytes(readBuffer, readBuffer.length);
+            String lineContent;
+            while((lineContent = portReader.readLine()) != null){
+                System.out.println(lineContent);
+            }
         } catch(Exception e){
             e.printStackTrace();
         }
-
+        portSelected.closePort();
 
         System.out.println( "Hello World!" );
     }
