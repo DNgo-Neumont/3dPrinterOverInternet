@@ -42,6 +42,7 @@ public class App
 
         portSelected.setBaudRate(250000);
         portSelected.openPort();
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
         BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
         try{
             String lineContent;
