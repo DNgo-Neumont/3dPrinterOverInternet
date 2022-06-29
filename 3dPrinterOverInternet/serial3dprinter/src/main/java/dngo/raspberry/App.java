@@ -1,8 +1,10 @@
 package dngo.raspberry;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 /**
  * Hello world!
@@ -40,17 +42,25 @@ public class App
 
         SerialPort portSelected = ports[choice];
 
-        portSelected.setBaudRate(250000);
+        //portSelected.setBaudRate(250000);
         portSelected.openPort();
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+        BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
+        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
         try{
-            while(portSelected.bytesAvailable() == 0) Thread.sleep(20);
-            byte[] readBuffer = new byte[portSelected.bytesAvailable()];
-            portSelected.readBytes(readBuffer, readBuffer.length);
+            String lineContent;
+            
+            while((lineContent = portReader.readLine()) != null && portSelected.bytesAvailable() != -1){
+                System.out.println(lineContent);
+                String userInput = reader.readLine();
+                portWriter.write(userInput, 0, userInput.length());
+            }
         } catch(Exception e){
             e.printStackTrace();
         }
-
+        portSelected.closePort();
 
         System.out.println( "Hello World!" );
+
     }
 }
