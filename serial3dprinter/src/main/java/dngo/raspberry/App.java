@@ -61,29 +61,27 @@ public class App
         
         System.out.println(portSelected.bytesAvailable());
         
-
-        byte[] bytes = new byte[portSelected.bytesAvailable()];
-        portSelected.readBytes(bytes, bytes.length);
-
-        System.out.println(new String(bytes));
-
-        System.out.println(portSelected.getCTS());
-
+        
+        // byte[] bytes = new byte[portSelected.bytesAvailable()];
+        // portSelected.readBytes(bytes, bytes.length);
+        
+        // System.out.println(new String(bytes));
+        portSelected.setRTS();
+        
+        
         System.out.println(portSelected.getRTS());
-
+        
+        System.out.println(portSelected.getCTS());
+        
         while(portSelected.getCTS() != true){
             //System.out.println("Waiting on being allowed to send data");
         }
-
-
-        portSelected.removeDataListener();
-
-        portSelected.addDataListener(new WriteListener());
+        
         String response = "G28";
-
+        
         portSelected.writeBytes(response.getBytes(), response.getBytes().length);
-
-
+        
+        
         System.out.println(portSelected.bytesAwaitingWrite());
 
         try {
