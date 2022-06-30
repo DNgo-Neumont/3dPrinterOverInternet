@@ -17,6 +17,10 @@ public class WriteListener implements SerialPortDataListener{
             System.out.println("Bytes written to port");
         }
         
+        System.out.println("Data written");
+
+        System.out.println(event.getEventType());
+
     }
     
 }
