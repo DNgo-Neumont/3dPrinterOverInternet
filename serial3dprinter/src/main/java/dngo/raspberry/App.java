@@ -1,8 +1,10 @@
 package dngo.raspberry;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 /**
  * Hello world!
@@ -44,10 +46,14 @@ public class App
         portSelected.openPort();
         portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
         BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
+        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
+        
         try{
             String lineContent;
-            while((lineContent = portReader.readLine()) != null){
+            while((lineContent = portReader.readLine()) != null && portSelected.isOpen()){
                 System.out.println(lineContent);
+                String input = reader.readLine();
+                portWriter.write(input, 0, input.length());
             }
         } catch(Exception e){
             e.printStackTrace();
