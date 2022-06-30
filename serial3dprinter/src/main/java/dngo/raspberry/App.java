@@ -46,11 +46,10 @@ public class App
         portSelected.openPort();
         portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
         BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
-        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
         
         try{
             String lineContent;
-            while((lineContent = portReader.readLine()) != null && !lineContent.equals("\n")){
+            while((lineContent = portReader.readLine()) != null){ //&& !lineContent.equals("\n")){
                 System.out.println(lineContent);
             }
         } catch(Exception e){
