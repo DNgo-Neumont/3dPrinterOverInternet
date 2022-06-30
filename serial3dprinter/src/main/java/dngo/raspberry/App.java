@@ -89,6 +89,12 @@ public class App
         portSelected.writeBytes(response.getBytes(), response.getBytes().length);
 
         portSelected.flushIOBuffers();
+
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // try{
         //     String lineContent;
         //     while((lineContent = portReader.readLine()) != null && !lineContent.isEmpty() && portSelected.bytesAvailable() > 0){//((lineContent = portReader.readLine()) != null && !lineContent.equals("\n")){
