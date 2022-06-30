@@ -89,7 +89,7 @@ public class App
         portSelected.writeBytes(response.getBytes(), response.getBytes().length);
 
 
-        portSelected.flushIOBuffers();
+        System.out.println(portSelected.bytesAwaitingWrite());
 
         try {
             Thread.sleep(10000);
