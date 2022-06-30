@@ -44,12 +44,13 @@ public class App
 
         portSelected.setBaudRate(250000);
         portSelected.openPort();
-        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
         BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
         
+
         try{
             String lineContent;
-            while((lineContent = portReader.readLine()) != null && !lineContent.equals("\n")){
+            while(portSelected.bytesAvailable() > 0 && (lineContent = portReader.readLine()) != null && !lineContent.isEmpty()){//((lineContent = portReader.readLine()) != null && !lineContent.equals("\n")){
                 System.out.println(lineContent);
             }
         } catch(Exception e){
