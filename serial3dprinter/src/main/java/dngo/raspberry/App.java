@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
  */
 
 
- import com.fazecast.jSerialComm.*;
+import com.fazecast.jSerialComm.*;
 public class App 
 {
     public static void main( String[] args )
@@ -66,23 +66,20 @@ public class App
         // portSelected.readBytes(bytes, bytes.length);
         
         // System.out.println(new String(bytes));
-        portSelected.setRTS();
-        
+        System.out.println("Sending RTS high signal, successful? " + portSelected.setRTS());
         
         System.out.println(portSelected.getRTS());
         
         System.out.println(portSelected.getCTS());
         
+        while(!portSelected.getCTS()){
+            System.out.print("waiting for CTS signal");
+        }
+
         String response = "G28";
 
         byte[] responseBytes = response.getBytes();
         BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
-
-        try {
-            portWriter.write(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         // System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
         
