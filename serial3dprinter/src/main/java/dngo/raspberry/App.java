@@ -40,7 +40,7 @@ public class App
             e.printStackTrace();
         }
 
-        final SerialPort portSelected = ports[choice];
+        SerialPort portSelected = ports[choice];
 
         portSelected.setBaudRate(250000);
         portSelected.openPort();
@@ -52,30 +52,8 @@ public class App
         //This should let me actually build a writer proper now without dealing with the weirdness of while loops.
         //Tying this into while a GCODE file still has lines to read should allow me to make a system that just feeds GCODE in when the printer sends me an OK response.
         //Just gotta set up the listener to do so.
-        portSelected.addDataListener(new SerialPortDataListener() {
-
-            @Override
-            public int getListeningEvents() {
-                return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
-            }
-
-            @Override
-            public void serialEvent(SerialPortEvent event) {
-                if(event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE){
-                    return;
-                }    
-
-                byte[] dataRec = new byte[portSelected.bytesAvailable()];
-
-                int read = portSelected.readBytes(dataRec, dataRec.length);
-
-                System.out.println(new String(dataRec));
-                
-                //BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
-
-            }
-            
-        });
+        portSelected.addDataListener(new MessageListener());
+        portSelected.addDataListener(new WriteListener());
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
