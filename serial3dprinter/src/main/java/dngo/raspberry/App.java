@@ -67,6 +67,13 @@ public class App
 
         System.out.println(new String(bytes));
 
+        System.out.println(portSelected.getCTS());
+
+        while(portSelected.getCTS() != true){
+            System.out.println("Waiting on being allowed to send data");
+        }
+
+
         portSelected.removeDataListener();
 
         portSelected.addDataListener(new WriteListener());
