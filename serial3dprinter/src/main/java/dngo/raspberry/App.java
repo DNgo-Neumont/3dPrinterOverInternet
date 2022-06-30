@@ -53,15 +53,17 @@ public class App
         //Tying this into while a GCODE file still has lines to read should allow me to make a system that just feeds GCODE in when the printer sends me an OK response.
         //Just gotta set up the listener to do so.
         portSelected.addDataListener(new MessageListener());
-        portSelected.addDataListener(new WriteListener());
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        
         System.out.println(portSelected.bytesAvailable());
+        
+        portSelected.removeDataListener();
 
+        portSelected.addDataListener(new WriteListener());
         String response = "G28";
 
         portSelected.writeBytes(response.getBytes(), response.getBytes().length);
