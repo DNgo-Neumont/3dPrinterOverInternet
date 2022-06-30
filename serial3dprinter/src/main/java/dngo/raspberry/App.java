@@ -73,6 +73,8 @@ public class App
         
         System.out.println(portSelected.getCTS());
         
+        portSelected.removeDataListener();
+
         portSelected.addDataListener(new WriteListener());
         
         String response = "G28";
