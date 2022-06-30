@@ -50,11 +50,8 @@ public class App
         
         try{
             String lineContent;
-            while((lineContent = portReader.readLine()) != null && portSelected.isOpen()){
+            while((lineContent = portReader.readLine()) != null && !lineContent.equals("\n")){
                 System.out.println(lineContent);
-                String input = reader.readLine();
-                portWriter.write(input, 0, input.length());
-                portWriter.flush();
             }
         } catch(Exception e){
             e.printStackTrace();
