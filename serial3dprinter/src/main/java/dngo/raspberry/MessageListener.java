@@ -9,14 +9,11 @@ public class MessageListener implements SerialPortDataListener {
 
     @Override
     public int getListeningEvents() {
-        return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
+        return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
     }
 
     @Override
     public void serialEvent(SerialPortEvent event) {
-        if(event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE){
-            return;
-        }    
 
         System.out.println("Data received!");
 
