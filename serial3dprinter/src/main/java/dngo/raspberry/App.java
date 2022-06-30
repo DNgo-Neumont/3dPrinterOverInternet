@@ -54,6 +54,7 @@ public class App
                 System.out.println(lineContent);
                 String input = reader.readLine();
                 portWriter.write(input, 0, input.length());
+                portWriter.flush();
             }
         } catch(Exception e){
             e.printStackTrace();
