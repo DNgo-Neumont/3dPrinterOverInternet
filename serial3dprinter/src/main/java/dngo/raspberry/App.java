@@ -44,7 +44,7 @@ public class App
 
         portSelected.setBaudRate(250000);
         portSelected.openPort();
-        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
         //Okay so this works but there is some serious shenanigans
         //First - the printer has to actually initialize the connection
         //Second - all this lets me do so far is read some stuff back from the port.
