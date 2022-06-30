@@ -91,7 +91,7 @@ public class App
         portSelected.flushIOBuffers();
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(10000);
         } catch (Exception e) {
             e.printStackTrace();
         }
