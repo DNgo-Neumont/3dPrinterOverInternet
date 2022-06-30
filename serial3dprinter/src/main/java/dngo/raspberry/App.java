@@ -50,7 +50,7 @@ public class App
 
         try{
             String lineContent;
-            while(portSelected.bytesAvailable() > 0 && (lineContent = portReader.readLine()) != null && !lineContent.isEmpty()){//((lineContent = portReader.readLine()) != null && !lineContent.equals("\n")){
+            while((lineContent = portReader.readLine()) != null && !lineContent.isEmpty() && portSelected.bytesAvailable() > 0){//((lineContent = portReader.readLine()) != null && !lineContent.equals("\n")){
                 System.out.println(lineContent);
             }
         } catch(Exception e){
