@@ -76,12 +76,19 @@ public class App
         String response = "G28";
 
         byte[] responseBytes = response.getBytes();
+        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
+
+        try {
+            portWriter.write(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
         
-        System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-        
-        System.out.println("Bytes to be written: " + portSelected.bytesAwaitingWrite());
-        System.out.println("Write timeout: " + portSelected.getWriteTimeout());
-        System.out.println("Write buffer size: " + portSelected.getDeviceWriteBufferSize());
+        // System.out.println("Bytes to be written: " + portSelected.bytesAwaitingWrite());
+        // System.out.println("Write timeout: " + portSelected.getWriteTimeout());
+        // System.out.println("Write buffer size: " + portSelected.getDeviceWriteBufferSize());
 
         System.out.println(portSelected.bytesAwaitingWrite());
 
