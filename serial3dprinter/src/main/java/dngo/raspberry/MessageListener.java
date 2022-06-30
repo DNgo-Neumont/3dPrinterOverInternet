@@ -20,6 +20,10 @@ public class MessageListener implements SerialPortDataListener {
 
         System.out.println("Data received!");
 
+        System.out.println(event.getEventType());
+
+        System.out.println(event.getReceivedData());
+
         byte[] dataRec = event.getReceivedData();
 
         System.out.println(new String(dataRec));

@@ -52,12 +52,12 @@ public class App
         //This should let me actually build a writer proper now without dealing with the weirdness of while loops.
         //Tying this into while a GCODE file still has lines to read should allow me to make a system that just feeds GCODE in when the printer sends me an OK response.
         //Just gotta set up the listener to do so.
-        portSelected.addDataListener(new MessageListener());
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        portSelected.addDataListener(new MessageListener());
         
         //System.out.println(portSelected.bytesAvailable());
         
