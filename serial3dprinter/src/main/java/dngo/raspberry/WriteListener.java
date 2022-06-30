@@ -6,6 +6,8 @@ import com.fazecast.jSerialComm.SerialPortEvent;
 
 public class WriteListener implements SerialPortDataListener{
 
+
+    //Nonfunctional on the Pi - disregard this class
     @Override
     public int getListeningEvents() {
         return SerialPort.LISTENING_EVENT_DATA_WRITTEN;

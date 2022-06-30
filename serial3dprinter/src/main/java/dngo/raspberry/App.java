@@ -73,16 +73,16 @@ public class App
         
         System.out.println(portSelected.getCTS());
         
-        portSelected.removeDataListener();
-
-        portSelected.addDataListener(new WriteListener());
-        
         String response = "G28";
 
         byte[] responseBytes = response.getBytes();
         
         System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
         
+        System.out.println("Bytes to be written: " + portSelected.bytesAwaitingWrite());
+        System.out.println("Write timeout: " + portSelected.getWriteTimeout());
+        System.out.println("Write buffer size: " + portSelected.getDeviceWriteBufferSize());
+
         System.out.println(portSelected.bytesAwaitingWrite());
 
         try {
