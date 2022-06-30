@@ -61,6 +61,12 @@ public class App
         
         System.out.println(portSelected.bytesAvailable());
         
+
+        byte[] bytes = new byte[portSelected.bytesAvailable()];
+        portSelected.readBytes(bytes, bytes.length);
+
+        System.out.println(bytes);
+
         portSelected.removeDataListener();
 
         portSelected.addDataListener(new WriteListener());
