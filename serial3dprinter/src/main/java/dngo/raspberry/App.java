@@ -79,7 +79,7 @@ public class App
 
         byte[] responseBytes = response.getBytes();
         
-        portSelected.writeBytes(responseBytes, responseBytes.length);
+        System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
         
         System.out.println(portSelected.bytesAwaitingWrite());
 
