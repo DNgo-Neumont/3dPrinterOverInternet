@@ -59,7 +59,7 @@ public class App
             e.printStackTrace();
         }
         
-        System.out.println(portSelected.bytesAvailable());
+        //System.out.println(portSelected.bytesAvailable());
         
         
         // byte[] bytes = new byte[portSelected.bytesAvailable()];
