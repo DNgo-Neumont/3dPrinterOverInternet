@@ -69,8 +69,10 @@ public class App
 
         System.out.println(portSelected.getCTS());
 
+        System.out.println(portSelected.getRTS());
+
         while(portSelected.getCTS() != true){
-            System.out.println("Waiting on being allowed to send data");
+            //System.out.println("Waiting on being allowed to send data");
         }
 
 
