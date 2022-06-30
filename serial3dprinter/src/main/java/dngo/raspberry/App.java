@@ -76,9 +76,10 @@ public class App
         portSelected.addDataListener(new WriteListener());
         
         String response = "G28";
+
+        byte[] responseBytes = response.getBytes();
         
-        portSelected.writeBytes(response.getBytes(), response.getBytes().length);
-        
+        portSelected.writeBytes(responseBytes, responseBytes.length);
         
         System.out.println(portSelected.bytesAwaitingWrite());
 
