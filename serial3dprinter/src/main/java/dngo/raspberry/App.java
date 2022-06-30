@@ -49,7 +49,7 @@ public class App
         
         try{
             String lineContent;
-            while((lineContent = portReader.readLine()) != null){ //&& !lineContent.equals("\n")){
+            while((lineContent = portReader.readLine()) != null && !lineContent.equals("\n")){
                 System.out.println(lineContent);
             }
         } catch(Exception e){
