@@ -70,7 +70,7 @@ public class App
             
         });
 
-        portSelected.bytesAvailable();
+        System.out.println(portSelected.bytesAvailable());
 
         // try{
         //     String lineContent;
