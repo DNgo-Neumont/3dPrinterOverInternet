@@ -45,6 +45,13 @@ public class App
         portSelected.setBaudRate(250000);
         portSelected.openPort();
         portSelected.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+        //Okay so this works but there is some serious shenanigans
+        //First - the printer has to actually initialize the connection
+        //Second - all this lets me do so far is read some stuff back from the port.
+        //BUT
+        //This should let me actually build a writer proper now without dealing with the weirdness of while loops.
+        //Tying this into while a GCODE file still has lines to read should allow me to make a system that just feeds GCODE in when the printer sends me an OK response.
+        //Just gotta set up the listener to do so.
         portSelected.addDataListener(new SerialPortDataListener() {
 
             @Override
@@ -76,6 +83,10 @@ public class App
         }
 
         System.out.println(portSelected.bytesAvailable());
+
+        String response = "G28";
+
+        portSelected.writeBytes(response.getBytes(), response.getBytes().length);
 
         // try{
         //     String lineContent;
