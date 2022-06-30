@@ -69,6 +69,11 @@ public class App
             }
             
         });
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         System.out.println(portSelected.bytesAvailable());
 
