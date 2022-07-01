@@ -87,7 +87,9 @@ public class App
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
+                System.out.println("Port open: " + portSelected.isOpen());
                 byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
+                
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 portSelected.flushIOBuffers();
             } catch (Exception e) {
