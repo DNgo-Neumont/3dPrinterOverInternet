@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Hello world!
@@ -67,35 +67,23 @@ public class App
         // portSelected.readBytes(bytes, bytes.length);
         
         // System.out.println(new String(bytes));
-        BufferedWriter portWriter = new BufferedWriter(new PrintWriter(portSelected.getOutputStream()));
+        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
 
-        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 4000, 4000);
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 4, 4000);
         
-        
-
         String response = "";
         
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                portWriter.write(response, 0, response.length());
-                portWriter.flush();
-                System.out.println("Bytes to write: " + portSelected.bytesAwaitingWrite());
+                byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
+                System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 portSelected.flushIOBuffers();
-                // byte[] responseBytes = response.getBytes();
-                // System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-                // portSelected.flushIOBuffers();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        try {
-            portWriter.close();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
         // System.out.println("Bytes to be written: " + portSelected.bytesAwaitingWrite());
         // System.out.println("Write timeout: " + portSelected.getWriteTimeout());
         // System.out.println("Write buffer size: " + portSelected.getDeviceWriteBufferSize());
