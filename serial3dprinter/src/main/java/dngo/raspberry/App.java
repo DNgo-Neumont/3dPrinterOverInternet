@@ -68,7 +68,7 @@ public class App
         // System.out.println(new String(bytes));
         BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
 
-        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 4000, 4000);
         
         String response = "";
         
