@@ -88,10 +88,12 @@ public class App
             try {
                 response = reader.readLine();
                 System.out.println("Port open: " + portSelected.isOpen());
+                System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
                 byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
                 
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 portSelected.flushIOBuffers();
+                System.out.println(portReader.readLine());
             } catch (Exception e) {
                 e.printStackTrace();
             }
