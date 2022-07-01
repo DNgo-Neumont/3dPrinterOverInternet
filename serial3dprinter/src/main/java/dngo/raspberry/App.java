@@ -73,7 +73,8 @@ public class App
         System.out.println(portSelected.getCTS());
         
         while(!portSelected.getCTS()){
-            System.out.print("waiting for CTS signal");
+            System.out.print("Waiting on CTS signal...");
+            System.out.print("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
         }
 
         String response = "G28";
@@ -81,8 +82,13 @@ public class App
         byte[] responseBytes = response.getBytes();
         BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
 
-        // System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-        
+        //System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
+        try {
+            portWriter.write(response, 0, response.length());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // System.out.println("Bytes to be written: " + portSelected.bytesAwaitingWrite());
         // System.out.println("Write timeout: " + portSelected.getWriteTimeout());
         // System.out.println("Write buffer size: " + portSelected.getDeviceWriteBufferSize());
