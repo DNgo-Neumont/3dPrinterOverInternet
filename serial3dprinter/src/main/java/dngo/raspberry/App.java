@@ -79,6 +79,7 @@ public class App
             try {
                 response = reader.readLine();
                 portWriter.write(response, 0, response.length());
+                portWriter.flush();
                 System.out.println("Bytes to write: " + portSelected.bytesAwaitingWrite());
                 portSelected.flushIOBuffers();
                 // byte[] responseBytes = response.getBytes();
@@ -89,6 +90,12 @@ public class App
             }
         }
 
+        try {
+            portWriter.close();
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         // System.out.println("Bytes to be written: " + portSelected.bytesAwaitingWrite());
         // System.out.println("Write timeout: " + portSelected.getWriteTimeout());
         // System.out.println("Write buffer size: " + portSelected.getDeviceWriteBufferSize());
