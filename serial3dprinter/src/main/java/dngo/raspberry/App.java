@@ -77,6 +77,7 @@ public class App
                 response = reader.readLine();
                 byte[] responseBytes = response.getBytes();
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
+                portSelected.flushIOBuffers();
             } catch (Exception e) {
                 e.printStackTrace();
             }
