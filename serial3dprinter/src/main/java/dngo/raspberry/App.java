@@ -68,14 +68,14 @@ public class App
         // System.out.println(new String(bytes));
         BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
 
-        //System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
         
         String response = "";
-
+        
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                portWriter.write(response, 0, response.length());
+                byte[] responseBytes = response.getBytes();
+                System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
             } catch (Exception e) {
                 e.printStackTrace();
             }
