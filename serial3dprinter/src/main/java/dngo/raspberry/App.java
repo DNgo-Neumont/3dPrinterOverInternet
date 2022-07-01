@@ -76,7 +76,7 @@ public class App
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
+                byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 portSelected.flushIOBuffers();
             } catch (Exception e) {
@@ -91,7 +91,7 @@ public class App
         System.out.println(portSelected.bytesAwaitingWrite());
 
         try {
-            Thread.sleep(10000);
+            Thread.sleep(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
