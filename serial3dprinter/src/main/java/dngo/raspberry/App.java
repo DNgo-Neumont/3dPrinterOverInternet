@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 /**
  * Hello world!
@@ -66,18 +67,23 @@ public class App
         // portSelected.readBytes(bytes, bytes.length);
         
         // System.out.println(new String(bytes));
-        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
+        BufferedWriter portWriter = new BufferedWriter(new PrintWriter(portSelected.getOutputStream()));
 
         portSelected.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 4000, 4000);
         
+        
+
         String response = "";
         
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                byte[] responseBytes = response.getBytes();
-                System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
+                portWriter.write(response, 0, response.length());
+                System.out.println("Bytes to write: " + portSelected.bytesAwaitingWrite());
                 portSelected.flushIOBuffers();
+                // byte[] responseBytes = response.getBytes();
+                // System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
+                // portSelected.flushIOBuffers();
             } catch (Exception e) {
                 e.printStackTrace();
             }
