@@ -76,7 +76,7 @@ public class App
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
+                byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 portSelected.flushIOBuffers();
             } catch (Exception e) {
