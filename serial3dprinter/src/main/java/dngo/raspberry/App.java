@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -59,7 +58,7 @@ public class App
         } catch (Exception e) {
             e.printStackTrace();
         }
-        portSelected.addDataListener(new MessageListener());
+        //portSelected.addDataListener(new MessageListener());
         
         //System.out.println(portSelected.bytesAvailable());
         
@@ -68,20 +67,29 @@ public class App
         // portSelected.readBytes(bytes, bytes.length);
         
         // System.out.println(new String(bytes));
+
+        BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
         BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
 
-        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 4, 4000);
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 400, 400);
         
         String response = "";
         
+
+        try {
+            while(portReader.ready()){
+                System.out.println(portReader.readLine());
+            }
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                // byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
-                // System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-                // portSelected.flushIOBuffers();
-                PrintWriter output = new PrintWriter(portSelected.getOutputStream(),true);
-                output.println(response);
+                byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
+                System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
+                portSelected.flushIOBuffers();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -94,9 +102,11 @@ public class App
         System.out.println(portSelected.bytesAwaitingWrite());
 
         try {
-            Thread.sleep(1000);
-        } catch (Exception e) {
-            e.printStackTrace();
+            while(portReader.ready()){
+                System.out.println(portReader.readLine());
+            }
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
         // try{
         //     String lineContent;
