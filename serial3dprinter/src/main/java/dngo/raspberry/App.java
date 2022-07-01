@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -76,9 +77,11 @@ public class App
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
-                System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-                portSelected.flushIOBuffers();
+                // byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
+                // System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
+                // portSelected.flushIOBuffers();
+                PrintWriter output = new PrintWriter(portSelected.getOutputStream(),true);
+                output.println(response);
             } catch (Exception e) {
                 e.printStackTrace();
             }
