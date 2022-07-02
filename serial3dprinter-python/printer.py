@@ -34,12 +34,12 @@ portToUse.timeout = 4000
 
 sleep(10)
 
-print(portToUse.read_all())
+print(str(portToUse.read_all()))
 
 printerInput = ""
 
 while(printerInput != "exit"):
-    printerInput = input()
+    printerInput = input() + "\n"
     print(f"Ascii encoding of input: {printerInput.encode('ascii')}")
     portToUse.write(printerInput.encode('ascii'))
-    print(portToUse.read_all())
+    print(str(portToUse.read_all()))
