@@ -29,7 +29,7 @@ portToUse.baudrate = 250000
 
 portToUse.timeout = 4000
 
-portToUse.open()
+#portToUse.open()
 
 print(portToUse.read_all())
 
