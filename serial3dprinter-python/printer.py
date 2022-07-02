@@ -36,6 +36,7 @@ sleep(10)
 
 print(portToUse.read_all())
 
+printerInput = ""
 
 while(printerInput != "exit"):
     printerInput = input()
