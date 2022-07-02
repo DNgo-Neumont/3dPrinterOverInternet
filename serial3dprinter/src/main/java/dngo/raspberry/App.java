@@ -92,7 +92,7 @@ public class App
 
         while(!response.equals("exit")){
             try {
-                //response = reader.readLine();
+                response = reader.readLine();
                 System.out.println("Port open: " + portSelected.isOpen());
                 System.out.println("Port read buffer size: " + portSelected.getDeviceReadBufferSize());
                 System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
