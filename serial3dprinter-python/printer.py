@@ -32,7 +32,7 @@ portToUse.timeout = 4000
 
 #portToUse.open()
 
-sleep(10000)
+sleep(10)
 
 print(portToUse.read_all())
 
