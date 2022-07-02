@@ -70,7 +70,7 @@ public class App
         BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
         BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
 
-        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 400, 400);
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 8000, 8000);
         
         String response = "";
         
@@ -91,7 +91,7 @@ public class App
                 System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
                 System.out.println("Clearing RTS signal - because why not");
                 portSelected.clearRTS();
-                System.out.println("RTS signal is" + portSelected.getRTS());
+                System.out.println("RTS signal is " + portSelected.getRTS());
                 System.out.println(portSelected.getFlowControlSettings());
                 byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
                 
