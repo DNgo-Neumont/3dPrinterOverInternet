@@ -73,7 +73,9 @@ public class App
         // System.out.println(new String(bytes));
 
         BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
-        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
+        //BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
+
+        portSelected.addDataListener(new MessageListener());
 
         portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 8000, 8000);
         
@@ -90,7 +92,7 @@ public class App
 
         while(!response.equals("exit")){
             try {
-                response = reader.readLine();
+                //response = reader.readLine();
                 System.out.println("Port open: " + portSelected.isOpen());
                 System.out.println("Port read buffer size: " + portSelected.getDeviceReadBufferSize());
                 System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
@@ -100,13 +102,14 @@ public class App
                 System.out.println(portSelected.getFlowControlSettings());
                 //Would rather not use this method - "borrowed" from stackOverflow at https://stackoverflow.com/questions/5688042/how-to-convert-a-java-string-to-an-ascii-byte-array
                 //But if it's what I need to do to get the printer to even read what the hell I sent it it's good enough for now.
-                byte[] responseBytes = new String(response + "\n").getBytes(StandardCharsets.US_ASCII);//strictStringToBytes(response, StandardCharsets.US_ASCII);
+                //turns out I don't need it - the issue wasn't the encoding but the message
+                //The printer will only accept a response ending with \n - even the standard echoback about an unrecognized command doesn't come through
+                //now to automate and send a gcode file through to have a proper print
+                byte[] responseBytes = new String(response + "\n").getBytes(StandardCharsets.US_ASCII);
 
                 System.out.println("Response bytes: " + new String(responseBytes));
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 System.out.println("Bytes waiting to be written: " + portSelected.bytesAwaitingWrite());
-                portWriter.write(0x53);
-                
                 while(portReader.ready()){
                     System.out.println(portReader.readLine());
                 }
@@ -140,12 +143,5 @@ public class App
 
         System.out.println( "Hello World!" );
     }
-
-    private static byte[] strictStringToBytes(String s, Charset charset) throws CharacterCodingException {
-        ByteBuffer x  = charset.newEncoder().onMalformedInput(CodingErrorAction.REPORT).encode(CharBuffer.wrap(s));
-        byte[] b = new byte[x.remaining()];
-        x.get(b);
-        return b;
-     }
 
 }
