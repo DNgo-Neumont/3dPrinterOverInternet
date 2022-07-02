@@ -2,12 +2,12 @@ from email.policy import default
 import serial
 import serial.tools.list_ports
 import serial.tools.list_ports_linux
-import serial.tools.list_ports_windows
+#import serial.tools.list_ports_windows
 import platform
 
-if(platform.system() == "Windows"):
-    ports = serial.tools.list_ports_windows.comports()
-elif(platform.system() == "Linux"):
+#if(platform.system() == "Windows"):
+#    ports = serial.tools.list_ports_windows.comports()
+if(platform.system() == "Linux"):
     ports = serial.tools.list_ports_linux.comports()
 else:
     ports = serial.tools.list_ports.comports()
