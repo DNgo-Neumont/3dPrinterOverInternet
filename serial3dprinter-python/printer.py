@@ -23,7 +23,7 @@ selection = int(input()) - 1
 portSelected = ports[selection]
 
 
-portToUse = serial.Serial(portSelected.device_path)
+portToUse = serial.Serial(portSelected.device)
 
 portToUse.baudrate = 250000
 
