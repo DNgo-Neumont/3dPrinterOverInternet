@@ -45,7 +45,6 @@ public class App
 
         portSelected.setBaudRate(250000);
         portSelected.openPort();
-        portSelected.setFlowControl(SerialPort.FLOW_CONTROL_RTS_ENABLED);
         //Okay so this works but there is some serious shenanigans
         //First - the printer has to actually initialize the connection
         //Second - all this lets me do so far is read some stuff back from the port.
@@ -54,7 +53,7 @@ public class App
         //Tying this into while a GCODE file still has lines to read should allow me to make a system that just feeds GCODE in when the printer sends me an OK response.
         //Just gotta set up the listener to do so.
         try {
-            Thread.sleep(2000);
+            Thread.sleep(20000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,11 +87,15 @@ public class App
             try {
                 response = reader.readLine();
                 System.out.println("Port open: " + portSelected.isOpen());
+                System.out.println("Port read buffer size: " + portSelected.getDeviceReadBufferSize());
                 System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
+                System.out.println("Clearing RTS signal - because why not");
+                portSelected.clearRTS();
+                System.out.println("RTS signal is" + portSelected.getRTS());
+                System.out.println(portSelected.getFlowControlSettings());
                 byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
                 
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-                portSelected.flushIOBuffers();
                 System.out.println(portReader.readLine());
             } catch (Exception e) {
                 e.printStackTrace();
