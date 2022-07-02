@@ -4,12 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -58,7 +52,7 @@ public class App
         //Tying this into while a GCODE file still has lines to read should allow me to make a system that just feeds GCODE in when the printer sends me an OK response.
         //Just gotta set up the listener to do so.
         try {
-            Thread.sleep(20000);
+            Thread.sleep(10000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,25 +75,16 @@ public class App
         
         String response = "";
         
-
-        try {
-            while(portReader.ready()){
-                System.out.println(portReader.readLine());
-            }
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                System.out.println("Port open: " + portSelected.isOpen());
-                System.out.println("Port read buffer size: " + portSelected.getDeviceReadBufferSize());
-                System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
+                // System.out.println("Port open: " + portSelected.isOpen());
+                // System.out.println("Port read buffer size: " + portSelected.getDeviceReadBufferSize());
+                // System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
                 //System.out.println("Clearing RTS signal - because why not");
                 //portSelected.clearRTS();
-                System.out.println("RTS signal is " + portSelected.getRTS());
-                System.out.println(portSelected.getFlowControlSettings());
+                // System.out.println("RTS signal is " + portSelected.getRTS());
+                // System.out.println(portSelected.getFlowControlSettings());
                 //Would rather not use this method - "borrowed" from stackOverflow at https://stackoverflow.com/questions/5688042/how-to-convert-a-java-string-to-an-ascii-byte-array
                 //But if it's what I need to do to get the printer to even read what the hell I sent it it's good enough for now.
                 //turns out I don't need it - the issue wasn't the encoding but the message
@@ -109,7 +94,7 @@ public class App
 
                 System.out.println("Response bytes: " + new String(responseBytes));
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-                System.out.println("Bytes waiting to be written: " + portSelected.bytesAwaitingWrite());
+                // System.out.println("Bytes waiting to be written: " + portSelected.bytesAwaitingWrite());
                 // while(portReader.ready()){
                 //     System.out.println(portReader.readLine());
                 // }
@@ -128,6 +113,7 @@ public class App
             while(portReader.ready()){
                 System.out.println(portReader.readLine());
             }
+            portReader.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }
