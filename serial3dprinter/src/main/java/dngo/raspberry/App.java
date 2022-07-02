@@ -107,6 +107,7 @@ public class App
                 portWriter.write(response);
                 System.out.println("Bytes waiting to be written: " + portSelected.bytesAwaitingWrite());
                 portWriter.write(0x53);
+                
                 while(portReader.ready()){
                     System.out.println(portReader.readLine());
                 }
