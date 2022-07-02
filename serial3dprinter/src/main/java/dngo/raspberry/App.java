@@ -94,8 +94,8 @@ public class App
                 System.out.println("Port open: " + portSelected.isOpen());
                 System.out.println("Port read buffer size: " + portSelected.getDeviceReadBufferSize());
                 System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
-                System.out.println("Clearing RTS signal - because why not");
-                portSelected.clearRTS();
+                //System.out.println("Clearing RTS signal - because why not");
+                //portSelected.clearRTS();
                 System.out.println("RTS signal is " + portSelected.getRTS());
                 System.out.println(portSelected.getFlowControlSettings());
                 //Would rather not use this method - "borrowed" from stackOverflow at https://stackoverflow.com/questions/5688042/how-to-convert-a-java-string-to-an-ascii-byte-array
@@ -103,7 +103,10 @@ public class App
                 byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);//strictStringToBytes(response, StandardCharsets.US_ASCII);
 
                 System.out.println("Response bytes: " + new String(responseBytes));
-                System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
+                //System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
+                portWriter.write(response);
+                System.out.println("Bytes waiting to be written: " + portSelected.bytesAwaitingWrite());
+                portWriter.write(0x53);
                 while(portReader.ready()){
                     System.out.println(portReader.readLine());
                 }
