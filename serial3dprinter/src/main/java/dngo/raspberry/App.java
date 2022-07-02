@@ -96,7 +96,9 @@ public class App
                 byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
                 
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-                System.out.println(portReader.readLine());
+                while(portReader.ready()){
+                    System.out.println(portReader.readLine());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
