@@ -110,9 +110,9 @@ public class App
                 System.out.println("Response bytes: " + new String(responseBytes));
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 System.out.println("Bytes waiting to be written: " + portSelected.bytesAwaitingWrite());
-                while(portReader.ready()){
-                    System.out.println(portReader.readLine());
-                }
+                // while(portReader.ready()){
+                //     System.out.println(portReader.readLine());
+                // }
             } catch (Exception e) {
                 e.printStackTrace();
             }
