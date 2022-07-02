@@ -101,6 +101,8 @@ public class App
                 //Would rather not use this method - "borrowed" from stackOverflow at https://stackoverflow.com/questions/5688042/how-to-convert-a-java-string-to-an-ascii-byte-array
                 //But if it's what I need to do to get the printer to even read what the hell I sent it it's good enough for now.
                 byte[] responseBytes = strictStringToBytes(response, StandardCharsets.US_ASCII);
+
+                System.out.println("Response bytes: " + new String(responseBytes));
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 while(portReader.ready()){
                     System.out.println(portReader.readLine());
