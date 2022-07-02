@@ -5,13 +5,12 @@ import serial.tools.list_ports_linux
 import serial.tools.list_ports_windows
 import platform
 
-match platform.system():
-    case "Windows":
-        ports = serial.tools.list_ports_windows.comports()
-    case "Linux":
-        ports = serial.tools.list_ports_linux.comports()
-    case _:
-        ports = serial.tools.list_ports.comports()
+if(platform.system() == "Windows"):
+    ports = serial.tools.list_ports_windows.comports()
+elif(platform.system() == "Linux"):
+    ports = serial.tools.list_ports_linux.comports()
+else:
+    ports = serial.tools.list_ports.comports()
 
 print("Select a port: ")
 num = 1
