@@ -103,8 +103,7 @@ public class App
                 byte[] responseBytes = new String(response + "\n").getBytes(StandardCharsets.US_ASCII);//strictStringToBytes(response, StandardCharsets.US_ASCII);
 
                 System.out.println("Response bytes: " + new String(responseBytes));
-                //System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-                portWriter.write(response);
+                System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
                 System.out.println("Bytes waiting to be written: " + portSelected.bytesAwaitingWrite());
                 portWriter.write(0x53);
                 
