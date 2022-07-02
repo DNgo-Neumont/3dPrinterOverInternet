@@ -1,4 +1,5 @@
 from email.policy import default
+from time import sleep
 import serial
 import serial.tools.list_ports
 import serial.tools.list_ports_linux
@@ -31,11 +32,13 @@ portToUse.timeout = 4000
 
 #portToUse.open()
 
+sleep(10000)
+
 print(portToUse.read_all())
 
-printerInput = input()
 
 while(printerInput != "exit"):
+    printerInput = input()
     print(f"Ascii encoding of input: {printerInput.encode('ascii')}")
     portToUse.write(printerInput.encode('ascii'))
     print(portToUse.read_all())
