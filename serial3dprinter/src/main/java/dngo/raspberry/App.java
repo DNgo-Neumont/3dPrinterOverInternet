@@ -71,8 +71,9 @@ public class App
         BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
         BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
 
-        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 400, 400);
-        
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 400, 400);
+        portSelected.setFlowControl(SerialPort.FLOW_CONTROL_XONXOFF_IN_ENABLED | SerialPort.FLOW_CONTROL_XONXOFF_OUT_ENABLED);
+
         String response = "";
         
 
