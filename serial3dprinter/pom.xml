@@ -43,7 +43,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>dngo.raspberry.Main</mainClass>
+                <mainClass>dngo.raspberry.App</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>
