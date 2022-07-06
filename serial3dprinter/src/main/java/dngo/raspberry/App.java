@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -45,7 +44,6 @@ public class App
 
         portSelected.setBaudRate(250000);
         portSelected.openPort();
-        portSelected.setFlowControl(SerialPort.FLOW_CONTROL_RTS_ENABLED);
         //Okay so this works but there is some serious shenanigans
         //First - the printer has to actually initialize the connection
         //Second - all this lets me do so far is read some stuff back from the port.
@@ -54,7 +52,7 @@ public class App
         //Tying this into while a GCODE file still has lines to read should allow me to make a system that just feeds GCODE in when the printer sends me an OK response.
         //Just gotta set up the listener to do so.
         try {
-            Thread.sleep(2000);
+            Thread.sleep(10000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,32 +67,37 @@ public class App
         // System.out.println(new String(bytes));
 
         BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
-        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
+        //BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
 
-        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 400, 400);
-        portSelected.setFlowControl(SerialPort.FLOW_CONTROL_XONXOFF_IN_ENABLED | SerialPort.FLOW_CONTROL_XONXOFF_OUT_ENABLED);
+        portSelected.addDataListener(new MessageListener());
 
+        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 8000, 8000);
+        
         String response = "";
         
-
-        try {
-            while(portReader.ready()){
-                System.out.println(portReader.readLine());
-            }
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-
         while(!response.equals("exit")){
             try {
                 response = reader.readLine();
-                System.out.println("Port open: " + portSelected.isOpen());
-                System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
-                byte[] responseBytes = response.getBytes(StandardCharsets.US_ASCII);
-                
+                // System.out.println("Port open: " + portSelected.isOpen());
+                // System.out.println("Port read buffer size: " + portSelected.getDeviceReadBufferSize());
+                // System.out.println("Port write buffer size: " + portSelected.getDeviceWriteBufferSize());
+                //System.out.println("Clearing RTS signal - because why not");
+                //portSelected.clearRTS();
+                // System.out.println("RTS signal is " + portSelected.getRTS());
+                // System.out.println(portSelected.getFlowControlSettings());
+                //Would rather not use this method - "borrowed" from stackOverflow at https://stackoverflow.com/questions/5688042/how-to-convert-a-java-string-to-an-ascii-byte-array
+                //But if it's what I need to do to get the printer to even read what the hell I sent it it's good enough for now.
+                //turns out I don't need it - the issue wasn't the encoding but the message
+                //The printer will only accept a response ending with \n - even the standard echoback about an unrecognized command doesn't come through
+                //now to automate and send a gcode file through to have a proper print
+                byte[] responseBytes = new String(response + "\n").getBytes(StandardCharsets.US_ASCII);
+
+                System.out.println("Response bytes: " + new String(responseBytes));
                 System.out.println("Wrote " + portSelected.writeBytes(responseBytes, responseBytes.length) + " bytes");
-                portSelected.flushIOBuffers();
-                System.out.println(portReader.readLine());
+                // System.out.println("Bytes waiting to be written: " + portSelected.bytesAwaitingWrite());
+                // while(portReader.ready()){
+                //     System.out.println(portReader.readLine());
+                // }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -110,6 +113,7 @@ public class App
             while(portReader.ready()){
                 System.out.println(portReader.readLine());
             }
+            portReader.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }
@@ -125,4 +129,5 @@ public class App
 
         System.out.println( "Hello World!" );
     }
+
 }
