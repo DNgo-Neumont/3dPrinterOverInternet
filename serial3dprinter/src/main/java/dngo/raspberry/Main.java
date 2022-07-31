@@ -80,6 +80,18 @@ public class Main {
             //may be worth it to grab the params returned by M115
             //the majority of the program is built there, I might need to look into threading for adding multiple printers.
 
+            //Multithreading behavior target
+            //Multiple printers connected to a pi
+            //all are stored in a ready-to-print list
+            //When starting a thread a printer will be selected based on params
+            //Once started the thread will remove the printer from the list
+            //The pi will continue to run the main program loop waiting on 
+            //incoming gcode and will pop printers off the list as fit
+            //Once threads finish executing the printer will be made available again
+            //and put back into the ready list
+            //Gotta make a listener to listen for the add function
+            //(or maybe just clever writing)
+
         }
         
     }
