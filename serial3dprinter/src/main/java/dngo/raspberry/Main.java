@@ -83,6 +83,8 @@ public class Main {
 
                 fileConsumer.sendFirst();
 
+                portSelected.addDataListener(fileConsumer);
+
                 while(!fileConsumer.finishedPrinting());
 
             }catch(Exception e){
