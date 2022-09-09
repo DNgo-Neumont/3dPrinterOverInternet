@@ -2,3 +2,4 @@ dngo\raspberry\App.class
 dngo\raspberry\MessageListener.class
 dngo\raspberry\WriteListener.class
 dngo\raspberry\Main.class
+dngo\raspberry\GcodeListener.class

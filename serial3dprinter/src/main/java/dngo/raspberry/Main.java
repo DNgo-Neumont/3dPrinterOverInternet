@@ -1,6 +1,7 @@
 package dngo.raspberry;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 
 import com.fazecast.jSerialComm.*;
@@ -69,6 +70,21 @@ public class Main {
                             break;
                     }
                 }
+
+                yesNo = "";
+
+                GcodeListener fileConsumer = new GcodeListener();
+
+                File file = new File("./test3dPrint.gcode");
+                
+                fileConsumer.setGcodeFile(file);
+
+                fileConsumer.setPort(portSelected);
+
+                fileConsumer.sendFirst();
+
+                while(!fileConsumer.finishedPrinting());
+
             }catch(Exception e){
                 e.printStackTrace();
             }
