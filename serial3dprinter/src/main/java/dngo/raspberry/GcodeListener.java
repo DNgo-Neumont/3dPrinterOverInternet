@@ -83,7 +83,8 @@ public class GcodeListener implements SerialPortDataListener{
 
                 byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
 
-                port.writeBytes(bytes, bytes.length);
+                System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
+                
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
