@@ -75,7 +75,7 @@ public class GcodeListener implements SerialPortDataListener{
 
         System.out.println(response);
 
-        if(response.contentEquals("ok")){
+        if(response.contains("ok")){
             try {
                 currentLine = gcodeReader.readLine();
 
