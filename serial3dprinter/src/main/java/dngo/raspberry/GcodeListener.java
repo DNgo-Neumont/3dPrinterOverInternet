@@ -133,10 +133,10 @@ public class GcodeListener implements SerialPortDataListener{
 
         Matcher matcher = coordPattern.matcher(response); 
 
-        System.out.println("Matcher result = " + matcher.find());
+        System.out.println("Matcher result = " + matcher.matches());
 
         //Terrible solution. But it's good for debug purposes right now. 
-        if(response.contains("ok") || matcher.find()){
+        if(response.contains("ok") || matcher.matches()){
             try {
                 currentLine = gcodeReader.readLine();
 
@@ -148,13 +148,13 @@ public class GcodeListener implements SerialPortDataListener{
 
                 System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
 
-                if(currentLine.contains("G92") || currentLine.contains("G1") || currentLine.contains("G0")){
-                    currentLine = gcodeReader.readLine();
-                    System.out.println("after g92/g1/g0 request: " + currentLine);
-                    currentLine = currentLine + "\n";
-                    bytes = currentLine.getBytes(StandardCharsets.UTF_8);
-                    System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
-                }
+                // if(currentLine.contains("G92") || currentLine.contains("G1") || currentLine.contains("G0")){
+                //     currentLine = gcodeReader.readLine();
+                //     System.out.println("after g92/g1/g0 request: " + currentLine);
+                //     currentLine = currentLine + "\n";
+                //     bytes = currentLine.getBytes(StandardCharsets.UTF_8);
+                //     System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
+                // }
 
             } catch (IOException e) {
                 // TODO Auto-generated catch block
