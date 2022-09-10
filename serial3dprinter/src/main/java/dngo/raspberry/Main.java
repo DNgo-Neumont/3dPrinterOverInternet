@@ -92,7 +92,9 @@ public class Main {
             }
 
             //TODO
-            //ADD a data listener class that queues up gcode and reports current printer echobacks to console
+            //ADD a data listener class that queues up gcode and reports current printer echobacks to console - IN PROGRESS
+            //Multithreading and daemon shenanigans
+            //Figure out a safer way to keep the program running or have the printer initialization code run on a port being connected
             //Work in a rabbitMQ message consumer that polls this classes' current progress or just hits this in a springboot container
             //Figure out how to use slic3r from the java runtime and have it slice raw gcode OR - just have customers send in raw gcode to the specifications of currently connected printers.
             //may be worth it to grab the params returned by M115

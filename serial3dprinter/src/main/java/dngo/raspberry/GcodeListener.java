@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -17,6 +18,8 @@ public class GcodeListener implements SerialPortDataListener{
     File gCodeFile;
 
     BufferedReader gcodeReader;
+
+    BufferedReader portReader;
 
     SerialPort port;
 
@@ -41,6 +44,9 @@ public class GcodeListener implements SerialPortDataListener{
     //call second
     public void setPort(SerialPort port){
         this.port = port;
+
+        portReader = new BufferedReader(new InputStreamReader(port.getInputStream()));
+
     }
 
     //finally call and let it run
@@ -65,13 +71,27 @@ public class GcodeListener implements SerialPortDataListener{
         return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
     }
 
+    //Ok so this works
+    //thing is sometimes the printer will have a message split
+    //SO
+    //Gonna have to change over to readline()
+    //so messages don't get torn in half
     @Override
     public void serialEvent(SerialPortEvent event) {
         System.out.print("Printer echoback: ");
 
-        byte[] bResponse = event.getReceivedData();
+        // byte[] bResponse = event.getReceivedData();
 
-        String response = new String(bResponse);
+        // String response = new String(bResponse);
+        //I hate this but I can't get this to throw exceptions proper for some reason.
+        String response = "";
+        try {
+            response = portReader.readLine();
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
 
         System.out.println(response);
 
