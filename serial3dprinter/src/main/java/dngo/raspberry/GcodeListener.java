@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
@@ -125,8 +127,13 @@ public class GcodeListener implements SerialPortDataListener{
 
         System.out.println(response);
 
+        Pattern coordPattern = Pattern.compile("X:\\d{0,6}\\.?\\d{0,6} Y:\\d{0,6}\\.?\\d{0,6} Z:\\d{0,6}\\.?\\d{0,6} E:\\d{0,6}\\.?\\d{0,6} Count: X:\\d{0,6}\\.?\\d{0,6} Y:\\d{0,6}\\.?\\d{0,6} Z:\\d{0,6}\\.?\\d{0,6}");
+
+        Matcher matcher = coordPattern.matcher(response);
+
+
         //Terrible solution. But it's good for debug purposes right now. 
-        if(response.contains("ok") || response.contains("X:0.00 T:0.00 Z:0.00 E:0.00 Count: X:0 Y:0 Z:0")){
+        if(response.contains("ok") || matcher.find()){
             try {
                 currentLine = gcodeReader.readLine();
 
@@ -137,14 +144,16 @@ public class GcodeListener implements SerialPortDataListener{
                 byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
 
                 System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
+                
 
-                if(currentLine.contains("G92") || currentLine.contains("G1") || currentLine.contains("G0")){
-                    currentLine = gcodeReader.readLine();
-                    System.out.println("after g92/g1/g0 request: " + currentLine);
-                    currentLine = currentLine + "\n";
-                    bytes = currentLine.getBytes(StandardCharsets.UTF_8);
-                    System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
-                }
+                //Going to try and regex out coordinate responses. 
+                // if(currentLine.contains("G92") || currentLine.contains("G1") || currentLine.contains("G0")){
+                //     currentLine = gcodeReader.readLine();
+                //     System.out.println("after g92/g1/g0 request: " + currentLine);
+                //     currentLine = currentLine + "\n";
+                //     bytes = currentLine.getBytes(StandardCharsets.UTF_8);
+                //     System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
+                // }
 
             } catch (IOException e) {
                 // TODO Auto-generated catch block
