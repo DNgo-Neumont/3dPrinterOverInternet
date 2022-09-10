@@ -39,7 +39,6 @@ public class Main {
                 portSelected.setBaudRate(baudRate);
 
                 portSelected.openPort();
-                portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
 
                 System.out.println("Giving the printer a second to initialize the connection.");
                 Thread.sleep(1000);
