@@ -37,7 +37,7 @@ public class Main {
                 int baudRate = Integer.valueOf(userInput.readLine());
 
                 portSelected.setBaudRate(baudRate);
-
+                // portSelected.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 100, 0);
                 portSelected.openPort();
 
                 System.out.println("Giving the printer a second to initialize the connection.");
