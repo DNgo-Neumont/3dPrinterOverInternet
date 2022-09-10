@@ -129,7 +129,7 @@ public class GcodeListener implements SerialPortDataListener{
 
         // Pattern coordPattern = Pattern.compile("X:\\d{0,6}\\.?\\d{0,6} Y:\\d{0,6}\\.?\\d{0,6} Z:\\d{0,6}\\.?\\d{0,6} E:\\d{0,6}\\.?\\d{0,6} Count: X:\\d{0,6}\\.?\\d{0,6} Y:\\d{0,6}\\.?\\d{0,6} Z:\\d{0,6}\\.?\\d{0,6}");
 
-        Pattern coordPattern = Pattern.compile("X:.{0,20} Y:.{0,20} Z:.{0,20} E:.{0,20} Count: X:.{0,20} Y:.{0,20} Z:.{0,20}", Pattern.DOTALL);
+        Pattern coordPattern = Pattern.compile("X:.{0,20} Y:.{0,20} Z:.{0,20} E:.{0,20}", Pattern.DOTALL);
 
         Matcher matcher = coordPattern.matcher(response.strip()); 
 
