@@ -130,6 +130,8 @@ public class GcodeListener implements SerialPortDataListener{
             try {
                 currentLine = gcodeReader.readLine();
 
+                System.out.println(currentLine);
+
                 currentLine = currentLine + "\n";
 
                 byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
