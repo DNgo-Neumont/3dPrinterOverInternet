@@ -131,9 +131,7 @@ public class GcodeListener implements SerialPortDataListener{
 
         Pattern coordPattern = Pattern.compile("X:.{0,20} Y:.{0,20} Z:.{0,20} E:.{0,20} Count: X:.{0,20} Y:.{0,20} Z:.{0,20}", Pattern.DOTALL);
 
-        String test = "X:0.00 Y:0.00 Z:0.00 E:0.00 Count: X:0 Y:0 Z:0";
-
-        Matcher matcher = coordPattern.matcher(test); 
+        Matcher matcher = coordPattern.matcher(response); 
 
         System.out.println(matcher.find());
 
@@ -152,13 +150,13 @@ public class GcodeListener implements SerialPortDataListener{
 
                 System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
 
-                // if(currentLine.contains("G92") || currentLine.contains("G1") || currentLine.contains("G0")){
-                //     currentLine = gcodeReader.readLine();
-                //     System.out.println("after g92/g1/g0 request: " + currentLine);
-                //     currentLine = currentLine + "\n";
-                //     bytes = currentLine.getBytes(StandardCharsets.UTF_8);
-                //     System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
-                // }
+                if(currentLine.contains("G92")){
+                    currentLine = gcodeReader.readLine();
+                    System.out.println("after g92 request: " + currentLine);
+                    currentLine = currentLine + "\n";
+                    bytes = currentLine.getBytes(StandardCharsets.UTF_8);
+                    System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
+                }
 
             } catch (IOException e) {
                 // TODO Auto-generated catch block
