@@ -110,6 +110,10 @@ public class GcodeListener implements SerialPortDataListener{
         //Scratching this. The port refuses to cooperate proper with a input stream and so I'm just going to do a
         //GROSS system of compiling a message together in case of a single letter back.
 
+        //Changing the event to data available makes this work - go figure.
+        //Reason why is the last one is very eager to return ANY data instead of fully formed messages.
+        //Now I know.
+        //I've got a minor issue with the data commands - not entirely sure how to deal with those right now, causes the damn thing to hang.
         String response = "";
         try {
             response = portReader.readLine();
@@ -121,7 +125,8 @@ public class GcodeListener implements SerialPortDataListener{
 
         System.out.println(response);
 
-        if(response.contains("ok")){
+        //Terrible solution. But it's good for debug purposes right now. 
+        if(response.contains("ok") || response.contains("X:0.00 T:0.00 Z:0.00 E:0.00 Count: X:0 Y:0 Z:0")){
             try {
                 currentLine = gcodeReader.readLine();
 
