@@ -137,7 +137,15 @@ public class GcodeListener implements SerialPortDataListener{
                 byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
 
                 System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
-                
+
+                if(currentLine.contains("G92")){
+                    currentLine = gcodeReader.readLine();
+                    System.out.println("after g92 request: " + currentLine);
+                    currentLine = currentLine + "\n";
+                    bytes = currentLine.getBytes(StandardCharsets.UTF_8);
+                    System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
+                }
+
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
