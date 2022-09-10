@@ -23,6 +23,10 @@ public class GcodeListener implements SerialPortDataListener{
 
     SerialPort port;
 
+    byte[] bResponse;
+
+    byte[] compileResponse = {" ".getBytes()[0], " ".getBytes()[0]};
+
     //gonna set up some test code to pull from a file and then we'll work out the rest. Should be fine to have a private file to step through and send
     //commands that way. Gonna be memory intensive, though, and I'd rather find something that's a little more forgiving due to our small memory budget.
 
@@ -80,17 +84,38 @@ public class GcodeListener implements SerialPortDataListener{
     public void serialEvent(SerialPortEvent event) {
         System.out.print("Printer echoback: ");
 
-        // byte[] bResponse = event.getReceivedData();
+        bResponse = event.getReceivedData();
 
-        // String response = new String(bResponse);
-        //I hate this but I can't get this to throw exceptions proper for some reason.
         String response = "";
-        try {
-            response = portReader.readLine();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+
+        //absolutely disgusting.
+        //but if it works...
+        if(bResponse.length != 1){
+            response = new String(bResponse);
+        }else{
+            if(compileResponse[0] == " ".getBytes()[0]){
+                compileResponse[0] = bResponse[0];
+            }else{
+                compileResponse[1] = bResponse[0];
+            }
         }
+
+        if(compileResponse[0] != " ".getBytes()[0] && compileResponse[1] != " ".getBytes()[0]){
+            response = new String(compileResponse);
+        }
+
+        //I hate this but I can't get this to throw exceptions proper for some reason.
+        //AND I'm having issues actually getting the sucker to read.
+        //Scratching this. The port refuses to cooperate proper with a input stream and so I'm just going to do a
+        //GROSS system of compiling a message together in case of a single letter back.
+
+        // String response = "";
+        // try {
+        //     response = portReader.readLine();
+        // } catch (IOException e1) {
+        //     // TODO Auto-generated catch block
+        //     e1.printStackTrace();
+        // }
 
 
         System.out.println(response);
