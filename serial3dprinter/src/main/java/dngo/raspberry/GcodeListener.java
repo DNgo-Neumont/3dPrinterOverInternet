@@ -86,57 +86,54 @@ public class GcodeListener implements SerialPortDataListener{
 
         bResponse = event.getReceivedData();
 
-        // String response = "";
+        String response = "";
 
         //absolutely disgusting.
         //but if it works...
-        // if(bResponse.length != 1){
-        //     response = new String(bResponse);
-        // }else{
-        //     if(compileResponse[0] == " ".getBytes()[0]){
-        //         compileResponse[0] = bResponse[0];
-        //     }else{
-        //         compileResponse[1] = bResponse[0];
-        //     }
-        // }
+        if(bResponse.length != 1){
+            response = new String(bResponse);
+        }else{
+            if(compileResponse[0] == " ".getBytes()[0]){
+                compileResponse[0] = bResponse[0];
+            }else{
+                compileResponse[1] = bResponse[0];
+            }
+        }
 
-        // if(compileResponse[0] != " ".getBytes()[0] && compileResponse[1] != " ".getBytes()[0]){
-        //     response = new String(compileResponse);
-        // }
-        //NEVER MIND I REMEMBERED IF READER.ISREADY EXISTS
+        if(compileResponse[0] != " ".getBytes()[0] && compileResponse[1] != " ".getBytes()[0]){
+            response = new String(compileResponse);
+        }
 
         //I hate this but I can't get this to throw exceptions proper for some reason.
         //AND I'm having issues actually getting the sucker to read.
         //Scratching this. The port refuses to cooperate proper with a input stream and so I'm just going to do a
         //GROSS system of compiling a message together in case of a single letter back.
 
+        // String response = "";
+        // try {
+        //     response = portReader.readLine();
+        // } catch (IOException e1) {
+        //     // TODO Auto-generated catch block
+        //     e1.printStackTrace();
+        // }
 
-        try {
-            if(portReader.ready()){
 
-                String response = "";
+        System.out.println(response);
+
+        if(response.contains("ok")){
+            try {
+                currentLine = gcodeReader.readLine();
+
+                currentLine = currentLine + "\n";
+
+                byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
+
+                System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
                 
-                response = portReader.readLine();
-             
-   
-                System.out.println(response);
-   
-                if(response.contains("ok")){
-                    currentLine = gcodeReader.readLine();
-
-                    currentLine = currentLine + "\n";
-
-                    byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
-
-                    System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
-                    
-            
-            
-                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
 
