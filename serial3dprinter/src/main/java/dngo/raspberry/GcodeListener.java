@@ -131,6 +131,9 @@ public class GcodeListener implements SerialPortDataListener{
 
         Matcher matcher = coordPattern.matcher(response);
 
+        System.out.println("raw response: " + response);
+
+        System.out.println("Match result = " + matcher.find());
 
         //Terrible solution. But it's good for debug purposes right now. 
         if(response.contains("ok") || matcher.find()){
