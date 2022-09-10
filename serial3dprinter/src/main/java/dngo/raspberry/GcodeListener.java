@@ -131,11 +131,11 @@ public class GcodeListener implements SerialPortDataListener{
 
         Pattern coordPattern = Pattern.compile("X:.{0,20} Y:.{0,20} Z:.{0,20} E:.{0,20} Count: X:.{0,20} Y:.{0,20} Z:.{0,20}", Pattern.DOTALL);
 
-        Matcher matcher = coordPattern.matcher(response); 
+        String test = "X:0.00 Y:0.00 Z:0.00 E:0.00 Count: X:0 Y:0 Z:0";
+
+        Matcher matcher = coordPattern.matcher(test); 
 
         System.out.println(matcher.find());
-
-        System.out.println(matcher.group());
 
         System.out.println("Matcher result = " + matcher.matches());
 
