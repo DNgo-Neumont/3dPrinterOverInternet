@@ -141,7 +141,15 @@ public class GcodeListener implements SerialPortDataListener{
                 System.out.println(currentLine);
 
                 if(currentLine.isBlank()){
-                    currentLine = gcodeReader.readLine();
+                    while(currentLine != null && currentLine.isBlank()){      
+                        currentLine = gcodeReader.readLine();
+                    }
+                }
+
+                if(currentLine.charAt(0) == ';'){
+                    while(currentLine != null && currentLine.charAt(0) == ';'){
+                        currentLine = gcodeReader.readLine();
+                    }
                 }
 
                 if(currentLine == null){
