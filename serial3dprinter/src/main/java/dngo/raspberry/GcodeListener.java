@@ -151,7 +151,7 @@ public class GcodeListener implements SerialPortDataListener{
 
                 System.out.println(currentLine);
 
-                Thread.sleep(100);
+                Thread.sleep(150);
 
                 if(currentLine.isBlank()){
                     while(currentLine != null && currentLine.isBlank()){      
