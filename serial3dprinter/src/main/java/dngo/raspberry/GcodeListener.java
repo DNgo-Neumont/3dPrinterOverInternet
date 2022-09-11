@@ -63,9 +63,7 @@ public class GcodeListener implements SerialPortDataListener{
             while(currentLine != null && currentLine.isBlank()){      
                 currentLine = gcodeReader.readLine();
             }
-        }
-
-        if(currentLine.charAt(0) == ';'){
+        }else if(currentLine.charAt(0) == ';'){
             while(currentLine != null && currentLine.charAt(0) == ';'){
                 currentLine = gcodeReader.readLine();
             }
@@ -157,9 +155,7 @@ public class GcodeListener implements SerialPortDataListener{
                     while(currentLine != null && currentLine.isBlank()){      
                         currentLine = gcodeReader.readLine();
                     }
-                }
-
-                if(currentLine.charAt(0) == ';'){
+                }else if(currentLine.charAt(0) == ';'){
                     while(currentLine != null && currentLine.charAt(0) == ';'){
                         currentLine = gcodeReader.readLine();
                     }
