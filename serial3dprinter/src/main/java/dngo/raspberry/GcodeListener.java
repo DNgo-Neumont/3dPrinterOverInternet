@@ -59,6 +59,19 @@ public class GcodeListener implements SerialPortDataListener{
     public void sendFirst() throws IOException{
         currentLine = gcodeReader.readLine();
 
+        if(currentLine.isBlank()){
+            while(currentLine != null && currentLine.isBlank()){      
+                currentLine = gcodeReader.readLine();
+            }
+        }
+
+        if(currentLine.charAt(0) == ';'){
+            while(currentLine != null && currentLine.charAt(0) == ';'){
+                currentLine = gcodeReader.readLine();
+            }
+        }
+
+
         currentLine = currentLine + "\n";
 
         System.out.println(currentLine);
