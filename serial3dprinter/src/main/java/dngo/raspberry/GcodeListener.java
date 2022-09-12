@@ -151,6 +151,8 @@ public class GcodeListener implements SerialPortDataListener{
 
                 System.out.println(currentLine);
 
+                //Needed because some printers have such a small buffer that even when responding there's still some junk in it and so we need to actually 
+                //do this so it gets cleared in time for the next command to go out.
                 Thread.sleep(150);
 
                 if(currentLine.isBlank()){
