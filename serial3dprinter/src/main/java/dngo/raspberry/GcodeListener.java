@@ -59,16 +59,11 @@ public class GcodeListener implements SerialPortDataListener{
     public void sendFirst() throws IOException{
         currentLine = gcodeReader.readLine();
 
-        // if(currentLine.isBlank()){
-        //     while(currentLine != null && currentLine.isBlank()){      
-        //         currentLine = gcodeReader.readLine();
-        //     }
-        // }else if(currentLine.charAt(0) == ';'){
-        //     while(currentLine != null && currentLine.charAt(0) == ';'){
-        //         currentLine = gcodeReader.readLine();
-        //     }
-        // }
-
+        if(currentLine.isBlank() || currentLine.charAt(0) == ';'){
+            while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
+                currentLine = gcodeReader.readLine();
+            }
+        }
 
         currentLine = currentLine + "\n";
 
@@ -155,12 +150,8 @@ public class GcodeListener implements SerialPortDataListener{
                 //do this so it gets cleared in time for the next command to go out.
                 Thread.sleep(150);
 
-                if(currentLine.isBlank()){
-                    while(currentLine != null && currentLine.isBlank()){      
-                        currentLine = gcodeReader.readLine();
-                    }
-                }else if(currentLine.charAt(0) == ';'){
-                    while(currentLine != null && currentLine.charAt(0) == ';'){
+                if(currentLine.isBlank() || currentLine.charAt(0) == ';'){
+                    while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
                         currentLine = gcodeReader.readLine();
                     }
                 }
