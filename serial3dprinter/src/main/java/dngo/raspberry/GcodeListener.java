@@ -74,6 +74,7 @@ public class GcodeListener implements SerialPortDataListener{
         port.writeBytes(bytes, bytes.length);
     }
 
+    //Use this to both set the printer this is tied to be ready again for gcode and for running the thread til it finishes printing.
     public boolean finishedPrinting(){
         return currentLine == null;
     }
@@ -140,6 +141,7 @@ public class GcodeListener implements SerialPortDataListener{
         Matcher matcher = coordPattern.matcher(response.strip()); 
 
         //Terrible solution. But it's good for debug purposes right now. 
+        //Scratch that this is good enough. We're not keeping track of where the print head is, we just care that it's not blowing up or stopping.
         if(response.contains("ok") || matcher.find()){
             try {
                 currentLine = gcodeReader.readLine();
@@ -148,32 +150,27 @@ public class GcodeListener implements SerialPortDataListener{
 
                 //Needed because some printers have such a small buffer that even when responding there's still some junk in it and so we need to actually 
                 //do this so it gets cleared in time for the next command to go out.
+                //Drawback is that print times are exponentially increased but better that than X axis shifting and dropped commands.
                 Thread.sleep(150);
 
+                //Code to skip blank space and gcode comments
                 if(currentLine.isBlank() || currentLine.charAt(0) == ';'){
                     while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
                         currentLine = gcodeReader.readLine();
                     }
                 }
 
+                //If we ever get to a null line we know we're done
                 if(currentLine == null){
                     System.out.println("print complete");
                 }else{
+                    //standard sending code
                     currentLine = currentLine + "\n";
     
                     byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
     
                     System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
                 }
-
-
-                // if(currentLine.contains("G92")){
-                //     currentLine = gcodeReader.readLine();
-                //     System.out.println("after g92 request: " + currentLine);
-                //     currentLine = currentLine + "\n";
-                //     bytes = currentLine.getBytes(StandardCharsets.UTF_8);
-                //     System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
-                // }
 
             } catch (IOException e) {
                 // TODO Auto-generated catch block
