@@ -48,7 +48,7 @@
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
-                    <Main-Class><dngo class="raspberry Main"></dngo></Main-Class>
+                    <Main-Class>dngo.raspberry.Main</Main-Class>
                   </manifestEntries>
                 </transformer>
               </transformers>

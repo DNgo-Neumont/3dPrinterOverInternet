@@ -21,9 +21,7 @@
               <transformers>
                 <transformer>
                   <manifestEntries>
-                    <Main-Class>
-                      <dngo />
-                    </Main-Class>
+                    <Main-Class>dngo.raspberry.Main</Main-Class>
                   </manifestEntries>
                 </transformer>
               </transformers>
