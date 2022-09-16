@@ -15,7 +15,8 @@ import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 
 public class PrinterSerialController implements SerialPortDataListener {
-
+    
+    long processedLineCount = 0;
     int linesInPrinterBuffer = 0;
     int artificialPrinterBuffer = 7;
     File workingGcodeFile;
@@ -43,7 +44,6 @@ public class PrinterSerialController implements SerialPortDataListener {
     public void processGcodeFile() throws IOException{
         long totalGcodeLines = Files.lines(workingGcodeFile.toPath()).count();
         do {
-            long processedLineCount = 0;
 
             if (linesInPrinterBuffer <= artificialPrinterBuffer) {
                 String currentGcodeCommand = gCodeReader.readLine();
