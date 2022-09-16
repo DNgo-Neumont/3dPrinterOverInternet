@@ -41,13 +41,14 @@ public class PrinterSerialController implements SerialPortDataListener {
         serialPortWriter = new BufferedWriter(new OutputStreamWriter(port.getOutputStream()));
     }
 
-    public void processGcodeFile() throws IOException{
+    public void processGcodeFile() throws IOException, InterruptedException{
         long totalGcodeLines = Files.lines(workingGcodeFile.toPath()).count();
+        boolean bufferFullMessageSent = false;
         do {
 
             if (linesInPrinterBuffer <= artificialPrinterBuffer) {
                 String currentGcodeCommand = gCodeReader.readLine();
-                
+                bufferFullMessageSent = false;
                 if (!(currentGcodeCommand.charAt(0) == ';' || currentGcodeCommand.isBlank())) {
                     serialPortWriter.write(currentGcodeCommand);
                     serialPortWriter.newLine();
@@ -64,7 +65,11 @@ public class PrinterSerialController implements SerialPortDataListener {
                 }
 
             } else if (linesInPrinterBuffer <= 8) {
-                System.out.println("LOG: Buffer at configured capacity; skipped sending gcode command.");
+                if (!bufferFullMessageSent) {
+                    System.out.println("LOG: Buffer at configured capacity; skipped sending gcode command.");
+                    bufferFullMessageSent = true;
+                }
+                Thread.sleep(1000);
             }
             
             float processedPercentage = (float)(Math.round(((processedLineCount/totalGcodeLines) * 100.0)) / 100.0);
