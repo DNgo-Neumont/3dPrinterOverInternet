@@ -18,7 +18,7 @@ public class PrinterSerialController implements SerialPortDataListener {
     
     long processedLineCount = 0;
     int linesInPrinterBuffer = 0;
-    int artificialPrinterBuffer = 7;
+    int artificialPrinterBuffer = 1;
     File workingGcodeFile;
     SerialPort printerPort;
     BufferedReader gCodeReader;
@@ -72,7 +72,7 @@ public class PrinterSerialController implements SerialPortDataListener {
                 Thread.sleep(1000);
             }
             
-            float processedPercentage = (float)(Math.round(((processedLineCount/totalGcodeLines) * 100.0)) / 100.0);
+            float processedPercentage = (float)(Math.round(((processedLineCount/totalGcodeLines) * 100.0)));
             System.out.println("LOG: Processed Lines: " + processedLineCount + "/" + totalGcodeLines + " | " + processedPercentage + "%");
             if (processedLineCount == totalGcodeLines) {gCodeFileStillProcessing = false;}
         } while (gCodeFileStillProcessing == true);
