@@ -73,11 +73,13 @@ public class GcodeListener implements SerialPortDataListener{
             }
         }
 
-        currentLine = currentLine + "\n";
+        // currentLine = currentLine + "\n";
 
         System.out.println(currentLine);
 
         portWriter.write(currentLine);
+        portWriter.newLine();
+        portWriter.flush();
     }
 
     //Use this to both set the printer this is tied to be ready again for gcode and for running the thread til it finishes printing.
@@ -174,13 +176,15 @@ public class GcodeListener implements SerialPortDataListener{
                     System.out.println("print complete");
                 }else{
                     //standard sending code
-                    currentLine = currentLine + "\n";
+                    // currentLine = currentLine + "\n";
     
                     // byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
                     // String sentCommand = new String(bytes);
                     // System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes; Sent command: " + sentCommand);
 
                     portWriter.write(currentLine);
+                    portWriter.newLine();
+                    portWriter.flush();
                     System.out.println("Wrote: " + currentLine);
                 }
 
