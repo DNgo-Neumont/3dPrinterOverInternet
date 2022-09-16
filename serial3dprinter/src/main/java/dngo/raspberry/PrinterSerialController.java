@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
@@ -72,8 +73,9 @@ public class PrinterSerialController implements SerialPortDataListener {
                 Thread.sleep(1000);
             }
             
-            float processedPercentage = (float)(Math.round(((processedLineCount/totalGcodeLines) * 100.0)));
-            System.out.println("LOG: Processed Lines: " + processedLineCount + "/" + totalGcodeLines + " | " + processedPercentage + "%");
+            float processedPercentage = (float)((processedLineCount/totalGcodeLines) * 100.0);
+            DecimalFormat percentage = new DecimalFormat("###.00");
+            System.out.println("LOG: Processed Lines: " + processedLineCount + "/" + totalGcodeLines + " | " + percentage.format(processedPercentage) + "%");
             if (processedLineCount == totalGcodeLines) {gCodeFileStillProcessing = false;}
         } while (gCodeFileStillProcessing == true);
         System.out.println("Total gcode lines: " + totalGcodeLines);
