@@ -1,11 +1,13 @@
 package dngo.raspberry;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +24,8 @@ public class GcodeListener implements SerialPortDataListener{
     BufferedReader gcodeReader;
 
     BufferedReader portReader;
+
+    BufferedWriter portWriter;
 
     SerialPort port;
 
@@ -55,6 +59,8 @@ public class GcodeListener implements SerialPortDataListener{
 
         portReader = new BufferedReader(new InputStreamReader(port.getInputStream()));
 
+        portWriter = new BufferedWriter(new OutputStreamWriter(port.getOutputStream()));
+
     }
 
     //finally call and let it run
@@ -71,9 +77,7 @@ public class GcodeListener implements SerialPortDataListener{
 
         System.out.println(currentLine);
 
-        byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
-
-        port.writeBytes(bytes, bytes.length);
+        portWriter.write(currentLine);
     }
 
     //Use this to both set the printer this is tied to be ready again for gcode and for running the thread til it finishes printing.
@@ -172,9 +176,12 @@ public class GcodeListener implements SerialPortDataListener{
                     //standard sending code
                     currentLine = currentLine + "\n";
     
-                    byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
-                    String sentCommand = new String(bytes);
-                    System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes; Sent command: " + sentCommand);
+                    // byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
+                    // String sentCommand = new String(bytes);
+                    // System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes; Sent command: " + sentCommand);
+
+                    portWriter.write(currentLine);
+                    System.out.println("Wrote: " + currentLine);
                 }
 
             } catch (IOException e) {
