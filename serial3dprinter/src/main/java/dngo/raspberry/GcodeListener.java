@@ -29,6 +29,8 @@ public class GcodeListener implements SerialPortDataListener{
 
     byte[] compileResponse = {" ".getBytes()[0], " ".getBytes()[0]};
 
+    String okReadback = "";
+
     //gonna set up some test code to pull from a file and then we'll work out the rest. Should be fine to have a private file to step through and send
     //commands that way. Gonna be memory intensive, though, and I'd rather find something that's a little more forgiving due to our small memory budget.
 
@@ -125,7 +127,12 @@ public class GcodeListener implements SerialPortDataListener{
         //I've got a minor issue with the data commands - not entirely sure how to deal with those right now, causes the damn thing to hang.
         String response = "";
         try {
-            response = portReader.readLine();
+            if (response.contains("ok")) {
+                okReadback = portReader.readLine();
+                response = portReader.readLine();
+            } else {
+                response = portReader.readLine();
+            }
         } catch (IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -146,7 +153,7 @@ public class GcodeListener implements SerialPortDataListener{
             try {
                 currentLine = gcodeReader.readLine();
 
-                System.out.println(currentLine);
+                System.out.println("Command from gcode file: " + currentLine);
 
                 //Needed because some printers have such a small buffer that even when responding there's still some junk in it and so we need to actually 
                 //do this so it gets cleared in time for the next command to go out.
@@ -154,10 +161,8 @@ public class GcodeListener implements SerialPortDataListener{
                 // Thread.sleep(170);
 
                 //Code to skip blank space and gcode comments
-                if(currentLine.isBlank() || currentLine.charAt(0) == ';'){
-                    while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
-                        currentLine = gcodeReader.readLine();
-                    }
+                while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
+                    currentLine = gcodeReader.readLine();
                 }
 
                 //If we ever get to a null line we know we're done
