@@ -151,7 +151,7 @@ public class GcodeListener implements SerialPortDataListener{
                 //Needed because some printers have such a small buffer that even when responding there's still some junk in it and so we need to actually 
                 //do this so it gets cleared in time for the next command to go out.
                 //Drawback is that print times are exponentially increased but better that than X axis shifting and dropped commands.
-                Thread.sleep(170);
+                // Thread.sleep(170);
 
                 //Code to skip blank space and gcode comments
                 if(currentLine.isBlank() || currentLine.charAt(0) == ';'){
@@ -168,17 +168,17 @@ public class GcodeListener implements SerialPortDataListener{
                     currentLine = currentLine + "\n";
     
                     byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
-    
-                    System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes");
+                    String sentCommand = new String(bytes);
+                    System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes; Sent command: " + sentCommand);
                 }
 
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            }// } catch (InterruptedException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // }
         }
 
 
