@@ -92,16 +92,16 @@ public class GcodeListener implements SerialPortDataListener{
         return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
     }
 
-    //Ok so this works
+    /*//Ok so this works
     //thing is sometimes the printer will have a message split
     //SO
     //Gonna have to change over to readline()
-    //so messages don't get torn in half
+    //so messages don't get torn in half*/
     @Override
     public void serialEvent(SerialPortEvent event) {
         System.out.print("Printer echoback: ");
 
-        // bResponse = event.getReceivedData();
+        /*// bResponse = event.getReceivedData();
 
         // String response = "";
 
@@ -131,6 +131,7 @@ public class GcodeListener implements SerialPortDataListener{
         //Reason why is the last one is very eager to return ANY data instead of fully formed messages.
         //Now I know.
         //I've got a minor issue with the data commands - not entirely sure how to deal with those right now, causes the damn thing to hang.
+        */
         String response = "";
         try {
             if (response.contains("ok")) {
@@ -164,7 +165,7 @@ public class GcodeListener implements SerialPortDataListener{
                 //Needed because some printers have such a small buffer that even when responding there's still some junk in it and so we need to actually 
                 //do this so it gets cleared in time for the next command to go out.
                 //Drawback is that print times are exponentially increased but better that than X axis shifting and dropped commands.
-                // Thread.sleep(170);
+                Thread.sleep(20);
 
                 //Code to skip blank space and gcode comments
                 while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
@@ -191,10 +192,10 @@ public class GcodeListener implements SerialPortDataListener{
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-            }// } catch (InterruptedException e) {
-            //     // TODO Auto-generated catch block
-            //     e.printStackTrace();
-            // }
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
 

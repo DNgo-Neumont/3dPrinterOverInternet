@@ -75,17 +75,19 @@ public class Main {
 
                 GcodeListener fileConsumer = new GcodeListener();
 
+                PrinterSerialController controller = new PrinterSerialController();
+
                 File file = new File("./test3dPrint.gcode");
                 
-                fileConsumer.setGcodeFile(file);
+                // fileConsumer.setGcodeFile(file);
+                controller.setGcodeFile(file);
+                controller.setPort(portSelected);
+                portSelected.addDataListener(controller);
+                controller.processGcodeFile();
 
-                fileConsumer.setPort(portSelected);
-
-                fileConsumer.sendFirst();
-
-                portSelected.addDataListener(fileConsumer);
-
-                while(!fileConsumer.finishedPrinting());
+                // fileConsumer.setPort(portSelected);
+                // fileConsumer.sendFirst();
+                // while(!fileConsumer.finishedPrinting());
 
             }catch(Exception e){
                 e.printStackTrace();
