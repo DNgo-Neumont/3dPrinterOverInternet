@@ -19,7 +19,7 @@ public class PrinterSerialController implements SerialPortDataListener {
     
     long processedLineCount = 0;
     int linesInPrinterBuffer = 0;
-    int artificialPrinterBuffer = 1;
+    int artificialPrinterBuffer = 2;
     File workingGcodeFile;
     SerialPort printerPort;
     BufferedReader gCodeReader;
@@ -70,7 +70,7 @@ public class PrinterSerialController implements SerialPortDataListener {
                     System.out.println("LOG: Buffer at configured capacity; skipped sending gcode command.");
                     bufferFullMessageSent = true;
                 }
-                Thread.sleep(1000);
+                Thread.sleep(500);
             }
             
             float processedPercentage = (float)((processedLineCount/totalGcodeLines) * 100.0);
