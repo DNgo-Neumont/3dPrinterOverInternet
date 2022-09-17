@@ -44,9 +44,9 @@ public class GcodeListener implements SerialPortDataListener{
 
     String currentLine = "";
 
-    Long gcodeLineCount;
+    long gcodeLineCount = 0;
 
-    Long currentLineNumber;
+    long currentLineNumber = 0;
 
     //call first
     public void setGcodeFile(File file){
