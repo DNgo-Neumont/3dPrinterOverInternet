@@ -27,7 +27,7 @@ public class GcodeListener implements SerialPortDataListener{
 
     BufferedWriter portWriter;
 
-    SerialPort port;
+    SerialPort printerPort;
 
     byte[] bResponse;
 
@@ -54,17 +54,18 @@ public class GcodeListener implements SerialPortDataListener{
     }
 
     //call second
-    public void setPort(SerialPort port){
-        this.port = port;
+    public void setPort(SerialPort printerPort){
+        this.printerPort = printerPort;
 
-        portReader = new BufferedReader(new InputStreamReader(port.getInputStream()));
+        portReader = new BufferedReader(new InputStreamReader(printerPort.getInputStream()));
 
-        portWriter = new BufferedWriter(new OutputStreamWriter(port.getOutputStream()));
+        portWriter = new BufferedWriter(new OutputStreamWriter(printerPort.getOutputStream()));
 
     }
 
     //finally call and let it run
     public void sendFirst() throws IOException{
+        printerPort.openPort();
         currentLine = gcodeReader.readLine();
 
         if(currentLine.isBlank() || currentLine.charAt(0) == ';'){
@@ -124,7 +125,7 @@ public class GcodeListener implements SerialPortDataListener{
 
         //I hate this but I can't get this to throw exceptions proper for some reason.
         //AND I'm having issues actually getting the sucker to read.
-        //Scratching this. The port refuses to cooperate proper with a input stream and so I'm just going to do a
+        //Scratching this. The printerPort refuses to cooperate proper with a input stream and so I'm just going to do a
         //GROSS system of compiling a message together in case of a single letter back.
 
         //Changing the event to data available makes this work - go figure.
@@ -165,7 +166,7 @@ public class GcodeListener implements SerialPortDataListener{
                 //Needed because some printers have such a small buffer that even when responding there's still some junk in it and so we need to actually 
                 //do this so it gets cleared in time for the next command to go out.
                 //Drawback is that print times are exponentially increased but better that than X axis shifting and dropped commands.
-                Thread.sleep(20);
+                Thread.sleep(150);
 
                 //Code to skip blank space and gcode comments
                 while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
@@ -181,7 +182,7 @@ public class GcodeListener implements SerialPortDataListener{
     
                     // byte[] bytes = currentLine.getBytes(StandardCharsets.UTF_8);
                     // String sentCommand = new String(bytes);
-                    // System.out.println("Wrote " + port.writeBytes(bytes, bytes.length) + " bytes; Sent command: " + sentCommand);
+                    // System.out.println("Wrote " + printerPort.writeBytes(bytes, bytes.length) + " bytes; Sent command: " + sentCommand);
 
                     portWriter.write(currentLine);
                     portWriter.newLine();
