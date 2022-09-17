@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
@@ -52,18 +50,18 @@ public class PrinterSerialController implements SerialPortDataListener {
             if (linesInPrinterBuffer <= artificialPrinterBuffer) {
                 String currentGcodeCommand = gCodeReader.readLine();
                 bufferFullMessageSent = false;
-                if (!( currentGcodeCommand.isBlank() || currentGcodeCommand.charAt(0) == ';')) {
+                if (!(currentGcodeCommand.charAt(0) == ';' || currentGcodeCommand.isBlank())) {
                     serialPortWriter.write(currentGcodeCommand);
                     serialPortWriter.newLine();
                     serialPortWriter.flush();
                     linesInPrinterBuffer++;
                     processedLineCount++;
                     System.out.println("LOG: Sent printer command: " + currentGcodeCommand);
-                } else if (currentGcodeCommand.isBlank()) {
-                    System.out.println("LOG: Skipped blank line.");
-                    processedLineCount++;
                 } else if (currentGcodeCommand.charAt(0) == ';') {
                     System.out.println("LOG: Skipped gcode comment.");
+                    processedLineCount++;
+                } else if (currentGcodeCommand.isBlank()) {
+                    System.out.println("LOG: Skipped blank line.");
                     processedLineCount++;
                 }
 
@@ -93,11 +91,8 @@ public class PrinterSerialController implements SerialPortDataListener {
         String printerResponse;
         try {
             printerResponse = serialPortReader.readLine().strip();
-            Pattern coordPattern = Pattern.compile("X:.{0,20} Y:.{0,20} Z:.{0,20} E:.{0,20}", Pattern.DOTALL);
-
-            Matcher matcher = coordPattern.matcher(printerResponse.strip()); 
             System.out.println("PMSG: " + printerResponse);
-            if (printerResponse.contentEquals("ok") || matcher.find()) {
+            if (printerResponse.contentEquals("ok")) {
                 linesInPrinterBuffer--;
             }
         } catch (IOException e) {
