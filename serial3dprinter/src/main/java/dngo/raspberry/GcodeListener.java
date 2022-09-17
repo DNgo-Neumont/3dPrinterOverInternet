@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,12 +44,20 @@ public class GcodeListener implements SerialPortDataListener{
 
     String currentLine = "";
 
+    Long gcodeLineCount;
+
+    Long currentLineNumber;
+
     //call first
     public void setGcodeFile(File file){
         gCodeFile = file;
         try {
             gcodeReader = new BufferedReader(new FileReader(gCodeFile));
+            gcodeLineCount = Files.lines(gCodeFile.toPath()).count();
         } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -67,10 +77,18 @@ public class GcodeListener implements SerialPortDataListener{
     public void sendFirst() throws IOException{
         printerPort.openPort();
         currentLine = gcodeReader.readLine();
+        currentLineNumber++;
+        Double processedPercentage = (currentLineNumber/gcodeLineCount) * 100.0;
+        DecimalFormat percentage = new DecimalFormat("###.##"); //For tracking percentage of print
+        System.out.println("LOG: Processed Lines: " + currentLineNumber + "/" + gcodeLineCount + " | " + percentage.format(processedPercentage) + "%");
 
         if(currentLine.isBlank() || currentLine.charAt(0) == ';'){
             while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
                 currentLine = gcodeReader.readLine();
+                currentLineNumber++;
+                processedPercentage = (currentLineNumber/gcodeLineCount) * 100.0;
+
+                System.out.println("LOG: Processed Lines: " + currentLineNumber + "/" + gcodeLineCount + " | " + percentage.format(processedPercentage) + "%");
             }
         }
 
@@ -161,6 +179,12 @@ public class GcodeListener implements SerialPortDataListener{
             try {
                 currentLine = gcodeReader.readLine();
 
+                currentLineNumber++;
+                Double processedPercentage = (currentLineNumber/gcodeLineCount) * 100.0;
+                DecimalFormat percentage = new DecimalFormat("###.##"); //For tracking percentage of print
+                System.out.println("LOG: Processed Lines: " + currentLineNumber + "/" + gcodeLineCount + " | " + percentage.format(processedPercentage) + "%");
+        
+
                 System.out.println("Command from gcode file: " + currentLine);
 
                 //Needed because some printers have such a small buffer that even when responding there's still some junk in it and so we need to actually 
@@ -171,6 +195,11 @@ public class GcodeListener implements SerialPortDataListener{
                 //Code to skip blank space and gcode comments
                 while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
                     currentLine = gcodeReader.readLine();
+                    currentLineNumber++;
+                    processedPercentage = (currentLineNumber/gcodeLineCount) * 100.0;
+                    percentage = new DecimalFormat("###.##"); //For tracking percentage of print
+                    System.out.println("LOG: Processed Lines: " + currentLineNumber + "/" + gcodeLineCount + " | " + percentage.format(processedPercentage) + "%");
+            
                 }
 
                 //If we ever get to a null line we know we're done
