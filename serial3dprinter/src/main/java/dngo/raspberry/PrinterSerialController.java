@@ -49,7 +49,7 @@ public class PrinterSerialController implements SerialPortDataListener {
         boolean bufferFullMessageSent = false;
         do {
 
-            if (linesInPrinterBuffer <= artificialPrinterBuffer) {
+            if (linesInPrinterBuffer < artificialPrinterBuffer) {
                 String currentGcodeCommand = gCodeReader.readLine();
                 bufferFullMessageSent = false;
                 if (!(currentGcodeCommand.isBlank() || currentGcodeCommand.charAt(0) == ';')) {
