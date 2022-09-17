@@ -87,16 +87,16 @@ public class Main {
 
                 File file = new File("./test3dPrint.gcode");
                 
-                // fileConsumer.setGcodeFile(file);
-                // portSelected.addDataListener(fileConsumer);
-                controller.setGcodeFile(file);
-                controller.setPort(portSelected);
-                portSelected.addDataListener(controller);
-                controller.processGcodeFile();
+                fileConsumer.setGcodeFile(file);
+                portSelected.addDataListener(fileConsumer);
+                // controller.setGcodeFile(file);
+                // controller.setPort(portSelected);
+                // portSelected.addDataListener(controller);
+                // controller.processGcodeFile();
 
-                // fileConsumer.setPort(portSelected);
-                // fileConsumer.sendFirst();
-                // while(!fileConsumer.finishedPrinting());
+                fileConsumer.setPort(portSelected);
+                fileConsumer.sendFirst();
+                while(!fileConsumer.finishedPrinting());
 
             }catch(Exception e){
                 e.printStackTrace();

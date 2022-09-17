@@ -166,7 +166,7 @@ public class GcodeListener implements SerialPortDataListener{
                 //Needed because some printers have such a small buffer that even when responding there's still some junk in it and so we need to actually 
                 //do this so it gets cleared in time for the next command to go out.
                 //Drawback is that print times are exponentially increased but better that than X axis shifting and dropped commands.
-                Thread.sleep(150);
+                Thread.sleep(200);
 
                 //Code to skip blank space and gcode comments
                 while(currentLine != null && (currentLine.isBlank() || currentLine.charAt(0) == ';')){      
