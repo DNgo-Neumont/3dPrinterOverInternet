@@ -1,8 +1,10 @@
 package dngo.raspberry;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import com.fazecast.jSerialComm.*;
 
@@ -40,9 +42,15 @@ public class Main {
                 portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
                 portSelected.openPort();
 
-                System.out.println("Giving the printer a second to initialize the connection.");
-                Thread.sleep(1000);
+                System.out.println("Giving the printer a few seconds to initialize the connection.");
+                Thread.sleep(5000);
                 System.out.println("Attempting to read from the port now...");
+
+                BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
+
+                portWriter.write("M114");
+                portWriter.newLine();
+                portWriter.flush();
 
                 BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
                 while(portReader.ready()){
@@ -80,6 +88,7 @@ public class Main {
                 File file = new File("./test3dPrint.gcode");
                 
                 // fileConsumer.setGcodeFile(file);
+                // portSelected.addDataListener(fileConsumer);
                 controller.setGcodeFile(file);
                 controller.setPort(portSelected);
                 portSelected.addDataListener(controller);
