@@ -61,7 +61,7 @@ public class GcodeProcessor {
             currentLineNumber++;
             double currentPercentage = currentLineNumber / gcodeLineCount;
             currentPercentage = currentPercentage * 100;
-
+            System.out.println(currentGcodeLine);
 
             System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
@@ -70,7 +70,7 @@ public class GcodeProcessor {
                 currentLineNumber++;
                 currentPercentage = currentLineNumber / gcodeLineCount;
                 currentPercentage = currentPercentage * 100;
-
+                System.out.println(currentGcodeLine);
                 System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
             }
