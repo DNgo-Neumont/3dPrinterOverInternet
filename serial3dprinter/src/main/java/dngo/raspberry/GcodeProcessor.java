@@ -65,9 +65,8 @@ public class GcodeProcessor {
 
             System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
-            while(!(currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';')){
+            while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';')){
                 currentGcodeLine = gcodeReader.readLine();
-                currentLineNumber++;
                 currentLineNumber++;
                 currentPercentage = currentLineNumber / gcodeLineCount;
                 currentPercentage = currentPercentage * 100;
