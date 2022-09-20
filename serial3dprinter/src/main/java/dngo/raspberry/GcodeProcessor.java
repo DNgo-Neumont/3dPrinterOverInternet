@@ -94,16 +94,18 @@ public class GcodeProcessor {
                     Pattern bedTempResponsePattern = Pattern.compile("(B:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})", Pattern.MULTILINE);
                     Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
 
-                    System.out.println("Match found: " + bedTempMatcher.find());
-                    if(bedTempMatcher.find()){
-                        System.out.println("Match result: " + bedTempMatcher.group(0));
-                    }
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                    // // System.out.println("Match found: " + bedTempMatcher.find());
+                    // System.out.println(bedTempMatcher.start());
+                    // System.out.println(bedTempMatcher.end());
+                    // if(bedTempMatcher.find()){
+                    //     System.out.println("Match result: " + bedTempMatcher.group(0));
+                    // }
+                    // try {
+                    //     Thread.sleep(200);
+                    // } catch (InterruptedException e) {
+                    //     // TODO Auto-generated catch block
+                    //     e.printStackTrace();
+                    // }
                     if(bedTempMatcher.find()){
                         System.out.println("Stepped into checking if statement");
                         String currentTempString = bedTempMatcher.group(0);
