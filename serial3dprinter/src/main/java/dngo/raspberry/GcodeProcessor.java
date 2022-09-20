@@ -75,6 +75,57 @@ public class GcodeProcessor {
 
             }
 
+            if(currentGcodeLine.contains("M190")){ // bed temp warm command
+                boolean bedWarm = false;
+                while(!bedWarm){
+                    String printerResponse = "";
+                    if(portReader.ready()){
+                        printerResponse = portReader.readLine().strip();
+                        System.out.println("Printer response: " + printerResponse);
+                    }
+                    Pattern bedTempResponsePattern = Pattern.compile("(B:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})");
+                    Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
+
+                    if(bedTempMatcher.find()){
+                        String currentTempString = bedTempMatcher.group(0);
+                        String[] splitString = currentTempString.split(" ");
+
+                        float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
+                        float desiredTemp = Float.parseFloat(splitString[1].substring(2, splitString[1].length()));
+                        if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
+                            bedWarm = true;
+                        }
+
+                    }
+                }
+
+            }else if(currentGcodeLine.contains("M104")){ // extruder warm command
+                boolean extruderWarm = false;
+                while(!extruderWarm){
+                    String printerResponse = "";
+                    if(portReader.ready()){
+                        printerResponse = portReader.readLine().strip();
+                        System.out.println("Printer response: " + printerResponse);
+                    }
+                    Pattern extruderTempResponsePattern = Pattern.compile("(T:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})");
+                    Matcher extruderTempMatcher = extruderTempResponsePattern.matcher(printerResponse);
+
+                    if(extruderTempMatcher.find()){
+                        String currentTempString = extruderTempMatcher.group(0);
+                        String[] splitString = currentTempString.split(" ");
+
+                        float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
+                        float desiredTemp = Float.parseFloat(splitString[1].substring(2, splitString[1].length()));
+                        if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
+                            extruderWarm = true;
+                        }
+
+                    }
+                }
+
+            }
+
+
             if(currentGcodeLine.substring(0, 2) == "G1" || currentGcodeLine.substring(0, 2) ==  "G0"){
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
