@@ -111,8 +111,10 @@ public class GcodeProcessor {
                         String currentTempString = bedTempMatcher.group(0);
                         String[] splitString = currentTempString.split(" ");
 
+                        System.out.println("SplitString contents: " + splitString[0] + "|" + splitString[1]);
+
                         float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
-                        float desiredTemp = Float.parseFloat(splitString[1].substring(2, splitString[1].length()));
+                        float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));
                         System.out.println("current temp parsed: " + currentTempFloat);
                         System.out.println("desired temp parsed: " + desiredTemp);
                         if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
