@@ -76,6 +76,9 @@ public class GcodeProcessor {
             }
 
             if(currentGcodeLine.contains("M190")){ // bed temp warm command
+                portWriter.write(currentGcodeLine);
+                portWriter.newLine();
+                portWriter.flush();
                 boolean bedWarm = false;
                 while(!bedWarm){
                     String printerResponse = "";
@@ -100,6 +103,9 @@ public class GcodeProcessor {
                 }
 
             }else if(currentGcodeLine.contains("M104")){ // extruder warm command
+                portWriter.write(currentGcodeLine);
+                portWriter.newLine();
+                portWriter.flush();
                 boolean extruderWarm = false;
                 while(!extruderWarm){
                     String printerResponse = "";
