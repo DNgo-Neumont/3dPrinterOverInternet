@@ -89,12 +89,16 @@ public class GcodeProcessor {
                     Pattern bedTempResponsePattern = Pattern.compile("(B:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})");
                     Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
 
+                    System.out.println("Match found: " + bedTempMatcher.find());
+                    
                     if(bedTempMatcher.find()){
                         String currentTempString = bedTempMatcher.group(0);
                         String[] splitString = currentTempString.split(" ");
 
                         float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
                         float desiredTemp = Float.parseFloat(splitString[1].substring(2, splitString[1].length()));
+                        System.out.println("current temp parsed: " + currentTempFloat);
+                        System.out.println("desired temp parsed: " + desiredTemp);
                         if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
                             bedWarm = true;
                         }
@@ -123,8 +127,7 @@ public class GcodeProcessor {
                         float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
                         float desiredTemp = Float.parseFloat(splitString[1].substring(2, splitString[1].length()));
 
-                        System.out.println("current temp parsed: " + currentTempFloat);
-                        System.out.println("desired temp parsed: " + desiredTemp);
+
                         if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
                             extruderWarm = true;
                         }
