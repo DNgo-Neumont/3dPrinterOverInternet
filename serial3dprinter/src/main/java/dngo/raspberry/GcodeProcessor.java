@@ -95,6 +95,7 @@ public class GcodeProcessor {
                     Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
 
                     System.out.println("Match found: " + bedTempMatcher.find());
+                    System.out.println("Match result: " + bedTempMatcher.group(0));
                     try {
                         Thread.sleep(200);
                     } catch (InterruptedException e) {
@@ -102,6 +103,7 @@ public class GcodeProcessor {
                         e.printStackTrace();
                     }
                     if(bedTempMatcher.find()){
+                        System.out.println("Stepped into checking if statement");
                         String currentTempString = bedTempMatcher.group(0);
                         String[] splitString = currentTempString.split(" ");
 
