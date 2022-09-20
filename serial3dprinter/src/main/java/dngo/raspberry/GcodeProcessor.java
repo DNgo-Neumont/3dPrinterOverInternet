@@ -92,10 +92,15 @@ public class GcodeProcessor {
                         System.out.println("Printer response: " + printerResponse);
                     }
                     Pattern bedTempResponsePattern = Pattern.compile("(B:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})", Pattern.MULTILINE);
-                    Matcher bedTempMatcher = bedTempResponsePattern.matcher(testMatchBed);
+                    Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
 
                     System.out.println("Match found: " + bedTempMatcher.find());
-                    
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                     if(bedTempMatcher.find()){
                         String currentTempString = bedTempMatcher.group(0);
                         String[] splitString = currentTempString.split(" ");
