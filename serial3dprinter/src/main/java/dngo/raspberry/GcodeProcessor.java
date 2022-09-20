@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
+import java.time.LocalTime;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,6 +88,8 @@ public class GcodeProcessor {
                 portWriter.newLine();
                 portWriter.flush();
                 boolean bedWarm = false;
+                // Get a timestamp of the current time for breaking out of the loop. 
+                LocalTime currentTime = LocalTime.now();
                 while(!bedWarm){
                     String printerResponse = "";
                     if(portReader.ready()){
@@ -97,14 +101,18 @@ public class GcodeProcessor {
                     if(bedTempMatcher.find()){
                         String currentTempString = bedTempMatcher.group(0);
                         String[] splitString = currentTempString.split(" ");
-                        float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
-                        float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));
+                        float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));//for excluding B:
+                        float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));//for excluding a /
                         
                         if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
                             bedWarm = true;
                         }
-                    }else if(printerResponse.contentEquals("ok")){
-                        bedWarm = true;
+                    }else if(SECONDS.between(currentTime, LocalTime.now()) > 3){
+                        currentTime = LocalTime.now();
+                        portWriter.write("M105");// Report temperatures
+                        portWriter.newLine();
+                        portWriter.flush();
+                        //While loop will handle the rest if this is a preheated bed.
                     }
                 }
 
@@ -113,6 +121,8 @@ public class GcodeProcessor {
                 portWriter.newLine();
                 portWriter.flush();
                 boolean extruderWarm = false;
+                // Get a timestamp of the current time for breaking out of the loop. 
+                LocalTime currentTime = LocalTime.now();
                 while(!extruderWarm){
                     String printerResponse = "";
                     if(portReader.ready()){
@@ -126,16 +136,20 @@ public class GcodeProcessor {
                         String currentTempString = extruderTempMatcher.group(0);
                         String[] splitString = currentTempString.split(" ");
 
-                        float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
-                        float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));
+                        float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));//for excluding T:
+                        float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));//for excluding /
 
 
                         if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
                             extruderWarm = true;
                         }
 
-                    }else if(printerResponse.contentEquals("ok")){
-                        extruderWarm = true;
+                    }else if(SECONDS.between(currentTime, LocalTime.now()) > 3){
+                        currentTime = LocalTime.now();
+                        portWriter.write("M105");// Report temperatures
+                        portWriter.newLine();
+                        portWriter.flush();
+                        //While loop will handle the rest if this is a preheated extruder.
                     }
                 }
 
