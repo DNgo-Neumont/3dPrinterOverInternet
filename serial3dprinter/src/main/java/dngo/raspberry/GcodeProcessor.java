@@ -75,6 +75,11 @@ public class GcodeProcessor {
 
             }
 
+            System.out.println("testing match of raw string");
+
+            String testMatchBed = "T:25.00 /0.00 B:56.67 /65.00 @:0 B@:127 W:?";
+
+
             if(currentGcodeLine.contains("M190")){ // bed temp warm command
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
@@ -86,8 +91,8 @@ public class GcodeProcessor {
                         printerResponse = portReader.readLine().strip();
                         System.out.println("Printer response: " + printerResponse);
                     }
-                    Pattern bedTempResponsePattern = Pattern.compile("(B:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})");
-                    Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
+                    Pattern bedTempResponsePattern = Pattern.compile("(B:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})", Pattern.MULTILINE);
+                    Matcher bedTempMatcher = bedTempResponsePattern.matcher(testMatchBed);
 
                     System.out.println("Match found: " + bedTempMatcher.find());
                     
