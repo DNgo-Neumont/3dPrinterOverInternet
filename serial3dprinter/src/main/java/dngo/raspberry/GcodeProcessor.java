@@ -79,7 +79,8 @@ public class GcodeProcessor {
 
             String testMatchBed = "T:25.00 /0.00 B:56.67 /65.00 @:0 B@:127 W:?";
 
-
+            //NOTE: does not follow DRY philosophy but it works so
+            //Will clean up later and extract into a seperate method
             if(currentGcodeLine.contains("M190")){ // bed temp warm command
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
@@ -93,34 +94,17 @@ public class GcodeProcessor {
                     }
                     Pattern bedTempResponsePattern = Pattern.compile("(B:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})", Pattern.MULTILINE);
                     Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
-
-                    // // System.out.println("Match found: " + bedTempMatcher.find());
-                    // System.out.println(bedTempMatcher.start());
-                    // System.out.println(bedTempMatcher.end());
-                    // if(bedTempMatcher.find()){
-                    //     System.out.println("Match result: " + bedTempMatcher.group(0));
-                    // }
-                    // try {
-                    //     Thread.sleep(200);
-                    // } catch (InterruptedException e) {
-                    //     // TODO Auto-generated catch block
-                    //     e.printStackTrace();
-                    // }
                     if(bedTempMatcher.find()){
-                        System.out.println("Stepped into checking if statement");
                         String currentTempString = bedTempMatcher.group(0);
                         String[] splitString = currentTempString.split(" ");
-
-                        System.out.println("SplitString contents: " + splitString[0] + "|" + splitString[1]);
-
                         float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
                         float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));
-                        System.out.println("current temp parsed: " + currentTempFloat);
-                        System.out.println("desired temp parsed: " + desiredTemp);
+                        
                         if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
                             bedWarm = true;
                         }
-
+                    }else if(printerResponse.contentEquals("ok")){
+                        bedWarm = true;
                     }
                 }
 
@@ -143,13 +127,15 @@ public class GcodeProcessor {
                         String[] splitString = currentTempString.split(" ");
 
                         float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));
-                        float desiredTemp = Float.parseFloat(splitString[1].substring(2, splitString[1].length()));
+                        float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));
 
 
                         if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
                             extruderWarm = true;
                         }
 
+                    }else if(printerResponse.contentEquals("ok")){
+                        extruderWarm = true;
                     }
                 }
 
