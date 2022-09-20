@@ -77,10 +77,6 @@ public class GcodeProcessor {
 
             }
 
-            System.out.println("testing match of raw string");
-
-            String testMatchBed = "T:25.00 /0.00 B:56.67 /65.00 @:0 B@:127 W:?";
-
             //NOTE: does not follow DRY philosophy but it works so
             //Will clean up later and extract into a seperate method
             if(currentGcodeLine.contains("M190")){ // bed temp warm command
