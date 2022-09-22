@@ -118,6 +118,7 @@ public class GcodeProcessor {
 
             //NOTE: does not follow DRY philosophy but it works so
             //Will clean up later and extract into a seperate method
+            //Cleaned up.
             if(currentGcodeLine.contains("M190")){ // bed temp warm command
                 handleHeatAndCool(currentGcodeLine, "B");
             }else if(currentGcodeLine.contains("M104")){ // extruder warm command
@@ -131,7 +132,12 @@ public class GcodeProcessor {
                 portWriter.flush();
                 boolean okReceived = false;
 
-                while(!okReceived){ //Will change to a bool and drop out once an ok has been recieved - should create a much better flow back and forth
+                //Will change to a bool and drop out once an ok has been recieved - should create a much better flow back and forth
+                //Didn't work.
+                //Not sure how to limit this entirely, now
+                //Considering just writing a loop that listens and reacts accordingly
+                //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
+                while(!okReceived){ 
                     String printerResponse = portReader.readLine().strip();
                     Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
                     Matcher regexMatch = matchCoordResponse.matcher(printerResponse);
