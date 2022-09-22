@@ -56,6 +56,45 @@ public class GcodeProcessor {
 
     }
 
+    public void handleHeatAndCool(String currentGcodeLine, String extruderOrBed) throws IOException{
+        portWriter.write(currentGcodeLine);
+        portWriter.newLine();
+        portWriter.flush();
+        boolean bedWarm = false;
+        // Get a timestamp of the current time for breaking out of the loop. 
+        LocalTime currentTime = LocalTime.now();
+        if(currentGcodeLine.contains("S0")){ //For cooling commands so we don't get stuck in a infinite loop, because 0 degrees is unreachable
+            bedWarm = true;
+        }
+
+        while(!bedWarm){
+            String printerResponse = "";
+            if(portReader.ready()){
+                printerResponse = portReader.readLine().strip();
+                System.out.println("Printer response: " + printerResponse);
+            }
+            Pattern bedTempResponsePattern = Pattern.compile("("+ extruderOrBed +":\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})", Pattern.MULTILINE);
+            Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
+            if(bedTempMatcher.find()){
+                String currentTempString = bedTempMatcher.group(0);
+                String[] splitString = currentTempString.split(" ");
+                float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));//for excluding B:
+                float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));//for excluding a /
+                
+                if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
+                    bedWarm = true;
+                }
+            }else if(SECONDS.between(currentTime, LocalTime.now()) > 3){
+                currentTime = LocalTime.now();
+                portWriter.write("M105");// Report temperatures
+                portWriter.newLine();
+                portWriter.flush();
+                //While loop will handle the rest if this is a preheated bed.
+            }
+        }
+    }
+
+
     public void processAndSend() throws IOException{
         
         while(currentLineNumber != gcodeLineCount){
@@ -80,75 +119,9 @@ public class GcodeProcessor {
             //NOTE: does not follow DRY philosophy but it works so
             //Will clean up later and extract into a seperate method
             if(currentGcodeLine.contains("M190")){ // bed temp warm command
-                portWriter.write(currentGcodeLine);
-                portWriter.newLine();
-                portWriter.flush();
-                boolean bedWarm = false;
-                // Get a timestamp of the current time for breaking out of the loop. 
-                LocalTime currentTime = LocalTime.now();
-                while(!bedWarm){
-                    String printerResponse = "";
-                    if(portReader.ready()){
-                        printerResponse = portReader.readLine().strip();
-                        System.out.println("Printer response: " + printerResponse);
-                    }
-                    Pattern bedTempResponsePattern = Pattern.compile("(B:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})", Pattern.MULTILINE);
-                    Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
-                    if(bedTempMatcher.find()){
-                        String currentTempString = bedTempMatcher.group(0);
-                        String[] splitString = currentTempString.split(" ");
-                        float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));//for excluding B:
-                        float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));//for excluding a /
-                        
-                        if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
-                            bedWarm = true;
-                        }
-                    }else if(SECONDS.between(currentTime, LocalTime.now()) > 3){
-                        currentTime = LocalTime.now();
-                        portWriter.write("M105");// Report temperatures
-                        portWriter.newLine();
-                        portWriter.flush();
-                        //While loop will handle the rest if this is a preheated bed.
-                    }
-                }
-
+                handleHeatAndCool(currentGcodeLine, "B");
             }else if(currentGcodeLine.contains("M104")){ // extruder warm command
-                portWriter.write(currentGcodeLine);
-                portWriter.newLine();
-                portWriter.flush();
-                boolean extruderWarm = false;
-                // Get a timestamp of the current time for breaking out of the loop. 
-                LocalTime currentTime = LocalTime.now();
-                while(!extruderWarm){
-                    String printerResponse = "";
-                    if(portReader.ready()){
-                        printerResponse = portReader.readLine().strip();
-                        System.out.println("Printer response: " + printerResponse);
-                    }
-                    Pattern extruderTempResponsePattern = Pattern.compile("(T:\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})");
-                    Matcher extruderTempMatcher = extruderTempResponsePattern.matcher(printerResponse);
-
-                    if(extruderTempMatcher.find()){
-                        String currentTempString = extruderTempMatcher.group(0);
-                        String[] splitString = currentTempString.split(" ");
-
-                        float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));//for excluding T:
-                        float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));//for excluding /
-
-
-                        if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
-                            extruderWarm = true;
-                        }
-
-                    }else if(SECONDS.between(currentTime, LocalTime.now()) > 3){
-                        currentTime = LocalTime.now();
-                        portWriter.write("M105");// Report temperatures
-                        portWriter.newLine();
-                        portWriter.flush();
-                        //While loop will handle the rest if this is a preheated extruder.
-                    }
-                }
-
+                handleHeatAndCool(currentGcodeLine, "T");
             }
 
 
@@ -156,7 +129,9 @@ public class GcodeProcessor {
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
                 portWriter.flush();
-                while(portReader.ready()){
+                boolean okReceived = false;
+
+                while(!okReceived){ //Will change to a bool and drop out once an ok has been recieved - should create a much better flow back and forth
                     String printerResponse = portReader.readLine().strip();
                     Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
                     Matcher regexMatch = matchCoordResponse.matcher(printerResponse);
@@ -165,7 +140,7 @@ public class GcodeProcessor {
 
                     if(printerResponse.contentEquals("ok")){
                         System.out.println("OK received");
-                        break;
+                        okReceived=true;
                     }else if(regexMatch.find()){
                         String returnedPosition = regexMatch.group(0);
                         if(!currentGcodeLine.substring(2,  currentGcodeLine.length()).contentEquals(returnedPosition)){

@@ -4,7 +4,7 @@
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="java.vm.version" value="18.0.1.1+2-6"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-18.0.1.1\bin"/>
-    <property name="maven.multiModuleProjectDirectory" value="C:\Users\david\Documents\Raspberry Pi development\3dPrinterOverInternet\serial3dprinter\target"/>
+    <property name="maven.multiModuleProjectDirectory" value="C:\Users\david\Documents\Raspberry Pi development\3dPrinterOverInternet"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="java.vendor.url" value="https://java.oracle.com/"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
@@ -15,7 +15,7 @@
     <property name="user.country" value="US"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="C:\Users\david\Documents\Raspberry Pi development\3dPrinterOverInternet\serial3dprinter\target"/>
+    <property name="user.dir" value="C:\Users\david\Documents\Raspberry Pi development\3dPrinterOverInternet"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="java.runtime.version" value="18.0.1.1+2-6"/>
     <property name="os.arch" value="amd64"/>
