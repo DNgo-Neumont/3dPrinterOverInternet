@@ -125,8 +125,9 @@ public class GcodeProcessor {
                 handleHeatAndCool(currentGcodeLine, "T");
             }
 
+            System.out.println(currentGcodeLine.substring(0, 2));
 
-            if(currentGcodeLine.substring(0, 2) == "G1" || currentGcodeLine.substring(0, 2) ==  "G0"){
+            if(currentGcodeLine.substring(0, 2).contentEquals("G1") || currentGcodeLine.substring(0, 2).contentEquals("G0")){
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
                 portWriter.flush();
