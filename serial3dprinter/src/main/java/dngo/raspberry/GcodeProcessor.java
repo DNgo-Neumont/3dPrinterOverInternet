@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.text.DefaultStyledDocument.ElementSpec;
+
 import com.fazecast.jSerialComm.SerialPort;
 
 public class GcodeProcessor {
@@ -132,7 +134,7 @@ public class GcodeProcessor {
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
                 portWriter.flush();
-                boolean okReceived = false;
+                boolean okToContinue = false;
                 
                 //Will change to a bool and drop out once an ok has been recieved - should create a much better flow back and forth
                 //Didn't work.
@@ -140,7 +142,7 @@ public class GcodeProcessor {
                 //Considering just writing a loop that listens and reacts accordingly
                 //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
                 
-                while(!okReceived){
+                while(!okToContinue){
                     portWriter.write("M114");
                     portWriter.newLine();
                     portWriter.flush();
@@ -149,6 +151,9 @@ public class GcodeProcessor {
                         String printerResponse = portReader.readLine().strip();
                         Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
                         Matcher responseMatcher = matchCoordResponse.matcher(printerResponse);
+                        boolean xMatch = true;
+                        boolean yMatch = true;
+                        boolean zMatch = true;
                         if(responseMatcher.find()){
                             String targetCoords = responseMatcher.group(0).strip();
                             System.out.println("Regex match on printerResponse: " + targetCoords);
@@ -160,7 +165,57 @@ public class GcodeProcessor {
                             System.out.println("Stripped gcode command: " + strippedCommand);
                             String[] gcodeAxisTargets = strippedCommand.split(" ");
                             System.out.println("Gcode axis targets: " + Arrays.toString(gcodeAxisTargets));
-                            
+                            //Going to have to use a doubled for loop for both arrays so we can check all our axis locations between the two.
+                            //Break out of the inner for loop or something to keep performance good.
+                            //Switch statement will handle inconsistencies.
+                            for(int gcodePos = 0; gcodePos < gcodeAxisTargets.length; gcodePos++){
+                                switch(gcodeAxisTargets[gcodePos].charAt(0)){
+                                    case 'X':
+                                        for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
+                                            if(axisLocations[printArrPos].charAt(0) == 'X'){
+                                                if(!gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length())
+                                                .contentEquals(axisLocations[printArrPos].substring(1, axisLocations[printArrPos].length()))){
+                                                    xMatch =false;
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    case 'Y':
+                                        for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
+                                            if(axisLocations[printArrPos].charAt(0) == 'Y'){
+                                                if(!gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length())
+                                                .contentEquals(axisLocations[printArrPos].substring(1, axisLocations[printArrPos].length()))){
+                                                    yMatch = false;
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    case 'Z':
+                                        for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
+                                            if(axisLocations[printArrPos].charAt(0) == 'Z'){
+                                                if(!gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length())
+                                                .contentEquals(axisLocations[printArrPos].substring(1, axisLocations[printArrPos].length()))){
+                                                    zMatch =false;
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    default:
+                                        System.out.println("default statement hit; " + gcodeAxisTargets[gcodePos]);
+                                        break;
+                                }
+                            }
+                            if(!xMatch || !yMatch || !zMatch){
+                                System.out.println("error in target head position, resending current command");
+                                portWriter.write(currentGcodeLine);
+                                portWriter.newLine();
+                                portWriter.flush();
+                            }else{
+                                okToContinue = true;
+                            }
                         }
                     }
 
