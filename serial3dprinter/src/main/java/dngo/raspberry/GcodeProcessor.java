@@ -159,7 +159,7 @@ public class GcodeProcessor {
                             System.out.println("Regex match on printerResponse: " + targetCoords);
                             String[] axisLocations = targetCoords.split(" ");
                             System.out.println("Axis locations in strings" + Arrays.toString(axisLocations));
-
+                            //strips out the two letter G1/G0 command.
                             String strippedCommand = currentGcodeLine.substring(2, currentGcodeLine.length()).strip();
 
                             System.out.println("Stripped gcode command: " + strippedCommand);
@@ -172,11 +172,14 @@ public class GcodeProcessor {
                                 switch(gcodeAxisTargets[gcodePos].charAt(0)){
                                     case 'X':
                                         for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
-                                            if(axisLocations[printArrPos].charAt(0) == 'X'){
-                                                if(!gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length())
-                                                .contentEquals(axisLocations[printArrPos].substring(1, axisLocations[printArrPos].length()))){
-                                                    xMatch =false;
+                                            if(axisLocations[printArrPos].charAt(0) == 'X'){                    //removes the X/Y/Z in the string
+                                                float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
+                                                                                                                      //removes the X:/Y:/Z: in the string
+                                                float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+                                                if(targetPos != actualPos){
+                                                    xMatch = false;
                                                 }
+                                                
                                                 break;
                                             }
                                         }
@@ -184,8 +187,9 @@ public class GcodeProcessor {
                                     case 'Y':
                                         for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
                                             if(axisLocations[printArrPos].charAt(0) == 'Y'){
-                                                if(!gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length())
-                                                .contentEquals(axisLocations[printArrPos].substring(1, axisLocations[printArrPos].length()))){
+                                                float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
+                                                float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+                                                if(targetPos != actualPos){
                                                     yMatch = false;
                                                 }
                                                 break;
@@ -195,9 +199,10 @@ public class GcodeProcessor {
                                     case 'Z':
                                         for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
                                             if(axisLocations[printArrPos].charAt(0) == 'Z'){
-                                                if(!gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length())
-                                                .contentEquals(axisLocations[printArrPos].substring(1, axisLocations[printArrPos].length()))){
-                                                    zMatch =false;
+                                                float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
+                                                float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+                                                if(targetPos != actualPos){
+                                                    zMatch = false;
                                                 }
                                                 break;
                                             }
