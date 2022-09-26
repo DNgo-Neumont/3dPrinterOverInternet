@@ -150,6 +150,7 @@ public class GcodeProcessor {
                         LocalTime currentTime = LocalTime.now();
                         
                         String printerResponse = portReader.readLine().strip();
+                        System.out.println(printerResponse);
                         Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
                         Matcher responseMatcher = matchCoordResponse.matcher(printerResponse);
                         boolean xMatch = true;
