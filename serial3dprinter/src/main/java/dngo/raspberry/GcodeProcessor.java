@@ -125,43 +125,47 @@ public class GcodeProcessor {
                 handleHeatAndCool(currentGcodeLine, "T");
             }
 
-            System.out.println(currentGcodeLine.substring(0, 2));
 
             if(currentGcodeLine.substring(0, 2).contentEquals("G1") || currentGcodeLine.substring(0, 2).contentEquals("G0")){
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
                 portWriter.flush();
                 boolean okReceived = false;
-
+                
                 //Will change to a bool and drop out once an ok has been recieved - should create a much better flow back and forth
                 //Didn't work.
                 //Not sure how to limit this entirely, now
                 //Considering just writing a loop that listens and reacts accordingly
                 //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
-                while(!okReceived){ 
-                    String printerResponse = portReader.readLine().strip();
-                    Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
-                    Matcher regexMatch = matchCoordResponse.matcher(printerResponse);
-                    System.out.println("Printer response: " + printerResponse);
+                
+                while(!okReceived){
+                    portWriter.write("M114");
+                    portWriter.newLine();
+                    portWriter.flush();
 
+                    if(portReader.ready()){
+                        String printerResponse = portReader.readLine().strip();
+                        Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
+                        Matcher responseMatcher = matchCoordResponse.matcher(printerResponse);
+                        if(responseMatcher.find()){
+                            String targetCoords = responseMatcher.group(0).strip();
+                            System.out.println("Regex match on printerResponse: " + targetCoords);
+                            String[] axisLocations = targetCoords.split(" ");
+                            System.out.println("Axis locations in strings" + axisLocations);
 
-                    if(printerResponse.contentEquals("ok")){
-                        System.out.println("OK received");
-                        okReceived=true;
-                    }else if(regexMatch.find()){
-                        String returnedPosition = regexMatch.group(0);
-                        if(!currentGcodeLine.substring(2,  currentGcodeLine.length()).contentEquals(returnedPosition)){
-                            portWriter.write(currentGcodeLine);
-                            portWriter.newLine();
-                            portWriter.flush();
+                            String strippedCommand = currentGcodeLine.substring(2, currentGcodeLine.length()).strip();
+
+                            System.out.println("Stripped gcode command: " + strippedCommand);
+                            String[] gcodeAxisTargets = strippedCommand.split(" ");
+                            System.out.println("Gcode axis targets: " + gcodeAxisTargets);
+                            okReceived = true;
                         }
-                    }else{
-                        portWriter.write("M114"); // Gcode to get head position
-                        portWriter.newLine();
-                        portWriter.flush();
                     }
 
+
+
                 }
+
             }else{
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
