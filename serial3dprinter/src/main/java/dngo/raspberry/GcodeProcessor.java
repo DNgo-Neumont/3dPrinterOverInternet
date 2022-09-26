@@ -142,11 +142,12 @@ public class GcodeProcessor {
                 //Considering just writing a loop that listens and reacts accordingly
                 //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
                 
-                while(!okToContinue){                    
+                while(!okToContinue){         
+                    portWriter.write("M114");
+                    portWriter.newLine();
+                    portWriter.flush();
                     if(portReader.ready()){
-                        portWriter.write("M114");
-                        portWriter.newLine();
-                        portWriter.flush();
+                        LocalTime currentTime = LocalTime.now();
                         
                         String printerResponse = portReader.readLine().strip();
                         Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
@@ -228,12 +229,14 @@ public class GcodeProcessor {
                                 okToContinue = true;
                             }
                         }
+                        if(SECONDS.between(currentTime, LocalTime.now()) > 1){
+                            currentTime = LocalTime.now();
+                            portWriter.write("M114");// Report position
+                            portWriter.newLine();
+                            portWriter.flush();
+                        }
                     }
-
-
-
                 }
-
             }else{
                 portWriter.write(currentGcodeLine);
                 portWriter.newLine();
