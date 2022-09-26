@@ -11,6 +11,8 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
+
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,14 +153,14 @@ public class GcodeProcessor {
                             String targetCoords = responseMatcher.group(0).strip();
                             System.out.println("Regex match on printerResponse: " + targetCoords);
                             String[] axisLocations = targetCoords.split(" ");
-                            System.out.println("Axis locations in strings" + axisLocations);
+                            System.out.println("Axis locations in strings" + Arrays.toString(axisLocations));
 
                             String strippedCommand = currentGcodeLine.substring(2, currentGcodeLine.length()).strip();
 
                             System.out.println("Stripped gcode command: " + strippedCommand);
                             String[] gcodeAxisTargets = strippedCommand.split(" ");
-                            System.out.println("Gcode axis targets: " + gcodeAxisTargets);
-                            okReceived = true;
+                            System.out.println("Gcode axis targets: " + Arrays.toString(gcodeAxisTargets));
+                            
                         }
                     }
 
