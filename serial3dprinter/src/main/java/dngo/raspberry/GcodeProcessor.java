@@ -142,12 +142,12 @@ public class GcodeProcessor {
                 //Considering just writing a loop that listens and reacts accordingly
                 //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
                 
-                while(!okToContinue){
-                    portWriter.write("M114");
-                    portWriter.newLine();
-                    portWriter.flush();
-
+                while(!okToContinue){                    
                     if(portReader.ready()){
+                        portWriter.write("M114");
+                        portWriter.newLine();
+                        portWriter.flush();
+                        
                         String printerResponse = portReader.readLine().strip();
                         Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
                         Matcher responseMatcher = matchCoordResponse.matcher(printerResponse);
