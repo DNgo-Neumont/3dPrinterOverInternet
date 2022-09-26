@@ -131,14 +131,22 @@ public class GcodeProcessor {
 
 
             if(currentGcodeLine.substring(0, 2).contentEquals("G1") || currentGcodeLine.substring(0, 2).contentEquals("G0")){
+                portWriter.write(currentGcodeLine);
+                portWriter.newLine();
+                portWriter.flush();
                 boolean okToContinue = false;
                 
+                //Will change to a bool and drop out once an ok has been recieved - should create a much better flow back and forth
+                //Didn't work.
+                //Not sure how to limit this entirely, now
+                //Considering just writing a loop that listens and reacts accordingly
+                //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
                 
                 while(!okToContinue){
                     portWriter.write("M114");
                     portWriter.newLine();
                     portWriter.flush();
-                    
+
                     if(portReader.ready()){
                         String printerResponse = portReader.readLine().strip();
                         Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
@@ -148,39 +156,43 @@ public class GcodeProcessor {
                         boolean zMatch = true;
                         if(responseMatcher.find()){
                             String targetCoords = responseMatcher.group(0).strip();
-                            System.out.println("Regex match on printerResponse: " + targetCoords);
+                            // System.out.println("Regex match on printerResponse: " + targetCoords);
                             String[] axisLocations = targetCoords.split(" ");
-                            System.out.println("Axis locations in strings" + Arrays.toString(axisLocations));
+                            // System.out.println("Axis locations in strings" + Arrays.toString(axisLocations));
                             //strips out the two letter G1/G0 command.
                             String strippedCommand = currentGcodeLine.substring(2, currentGcodeLine.length()).strip();
-                            
-                            System.out.println("Stripped gcode command: " + strippedCommand);
+
+                            // System.out.println("Stripped gcode command: " + strippedCommand);
                             String[] gcodeAxisTargets = strippedCommand.split(" ");
-                            System.out.println("Gcode axis targets: " + Arrays.toString(gcodeAxisTargets));
+                            // System.out.println("Gcode axis targets: " + Arrays.toString(gcodeAxisTargets));
                             //Going to have to use a doubled for loop for both arrays so we can check all our axis locations between the two.
                             //Break out of the inner for loop or something to keep performance good.
                             //Switch statement will handle inconsistencies.
                             for(int gcodePos = 0; gcodePos < gcodeAxisTargets.length; gcodePos++){
                                 switch(gcodeAxisTargets[gcodePos].charAt(0)){
                                     case 'X':
-                                    for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
-                                        if(axisLocations[printArrPos].charAt(0) == 'X'){                    //removes the X/Y/Z in the string
-                                            float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
-                                            //removes the X:/Y:/Z: in the string
-                                            float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
-                                            if(targetPos != actualPos){
-                                                xMatch = false;
+                                        for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
+                                            if(axisLocations[printArrPos].charAt(0) == 'X'){                    //removes the X/Y/Z in the string
+                                                float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
+                                                                                                                      //removes the X:/Y:/Z: in the string
+                                                float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+                                                System.out.println("X target pos: " + targetPos);
+                                                System.out.println("X actual pos: " + actualPos);
+                                                if(targetPos != actualPos){
+                                                    xMatch = false;
+                                                }
+                                                
+                                                break;
                                             }
-                                            
-                                            break;
                                         }
-                                    }
-                                    break;
+                                        break;
                                     case 'Y':
-                                    for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
+                                        for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
                                             if(axisLocations[printArrPos].charAt(0) == 'Y'){
                                                 float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
                                                 float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+                                                System.out.println("Y target pos: " + targetPos);
+                                                System.out.println("Y actual pos: " + actualPos);
                                                 if(targetPos != actualPos){
                                                     yMatch = false;
                                                 }
@@ -188,11 +200,13 @@ public class GcodeProcessor {
                                             }
                                         }
                                         break;
-                                        case 'Z':
+                                    case 'Z':
                                         for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
                                             if(axisLocations[printArrPos].charAt(0) == 'Z'){
                                                 float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
                                                 float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+                                                System.out.println("Z target pos: " + targetPos);
+                                                System.out.println("Z actual pos: " + actualPos);
                                                 if(targetPos != actualPos){
                                                     zMatch = false;
                                                 }
@@ -200,28 +214,25 @@ public class GcodeProcessor {
                                             }
                                         }
                                         break;
-                                        default:
+                                    default:
                                         System.out.println("default statement hit; " + gcodeAxisTargets[gcodePos]);
                                         break;
-                                    }
                                 }
-                                if(!xMatch || !yMatch || !zMatch){
-                                    System.out.println("error in target head position, resending current command");
-                                    portWriter.write(currentGcodeLine);
-                                    portWriter.newLine();
-                                    portWriter.flush();
-                                }else{
-                                    okToContinue = true;
+                            }
+                            if(!xMatch || !yMatch || !zMatch){
+                                System.out.println("error in target head position, resending current command");
+                                portWriter.write(currentGcodeLine);
+                                portWriter.newLine();
+                                portWriter.flush();
+                            }else{
+                                okToContinue = true;
                             }
                         }
                     }
-                    
-                    
-                    
+
+
+
                 }
-                portWriter.write(currentGcodeLine);
-                portWriter.newLine();
-                portWriter.flush();
 
             }else{
                 portWriter.write(currentGcodeLine);
