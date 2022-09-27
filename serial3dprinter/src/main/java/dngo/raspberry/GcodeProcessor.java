@@ -12,11 +12,13 @@ import java.nio.file.Files;
 import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.text.DefaultStyledDocument.ElementSpec;
 
 import com.fazecast.jSerialComm.SerialPort;
 
@@ -34,6 +36,10 @@ public class GcodeProcessor {
     long gcodeLineCount = 0;
 
     long currentLineNumber = 0;
+
+    LinkedList<String> buffer = new LinkedList<String>();
+
+    int bufferSize = 4;
 
     //call first
     public void setGcodeFile(File file){
@@ -102,36 +108,53 @@ public class GcodeProcessor {
     public void processAndSend() throws IOException{
         
         while(currentLineNumber != gcodeLineCount){
-            String currentGcodeLine = gcodeReader.readLine();
-            currentLineNumber++;
-            double currentPercentage = currentLineNumber / gcodeLineCount;
-            currentPercentage = currentPercentage * 100;
-            System.out.println(currentGcodeLine);
 
-            System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
+            String currentGcodeLine = "";
 
-            while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';')){
-                currentGcodeLine = gcodeReader.readLine();
+            while(buffer.size() < 4 && (currentGcodeLine = gcodeReader.readLine()) != null){
+
                 currentLineNumber++;
-                currentPercentage = currentLineNumber / gcodeLineCount;
+                double currentPercentage = currentLineNumber / gcodeLineCount;
                 currentPercentage = currentPercentage * 100;
                 System.out.println(currentGcodeLine);
                 System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
+                
+                System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
+                //Ignores blank / commented lines.
+                while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';')){
+                    currentGcodeLine = gcodeReader.readLine();
+                    currentLineNumber++;
+                    currentPercentage = currentLineNumber / gcodeLineCount;
+                    currentPercentage = currentPercentage * 100;
+                    System.out.println(currentGcodeLine);
+                    System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
+    
+                }
+                
+                buffer.add(currentGcodeLine);
+            }
 
+            String bufferLine = "";
+
+            try{
+
+                bufferLine = buffer.remove();
+            }catch(NoSuchElementException e){
+                System.out.println("Print buffer empty");
             }
 
             //NOTE: does not follow DRY philosophy but it works so
             //Will clean up later and extract into a seperate method
             //Cleaned up.
-            if(currentGcodeLine.contains("M190")){ // bed temp warm command
-                handleHeatAndCool(currentGcodeLine, "B");
-            }else if(currentGcodeLine.contains("M104")){ // extruder warm command
-                handleHeatAndCool(currentGcodeLine, "T");
+            if(bufferLine.contains("M190")){ // bed temp warm command
+                handleHeatAndCool(bufferLine, "B");
+            }else if(bufferLine.contains("M104")){ // extruder warm command
+                handleHeatAndCool(bufferLine, "T");
             }
 
 
-            if(currentGcodeLine.substring(0, 2).contentEquals("G1") || currentGcodeLine.substring(0, 2).contentEquals("G0")){
-                portWriter.write(currentGcodeLine);
+            if(bufferLine.substring(0, 2).contentEquals("G1") || bufferLine.substring(0, 2).contentEquals("G0")){
+                portWriter.write(bufferLine);
                 portWriter.newLine();
                 portWriter.flush();
                 boolean okToContinue = false;
@@ -142,6 +165,11 @@ public class GcodeProcessor {
                 //Considering just writing a loop that listens and reacts accordingly
                 //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
                 
+
+                //Doing more research and went back to that old apple2gs vid running a printer
+                //He used a buffer. Same issue I've been having with dropped commands. 
+                //Of course. Will implement a queue and then some handling as having a queue allows lookback on dropped commands. 
+                //
                 while(!okToContinue){         
                     portWriter.write("M114");
                     portWriter.newLine();
@@ -158,15 +186,13 @@ public class GcodeProcessor {
                         boolean zMatch = true;
                         if(responseMatcher.find()){
                             String targetCoords = responseMatcher.group(0).strip();
-                            // System.out.println("Regex match on printerResponse: " + targetCoords);
                             String[] axisLocations = targetCoords.split(" ");
-                            // System.out.println("Axis locations in strings" + Arrays.toString(axisLocations));
-                            //strips out the two letter G1/G0 command.
-                            String strippedCommand = currentGcodeLine.substring(2, currentGcodeLine.length()).strip();
 
-                            // System.out.println("Stripped gcode command: " + strippedCommand);
+                            //strips out the two letter G1/G0 command.
+                            String strippedCommand = bufferLine.substring(2, bufferLine.length()).strip();
+
                             String[] gcodeAxisTargets = strippedCommand.split(" ");
-                            // System.out.println("Gcode axis targets: " + Arrays.toString(gcodeAxisTargets));
+
                             //Going to have to use a doubled for loop for both arrays so we can check all our axis locations between the two.
                             //Break out of the inner for loop or something to keep performance good.
                             //Switch statement will handle inconsistencies.
@@ -223,7 +249,7 @@ public class GcodeProcessor {
                             }
                             if(!xMatch || !yMatch || !zMatch){
                                 System.out.println("error in target head position, resending current command");
-                                portWriter.write(currentGcodeLine);
+                                portWriter.write(bufferLine);
                                 portWriter.newLine();
                                 portWriter.flush();
                             }else{
@@ -239,7 +265,7 @@ public class GcodeProcessor {
                     }
                 }
             }else{
-                portWriter.write(currentGcodeLine);
+                portWriter.write(bufferLine);
                 portWriter.newLine();
                 portWriter.flush();
                 while(portReader.ready()){
