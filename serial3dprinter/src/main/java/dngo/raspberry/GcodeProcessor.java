@@ -111,7 +111,7 @@ public class GcodeProcessor {
         
         while(currentLineNumber != gcodeLineCount){
 
-            String currentGcodeLine = portReader.readLine();
+            String currentGcodeLine = gcodeReader.readLine();
             currentLineNumber++;
             double currentPercentage = currentLineNumber / gcodeLineCount;
             currentPercentage = currentPercentage * 100;
