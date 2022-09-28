@@ -115,7 +115,7 @@ public class GcodeProcessor {
             currentLineNumber++;
             double currentPercentage = currentLineNumber / gcodeLineCount;
             currentPercentage = currentPercentage * 100;
-            System.out.println(currentGcodeLine);
+            System.out.println("current gcode line: " + currentGcodeLine);
             System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
             //Filters out blank lines, comments, and the auto leveling command.
@@ -236,8 +236,12 @@ public class GcodeProcessor {
                 }
 
             }else{
+                LocalTime timeStamp = LocalTime.now();
                 while(portReader.ready()){
                     System.out.println("Waiting on buffer being free; printer response is " + portReader.readLine().strip());
+                    if(SECONDS.between(timeStamp, LocalTime.now()) > 2){
+                        break;
+                    }
                 }
                 printBufferLines--;
             }
