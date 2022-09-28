@@ -210,7 +210,7 @@ public class GcodeProcessor {
                         okToContinue = true;
                         buffer.remove(0);
                     }
-                }
+                } 
             //else statement handles all non move gcode
             }else{
                 try {
@@ -222,6 +222,7 @@ public class GcodeProcessor {
                 portWriter.write(bufferLine);
                 portWriter.newLine();
                 portWriter.flush();
+                buffer.remove(0);
                 LocalTime timeStamp = LocalTime.now();
                 while(portReader.ready()){
                     System.out.println("Printer response: " + portReader.readLine());
