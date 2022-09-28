@@ -160,6 +160,7 @@ public class GcodeProcessor {
                 LocalTime timeStamp = LocalTime.now(); //Should not have any null issues - we always set this when we step into the while loop.
                 while(!okToContinue){
                     if(!sent){
+                        printBufferLines++;
                         portWriter.write(currentGcodeLine);
                         portWriter.newLine();
                         portWriter.flush();
@@ -187,6 +188,7 @@ public class GcodeProcessor {
                                 portWriter.write(command);
                                 portWriter.newLine();
                                 portWriter.flush();
+                                printBufferLines++;
                                 commandFound = true;
                                 LocalTime wait = LocalTime.now();
                                 boolean sentWaitMSG = false;
