@@ -193,12 +193,21 @@ public class GcodeProcessor {
                                 commandFound = true;
                                 break;
                             }
+                            boolean commandOk = false;
+                            if(commandFound){
+                                while(!commandOk){
+                                    String okResponse = portReader.readLine();
+                                    System.out.println("waiting on ok; printer response is " + okResponse);
+                                    if(okResponse.contentEquals("ok")){
+                                        commandOk = true;
+                                    }
+                                }
+                            }
                         }
 
                         if(!commandFound){
                             System.out.println("Unknown command not found; continuing");
                         }
-
                     }else if(printerResponse.contains("ok")){
                         okToContinue = true;
                         printBufferLines--;
