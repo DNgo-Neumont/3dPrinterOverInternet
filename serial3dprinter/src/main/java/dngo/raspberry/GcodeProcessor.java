@@ -162,7 +162,7 @@ public class GcodeProcessor {
                         portWriter.flush();
                         timeStamp = LocalTime.now();
                     }
-                    System.out.println("Stepped into okToContinue loop");
+                    //System.out.println("Stepped into okToContinue loop");
                     String printerResponse = portReader.readLine();
 
                     System.out.println("Printer response: " + printerResponse);
@@ -176,19 +176,20 @@ public class GcodeProcessor {
                         boolean commandFound = false;
                         for (String command : bufferHistory) {
                             if(command.contains(strippedResponse)){
+                                System.out.println("Command found: " + command);
                                 portWriter.write(command);
                                 portWriter.newLine();
                                 portWriter.flush();
                                 commandFound = true;
-                                break;
-                            }
-                            LocalTime wait = LocalTime.now();
-                            boolean sentWaitMSG = false;
-                            while(SECONDS.between(wait, LocalTime.now()) < 3){
-                                if(!sentWaitMSG){
-                                    System.out.println("Waiting on printer to catch up with commands and redo the errored command");
-                                    sentWaitMSG = true;
+                                LocalTime wait = LocalTime.now();
+                                boolean sentWaitMSG = false;
+                                while(SECONDS.between(wait, LocalTime.now()) < 3){
+                                    if(!sentWaitMSG){
+                                        System.out.println("Waiting on printer to catch up with commands and redo the errored command");
+                                        sentWaitMSG = true;
+                                    }
                                 }
+                                break;
                             }
 
                         }
