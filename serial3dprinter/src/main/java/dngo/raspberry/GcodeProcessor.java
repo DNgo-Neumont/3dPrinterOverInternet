@@ -37,7 +37,6 @@ public class GcodeProcessor {
 
     long currentLineNumber = 0;
 
-    List<String> buffer = new ArrayList<String>();
     List<String> bufferHistory = new ArrayList<>();
     //Buffer and buffer history size, respectively
     int bufferSize = 4;
@@ -112,62 +111,48 @@ public class GcodeProcessor {
         
         while(currentLineNumber != gcodeLineCount){
 
-            String currentGcodeLine = "";
+            String currentGcodeLine = portReader.readLine();
 
-            while(buffer.size() < 4 && (currentGcodeLine = gcodeReader.readLine()) != null){
-                //Ignores blank / commented lines.
-                while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.contains("M420"))){
-                    currentGcodeLine = gcodeReader.readLine();
-                    currentLineNumber++;
-                    double currentPercentage = currentLineNumber / gcodeLineCount;
-                    currentPercentage = currentPercentage * 100;
-                    System.out.println(currentGcodeLine);
-                    System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
-    
-                }
-                
-                buffer.add(currentGcodeLine);
-                if(bufferHistory.size() < historySize){
-                    bufferHistory.add(currentGcodeLine);
-                }else{
-                    bufferHistory.remove(0);
-                    bufferHistory.add(currentGcodeLine);
-                }
+            //Filters out blank lines, comments, and the auto leveling command.
+            while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.contains("M420"))){
+                currentGcodeLine = gcodeReader.readLine();
+                currentLineNumber++;
+                double currentPercentage = currentLineNumber / gcodeLineCount;
+                currentPercentage = currentPercentage * 100;
+                System.out.println(currentGcodeLine);
+                System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
             }
             
-            String bufferLine = "";
-            
-            try{
-                
-                bufferLine = buffer.get(0);
-            }catch(NoSuchElementException e){
-                System.out.println("Print buffer empty");
+            if(bufferHistory.size() < historySize){
+                bufferHistory.add(currentGcodeLine);
+            }else{
+                bufferHistory.remove(0);
+                bufferHistory.add(currentGcodeLine);
             }
+
             
-            System.out.println("Current bufferline: " + bufferLine);
+            
 
             //NOTE: does not follow DRY philosophy but it works so
             //Will clean up later and extract into a seperate method
             //Cleaned up.
-            if(bufferLine.contains("M190")){ // bed temp warm command
-                handleHeatAndCool(bufferLine, "B");
-                System.out.println("Item removed after M190: " + buffer.remove(0));
+            if(currentGcodeLine.contains("M190")){ // bed temp warm command
+                handleHeatAndCool(currentGcodeLine, "B");
             }
-            if(bufferLine.contains("M104") || bufferLine.contains("M109")){ // extruder warm command
-                handleHeatAndCool(bufferLine, "T");
-                System.out.println("Item removed after M109/M104: " + buffer.remove(0));
+            if(currentGcodeLine.contains("M104") || currentGcodeLine.contains("M109")){ // extruder warm command
+                handleHeatAndCool(currentGcodeLine, "T");
             }
             
-            if(bufferLine.substring(0, 2).contentEquals("G1") || bufferLine.substring(0, 2).contentEquals("G0") 
-            || bufferLine.substring(0, 2).contentEquals("G2") || bufferLine.substring(0, 2).contentEquals("G3") 
+            if(currentGcodeLine.substring(0, 2).contentEquals("G1") || currentGcodeLine.substring(0, 2).contentEquals("G0") 
+            || currentGcodeLine.substring(0, 2).contentEquals("G2") || currentGcodeLine.substring(0, 2).contentEquals("G3") 
             && printBufferLines < bufferSize){
                 boolean okToContinue = false;
                 boolean sent = false;
                 LocalTime timeStamp = null; //Should not have any null issues - we always set this when we step into the while loop.
                 while(!okToContinue){
                     if(!sent){
-                        portWriter.write(bufferLine);
+                        portWriter.write(currentGcodeLine);
                         portWriter.newLine();
                         portWriter.flush();
                         timeStamp = LocalTime.now();
@@ -180,7 +165,6 @@ public class GcodeProcessor {
                     if(printerResponse.contains("Unknown command: ")){
                         System.out.println("Buffer contents:");
                         System.out.println(bufferHistory);
-                        System.out.println(buffer);
                         String strippedResponse = printerResponse.replace("echo:Unknown command: ", "").strip();
                         strippedResponse = strippedResponse.replace("\"", "");
                         System.out.println("Error response: "  + strippedResponse);
@@ -218,13 +202,11 @@ public class GcodeProcessor {
                     }else if(printerResponse.contains("ok")){
                         okToContinue = true;
                         printBufferLines--;
-                        System.out.println("First item in buffer removed: " + buffer.remove(0));
                     }else if(SECONDS.between(timeStamp, LocalTime.now()) > 5){
                         System.out.println("Last command sent 5 seconds ago");
                         System.out.println("continuing loop");
                         okToContinue = true;
                         printBufferLines--;
-                        System.out.println("First item in buffer removed: " + buffer.remove(0));
                     }
                 } 
             //else statement handles all non move gcode
@@ -235,11 +217,10 @@ public class GcodeProcessor {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                portWriter.write(bufferLine);
+                portWriter.write(currentGcodeLine);
                 portWriter.newLine();
                 portWriter.flush();
                 printBufferLines++;
-                buffer.remove(0);
                 LocalTime timeStamp = LocalTime.now();
                 while(portReader.ready()){
                     System.out.println("Printer response: " + portReader.readLine());
@@ -250,7 +231,7 @@ public class GcodeProcessor {
                 }
 
             }
-            //     portWriter.write(bufferLine);
+            //     portWriter.write(currentGcodeLine);
             //     portWriter.newLine();
             //     portWriter.flush();
             //     boolean okToContinue = false;
@@ -285,7 +266,7 @@ public class GcodeProcessor {
             //                 String[] axisLocations = targetCoords.split(" ");
 
             //                 //strips out the two letter G1/G0 command.
-            //                 String strippedCommand = bufferLine.substring(2, bufferLine.length()).strip();
+            //                 String strippedCommand = currentGcodeLine.substring(2, currentGcodeLine.length()).strip();
 
             //                 String[] gcodeAxisTargets = strippedCommand.split(" ");
 
@@ -345,7 +326,7 @@ public class GcodeProcessor {
             //                 }
             //                 if(!xMatch || !yMatch || !zMatch){
             //                     System.out.println("error in target head position, resending current command");
-            //                     portWriter.write(bufferLine);
+            //                     portWriter.write(currentGcodeLine);
             //                     portWriter.newLine();
             //                     portWriter.flush();
             //                 }else{
@@ -361,7 +342,7 @@ public class GcodeProcessor {
             //         }
             //     }
             // }else{
-            //     portWriter.write(bufferLine);
+            //     portWriter.write(currentGcodeLine);
             //     portWriter.newLine();
             //     portWriter.flush();
             //     while(portReader.ready()){
