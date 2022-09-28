@@ -152,11 +152,11 @@ public class GcodeProcessor {
             //Cleaned up.
             if(bufferLine.contains("M190")){ // bed temp warm command
                 handleHeatAndCool(bufferLine, "B");
-                buffer.remove(0);
+                System.out.println("Item removed after M190: " + buffer.remove(0));
             }
             if(bufferLine.contains("M104") || bufferLine.contains("M109")){ // extruder warm command
                 handleHeatAndCool(bufferLine, "T");
-                buffer.remove(0);
+                System.out.println("Item removed after M109/M104: " + buffer.remove(0));
             }
             
             if(bufferLine.substring(0, 2).contentEquals("G1") || bufferLine.substring(0, 2).contentEquals("G0") 
@@ -193,19 +193,26 @@ public class GcodeProcessor {
                                 commandFound = true;
                                 break;
                             }
-                            boolean commandOk = false;
-                            if(commandFound){
-                                while(!commandOk){
-                                    String okResponse = portReader.readLine();
-                                    System.out.println("waiting on ok; printer response is " + okResponse);
-                                    if(okResponse.contentEquals("ok")){
-                                        commandOk = true;
-                                    }
+                            LocalTime wait = LocalTime.now();
+                            boolean sentWaitMSG = false;
+                            while(SECONDS.between(wait, LocalTime.now()) < 3){
+                                if(!sentWaitMSG){
+                                    System.out.println("Waiting on printer to catch up with commands and redo the errored command");
+                                    sentWaitMSG = true;
                                 }
                             }
+
                         }
 
                         if(!commandFound){
+                            LocalTime wait = LocalTime.now();
+                            boolean sentWaitMSG = false;
+                            while(SECONDS.between(wait, LocalTime.now()) < 3){
+                                if(!sentWaitMSG){
+                                    System.out.println("Waiting on printer to catch up with commands");
+                                    sentWaitMSG = true;
+                                }
+                            }
                             System.out.println("Unknown command not found; continuing");
                         }
                     }else if(printerResponse.contains("ok")){
