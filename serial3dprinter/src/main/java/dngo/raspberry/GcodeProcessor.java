@@ -183,7 +183,7 @@ public class GcodeProcessor {
                                 commandFound = true;
                                 LocalTime wait = LocalTime.now();
                                 boolean sentWaitMSG = false;
-                                while(SECONDS.between(wait, LocalTime.now()) < 3){
+                                while(SECONDS.between(wait, LocalTime.now()) < 6){
                                     if(!sentWaitMSG){
                                         System.out.println("Waiting on printer to catch up with commands and redo the errored command");
                                         sentWaitMSG = true;
