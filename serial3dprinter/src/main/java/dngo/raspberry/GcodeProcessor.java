@@ -230,6 +230,11 @@ public class GcodeProcessor {
                     }
                 }
 
+            }else{
+                while(portReader.ready()){
+                    System.out.println("Waiting on buffer being free; printer response is " + portReader.readLine().strip());
+                }
+                printBufferLines--;
             }
             //     portWriter.write(currentGcodeLine);
             //     portWriter.newLine();
