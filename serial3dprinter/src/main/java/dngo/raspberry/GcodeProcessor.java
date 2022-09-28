@@ -230,8 +230,56 @@ public class GcodeProcessor {
             }else{
                 LocalTime timeStamp = LocalTime.now();
                 while(portReader.ready()){
-                    System.out.println("Waiting on buffer being free; printer response is " + portReader.readLine().strip());
-                    if(SECONDS.between(timeStamp, LocalTime.now()) > 1){
+                    String printerResponse = portReader.readLine().strip();
+
+                    System.out.println("Waiting on buffer being free; printer response is " + printerResponse);
+                    
+                    if(printerResponse.contains("Unknown command: ")){
+                        System.out.println("Buffer contents:");
+                        System.out.println(bufferHistory);
+                        String strippedResponse = printerResponse.replace("echo:Unknown command: ", "").strip();
+                        strippedResponse = strippedResponse.replace("\"", "");
+                        System.out.println("Error response: "  + strippedResponse);
+                        boolean commandFound = false;
+                        for (String command : bufferHistory) {
+                            if(strippedResponse.contains("M420")){
+                                //Some printers perform an autohome command automatically for some reason;
+                                //Without this break we'll get hung up on it and tell the printer to home several times before continuing
+                                break;
+                            }
+                            if(command.contains(strippedResponse)){
+                                System.out.println("Command found: " + command);
+                                portWriter.write(command);
+                                portWriter.newLine();
+                                portWriter.flush();
+                                printBufferLines++;
+                                commandFound = true;
+                                LocalTime wait = LocalTime.now();
+                                boolean sentWaitMSG = false;
+                                while(SECONDS.between(wait, LocalTime.now()) < 2){
+                                    if(!sentWaitMSG){
+                                        System.out.println("Waiting on printer to catch up with commands and redo the errored command");
+                                        sentWaitMSG = true;
+                                    }
+                                }
+                                break;
+                            }
+
+                        }
+
+                        if(!commandFound){
+                            LocalTime wait = LocalTime.now();
+                            boolean sentWaitMSG = false;
+                            while(SECONDS.between(wait, LocalTime.now()) < 1){
+                                if(!sentWaitMSG){
+                                    System.out.println("Waiting on printer to catch up with commands");
+                                    sentWaitMSG = true;
+                                }
+                            }
+                            System.out.println("Unknown command not found; continuing");
+                        }
+                    }
+                    if(SECONDS.between(timeStamp, LocalTime.now()) > 3){
                         break;
                     }
                 }
