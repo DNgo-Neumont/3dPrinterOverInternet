@@ -13,9 +13,9 @@ import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
-import java.util.NoSuchElementException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -149,8 +149,8 @@ public class GcodeProcessor {
                 handleHeatAndCool(currentGcodeLine, "T");
             }
             
-            if(currentGcodeLine.substring(0, 2).contentEquals("G1") || currentGcodeLine.substring(0, 2).contentEquals("G0") 
-            || currentGcodeLine.substring(0, 2).contentEquals("G2") || currentGcodeLine.substring(0, 2).contentEquals("G3") 
+            if(currentGcodeLine.substring(0, 2).contentEquals("G1") 
+            || currentGcodeLine.substring(0, 2).contentEquals("G0") 
             && printBufferLines < bufferSize){
                 boolean okToContinue = false;
                 boolean sent = false;
@@ -162,7 +162,7 @@ public class GcodeProcessor {
                         portWriter.flush();
                         timeStamp = LocalTime.now();
                     }
-
+                    System.out.println("Stepped into okToContinue loop");
                     String printerResponse = portReader.readLine();
 
                     System.out.println("Printer response: " + printerResponse);
