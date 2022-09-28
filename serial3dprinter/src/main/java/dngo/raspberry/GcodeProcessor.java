@@ -154,13 +154,12 @@ public class GcodeProcessor {
             && printBufferLines < bufferSize){
                 boolean okToContinue = false;
                 boolean sent = false;
-                LocalTime timeStamp = null; //Should not have any null issues - we always set this when we step into the while loop.
+                LocalTime timeStamp = LocalTime.now(); //Should not have any null issues - we always set this when we step into the while loop.
                 while(!okToContinue){
                     if(!sent){
                         portWriter.write(currentGcodeLine);
                         portWriter.newLine();
                         portWriter.flush();
-                        timeStamp = LocalTime.now();
                     }
                     //System.out.println("Stepped into okToContinue loop");
                     String printerResponse = portReader.readLine();
@@ -183,7 +182,7 @@ public class GcodeProcessor {
                                 commandFound = true;
                                 LocalTime wait = LocalTime.now();
                                 boolean sentWaitMSG = false;
-                                while(SECONDS.between(wait, LocalTime.now()) < 8){
+                                while(SECONDS.between(wait, LocalTime.now()) < 3){
                                     if(!sentWaitMSG){
                                         System.out.println("Waiting on printer to catch up with commands and redo the errored command");
                                         sentWaitMSG = true;
