@@ -154,6 +154,8 @@ public class GcodeProcessor {
                 System.out.println("Print buffer empty");
             }
             
+            System.out.println("Current bufferline: " + bufferLine);
+
             //NOTE: does not follow DRY philosophy but it works so
             //Will clean up later and extract into a seperate method
             //Cleaned up.
