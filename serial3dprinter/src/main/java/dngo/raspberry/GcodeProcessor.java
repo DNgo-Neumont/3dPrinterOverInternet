@@ -143,12 +143,17 @@ public class GcodeProcessor {
             //Will clean up later and extract into a seperate method
             //Cleaned up.
             if(currentGcodeLine.contains("M190")){ // bed temp warm command
+                System.out.println("Stepped into M190 statement");
                 handleHeatAndCool(currentGcodeLine, "B");
             }
             if(currentGcodeLine.contains("M104") || currentGcodeLine.contains("M109")){ // extruder warm command
+                System.out.println("Current gcode line: ");
+                System.out.println("Stepped into m104 or m109 statement");
                 handleHeatAndCool(currentGcodeLine, "T");
             }
             
+            System.out.println("Current print buffer size: " + printBufferLines);
+
             if(printBufferLines < bufferSize){
                 boolean okToContinue = false;
                 boolean sent = false;
@@ -172,6 +177,11 @@ public class GcodeProcessor {
                         System.out.println("Error response: "  + strippedResponse);
                         boolean commandFound = false;
                         for (String command : bufferHistory) {
+                            if(strippedResponse.contains("M420")){
+                                //Some printers perform an autohome command automatically for some reason;
+                                //Without this break we'll get hung up on it and tell the printer to home several times before continuing
+                                break;
+                            }
                             if(command.contains(strippedResponse)){
                                 System.out.println("Command found: " + command);
                                 portWriter.write(command);
