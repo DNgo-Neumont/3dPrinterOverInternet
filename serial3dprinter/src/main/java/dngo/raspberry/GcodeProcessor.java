@@ -115,17 +115,11 @@ public class GcodeProcessor {
             String currentGcodeLine = "";
 
             while(buffer.size() < 4 && (currentGcodeLine = gcodeReader.readLine()) != null){
-
-                currentLineNumber++;
-                double currentPercentage = currentLineNumber / gcodeLineCount;
-                currentPercentage = currentPercentage * 100;
-                System.out.println(currentGcodeLine);         
-                System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
                 //Ignores blank / commented lines.
                 while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.contains("M420"))){
                     currentGcodeLine = gcodeReader.readLine();
                     currentLineNumber++;
-                    currentPercentage = currentLineNumber / gcodeLineCount;
+                    double currentPercentage = currentLineNumber / gcodeLineCount;
                     currentPercentage = currentPercentage * 100;
                     System.out.println(currentGcodeLine);
                     System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
@@ -141,9 +135,6 @@ public class GcodeProcessor {
                 }
 
             }
-            
-            
-            
             
             String bufferLine = "";
             
