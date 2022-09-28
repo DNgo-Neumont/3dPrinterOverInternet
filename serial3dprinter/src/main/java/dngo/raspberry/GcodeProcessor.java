@@ -13,7 +13,6 @@ import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
@@ -37,9 +36,11 @@ public class GcodeProcessor {
 
     long currentLineNumber = 0;
 
-    LinkedList<String> buffer = new LinkedList<String>();
-
+    List<String> buffer = new ArrayList<String>();
+    List<String> bufferHistory = new ArrayList<>();
+    //Buffer and buffer history size, respectively
     int bufferSize = 4;
+    int historySize = 8;
 
     //call first
     public void setGcodeFile(File file){
@@ -132,148 +133,224 @@ public class GcodeProcessor {
                 }
                 
                 buffer.add(currentGcodeLine);
+                if(bufferHistory.size() < historySize){
+                    bufferHistory.add(currentGcodeLine);
+                }else{
+                    bufferHistory.remove(0);
+                    bufferHistory.add(currentGcodeLine);
+                }
+
             }
-
+            
+            
+            
+            
             String bufferLine = "";
-
+            
             try{
-
-                bufferLine = buffer.remove();
+                
+                bufferLine = buffer.get(0);
             }catch(NoSuchElementException e){
                 System.out.println("Print buffer empty");
             }
-
+            
             //NOTE: does not follow DRY philosophy but it works so
             //Will clean up later and extract into a seperate method
             //Cleaned up.
             if(bufferLine.contains("M190")){ // bed temp warm command
                 handleHeatAndCool(bufferLine, "B");
+                buffer.remove(0);
             }else if(bufferLine.contains("M104")){ // extruder warm command
                 handleHeatAndCool(bufferLine, "T");
+                buffer.remove(0);
             }
-
-
-            if(bufferLine.substring(0, 2).contentEquals("G1") || bufferLine.substring(0, 2).contentEquals("G0")){
-                portWriter.write(bufferLine);
-                portWriter.newLine();
-                portWriter.flush();
+            
+            if(bufferLine.substring(0, 2).contentEquals("G1") || bufferLine.substring(0, 2).contentEquals("G0") 
+            || bufferLine.substring(0, 2).contentEquals("G2") || bufferLine.substring(0, 2).contentEquals("G3")){
                 boolean okToContinue = false;
-                
-                //Will change to a bool and drop out once an ok has been recieved - should create a much better flow back and forth
-                //Didn't work.
-                //Not sure how to limit this entirely, now
-                //Considering just writing a loop that listens and reacts accordingly
-                //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
-                
+                boolean sent = false;
+                LocalTime timeStamp = null; //Should not have any null issues - we always set this when we step into the while loop.
+                while(!okToContinue){
+                    if(!sent){
+                        portWriter.write(bufferLine);
+                        portWriter.newLine();
+                        portWriter.flush();
+                        timeStamp = LocalTime.now();
+                    }
 
-                //Doing more research and went back to that old apple2gs vid running a printer
-                //He used a buffer. Same issue I've been having with dropped commands. 
-                //Of course. Will implement a queue and then some handling as having a queue allows lookback on dropped commands. 
-                //
-                while(!okToContinue){         
-                    portWriter.write("M114");
-                    portWriter.newLine();
-                    portWriter.flush();
-                    if(portReader.ready()){
-                        LocalTime currentTime = LocalTime.now();
-                        
-                        String printerResponse = portReader.readLine().strip();
-                        System.out.println("Printer response: " + printerResponse);
-                        Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
-                        Matcher responseMatcher = matchCoordResponse.matcher(printerResponse);
-                        boolean xMatch = true;
-                        boolean yMatch = true;
-                        boolean zMatch = true;
-                        if(responseMatcher.find()){
-                            String targetCoords = responseMatcher.group(0).strip();
-                            String[] axisLocations = targetCoords.split(" ");
+                    String printerResponse = portReader.readLine();
 
-                            //strips out the two letter G1/G0 command.
-                            String strippedCommand = bufferLine.substring(2, bufferLine.length()).strip();
-
-                            String[] gcodeAxisTargets = strippedCommand.split(" ");
-
-                            //Going to have to use a doubled for loop for both arrays so we can check all our axis locations between the two.
-                            //Break out of the inner for loop or something to keep performance good.
-                            //Switch statement will handle inconsistencies.
-                            for(int gcodePos = 0; gcodePos < gcodeAxisTargets.length; gcodePos++){
-                                switch(gcodeAxisTargets[gcodePos].charAt(0)){
-                                    case 'X':
-                                        for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
-                                            if(axisLocations[printArrPos].charAt(0) == 'X'){                    //removes the X/Y/Z in the string
-                                                float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
-                                                                                                                      //removes the X:/Y:/Z: in the string
-                                                float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
-                                                System.out.println("X target pos: " + targetPos);
-                                                System.out.println("X actual pos: " + actualPos);
-                                                if(targetPos != actualPos){
-                                                    xMatch = false;
-                                                }
-                                                
-                                                break;
-                                            }
-                                        }
-                                        break;
-                                    case 'Y':
-                                        for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
-                                            if(axisLocations[printArrPos].charAt(0) == 'Y'){
-                                                float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
-                                                float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
-                                                System.out.println("Y target pos: " + targetPos);
-                                                System.out.println("Y actual pos: " + actualPos);
-                                                if(targetPos != actualPos){
-                                                    yMatch = false;
-                                                }
-                                                break;
-                                            }
-                                        }
-                                        break;
-                                    case 'Z':
-                                        for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
-                                            if(axisLocations[printArrPos].charAt(0) == 'Z'){
-                                                float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
-                                                float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
-                                                System.out.println("Z target pos: " + targetPos);
-                                                System.out.println("Z actual pos: " + actualPos);
-                                                if(targetPos != actualPos){
-                                                    zMatch = false;
-                                                }
-                                                break;
-                                            }
-                                        }
-                                        break;
-                                    default:
-                                        System.out.println("default statement hit; " + gcodeAxisTargets[gcodePos]);
-                                        break;
-                                }
-                            }
-                            if(!xMatch || !yMatch || !zMatch){
-                                System.out.println("error in target head position, resending current command");
-                                portWriter.write(bufferLine);
+                    System.out.println("Printer response: " + printerResponse);
+                    
+                    if(printerResponse.contains("Unknown command: ")){
+                        String strippedResponse = printerResponse.replace("echo:Unknown command: ", "").strip();
+                        strippedResponse = strippedResponse.replace("\"", "");
+                        System.out.println("Error response: "  + strippedResponse);
+                        boolean commandFound = false;
+                        for (String command : bufferHistory) {
+                            if(command.contains(strippedResponse)){
+                                portWriter.write(command);
                                 portWriter.newLine();
                                 portWriter.flush();
-                            }else{
-                                okToContinue = true;
+                                commandFound = true;
+                                break;
                             }
                         }
-                        if(SECONDS.between(currentTime, LocalTime.now()) > 1){
-                            currentTime = LocalTime.now();
-                            portWriter.write("M114");// Report position
-                            portWriter.newLine();
-                            portWriter.flush();
+
+                        if(!commandFound){
+                            System.out.println("Unknown command not found; continuing");
                         }
+
+                    }else if(printerResponse.contains("ok")){
+                        okToContinue = true;
+                        buffer.remove(0);
+                    }else if(SECONDS.between(timeStamp, LocalTime.now()) > 5){
+                        System.out.println("Last command sent 5 seconds ago");
+                        System.out.println("continuing loop");
+                        okToContinue = true;
+                        buffer.remove(0);
                     }
                 }
+            //else statement handles all non move gcode
             }else{
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 portWriter.write(bufferLine);
                 portWriter.newLine();
                 portWriter.flush();
+                LocalTime timeStamp = LocalTime.now();
                 while(portReader.ready()){
-                    String printerResponse = portReader.readLine().strip();
-                    System.out.println("Printer response: " + printerResponse);
-                    break;
+                    System.out.println("Printer response: " + portReader.readLine());
+                    if(SECONDS.between(timeStamp, LocalTime.now()) > 2){
+                        break;
+                    }
                 }
+
             }
+            //     portWriter.write(bufferLine);
+            //     portWriter.newLine();
+            //     portWriter.flush();
+            //     boolean okToContinue = false;
+                
+            //     //Will change to a bool and drop out once an ok has been recieved - should create a much better flow back and forth
+            //     //Didn't work.
+            //     //Not sure how to limit this entirely, now
+            //     //Considering just writing a loop that listens and reacts accordingly
+            //     //Quickly recompiling and pushing to see if I just forgot to send this off to the test rig
+                
+
+            //     //Doing more research and went back to that old apple2gs vid running a printer
+            //     //He used a buffer. Same issue I've been having with dropped commands. 
+            //     //Of course. Will implement a queue and then some handling as having a queue allows lookback on dropped commands. 
+            //     //
+            //     while(!okToContinue){         
+            //         portWriter.write("M114");
+            //         portWriter.newLine();
+            //         portWriter.flush();
+            //         if(portReader.ready()){
+            //             LocalTime currentTime = LocalTime.now();
+                        
+            //             String printerResponse = portReader.readLine().strip();
+            //             System.out.println("Printer response: " + printerResponse);
+            //             Pattern matchCoordResponse = Pattern.compile("(X:\\d\\.?\\d{0,20} Y:\\d\\.?\\d{0,20} Z:\\d\\.?\\d{0,20} E:\\d\\.?\\d{0,20})");
+            //             Matcher responseMatcher = matchCoordResponse.matcher(printerResponse);
+            //             boolean xMatch = true;
+            //             boolean yMatch = true;
+            //             boolean zMatch = true;
+            //             if(responseMatcher.find()){
+            //                 String targetCoords = responseMatcher.group(0).strip();
+            //                 String[] axisLocations = targetCoords.split(" ");
+
+            //                 //strips out the two letter G1/G0 command.
+            //                 String strippedCommand = bufferLine.substring(2, bufferLine.length()).strip();
+
+            //                 String[] gcodeAxisTargets = strippedCommand.split(" ");
+
+            //                 //Going to have to use a doubled for loop for both arrays so we can check all our axis locations between the two.
+            //                 //Break out of the inner for loop or something to keep performance good.
+            //                 //Switch statement will handle inconsistencies.
+            //                 for(int gcodePos = 0; gcodePos < gcodeAxisTargets.length; gcodePos++){
+            //                     switch(gcodeAxisTargets[gcodePos].charAt(0)){
+            //                         case 'X':
+            //                             for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
+            //                                 if(axisLocations[printArrPos].charAt(0) == 'X'){                    //removes the X/Y/Z in the string
+            //                                     float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
+            //                                                                                                           //removes the X:/Y:/Z: in the string
+            //                                     float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+            //                                     System.out.println("X target pos: " + targetPos);
+            //                                     System.out.println("X actual pos: " + actualPos);
+            //                                     if(targetPos != actualPos){
+            //                                         xMatch = false;
+            //                                     }
+                                                
+            //                                     break;
+            //                                 }
+            //                             }
+            //                             break;
+            //                         case 'Y':
+            //                             for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
+            //                                 if(axisLocations[printArrPos].charAt(0) == 'Y'){
+            //                                     float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
+            //                                     float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+            //                                     System.out.println("Y target pos: " + targetPos);
+            //                                     System.out.println("Y actual pos: " + actualPos);
+            //                                     if(targetPos != actualPos){
+            //                                         yMatch = false;
+            //                                     }
+            //                                     break;
+            //                                 }
+            //                             }
+            //                             break;
+            //                         case 'Z':
+            //                             for(int printArrPos = 0; printArrPos < axisLocations.length; printArrPos++){
+            //                                 if(axisLocations[printArrPos].charAt(0) == 'Z'){
+            //                                     float targetPos = Float.parseFloat(gcodeAxisTargets[gcodePos].substring(1, gcodeAxisTargets[gcodePos].length()));
+            //                                     float actualPos = Float.parseFloat(axisLocations[printArrPos].substring(2, axisLocations[printArrPos].length())); 
+            //                                     System.out.println("Z target pos: " + targetPos);
+            //                                     System.out.println("Z actual pos: " + actualPos);
+            //                                     if(targetPos != actualPos){
+            //                                         zMatch = false;
+            //                                     }
+            //                                     break;
+            //                                 }
+            //                             }
+            //                             break;
+            //                         default:
+            //                             System.out.println("default statement hit; " + gcodeAxisTargets[gcodePos]);
+            //                             break;
+            //                     }
+            //                 }
+            //                 if(!xMatch || !yMatch || !zMatch){
+            //                     System.out.println("error in target head position, resending current command");
+            //                     portWriter.write(bufferLine);
+            //                     portWriter.newLine();
+            //                     portWriter.flush();
+            //                 }else{
+            //                     okToContinue = true;
+            //                 }
+            //             }
+            //             if(SECONDS.between(currentTime, LocalTime.now()) > 1){
+            //                 currentTime = LocalTime.now();
+            //                 portWriter.write("M114");// Report position
+            //                 portWriter.newLine();
+            //                 portWriter.flush();
+            //             }
+            //         }
+            //     }
+            // }else{
+            //     portWriter.write(bufferLine);
+            //     portWriter.newLine();
+            //     portWriter.flush();
+            //     while(portReader.ready()){
+            //         String printerResponse = portReader.readLine().strip();
+            //         System.out.println("Printer response: " + printerResponse);
+            //         break;
+            //     }
+            // }
 
         }
     }
