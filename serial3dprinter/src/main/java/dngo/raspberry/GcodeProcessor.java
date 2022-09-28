@@ -119,7 +119,7 @@ public class GcodeProcessor {
             System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
             //Filters out blank lines, comments, and the auto leveling command.
-            while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.contains("M420"))){
+            while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.substring(0, 4).contentEquals("M420"))){
                 currentGcodeLine = gcodeReader.readLine();
                 currentLineNumber++;
                 currentPercentage = currentLineNumber / gcodeLineCount;
@@ -149,9 +149,7 @@ public class GcodeProcessor {
                 handleHeatAndCool(currentGcodeLine, "T");
             }
             
-            if(currentGcodeLine.substring(0, 2).contentEquals("G1") 
-            || currentGcodeLine.substring(0, 2).contentEquals("G0") 
-            && printBufferLines < bufferSize){
+            if(printBufferLines < bufferSize){
                 boolean okToContinue = false;
                 boolean sent = false;
                 LocalTime timeStamp = LocalTime.now(); //Should not have any null issues - we always set this when we step into the while loop.
@@ -182,7 +180,7 @@ public class GcodeProcessor {
                                 commandFound = true;
                                 LocalTime wait = LocalTime.now();
                                 boolean sentWaitMSG = false;
-                                while(SECONDS.between(wait, LocalTime.now()) < 3){
+                                while(SECONDS.between(wait, LocalTime.now()) < 2){
                                     if(!sentWaitMSG){
                                         System.out.println("Waiting on printer to catch up with commands and redo the errored command");
                                         sentWaitMSG = true;
@@ -196,7 +194,7 @@ public class GcodeProcessor {
                         if(!commandFound){
                             LocalTime wait = LocalTime.now();
                             boolean sentWaitMSG = false;
-                            while(SECONDS.between(wait, LocalTime.now()) < 3){
+                            while(SECONDS.between(wait, LocalTime.now()) < 1){
                                 if(!sentWaitMSG){
                                     System.out.println("Waiting on printer to catch up with commands");
                                     sentWaitMSG = true;
@@ -214,32 +212,11 @@ public class GcodeProcessor {
                         printBufferLines--;
                     }
                 } 
-            //else statement handles all non move gcode
-            }else if(printBufferLines < bufferSize){
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                portWriter.write(currentGcodeLine);
-                portWriter.newLine();
-                portWriter.flush();
-                printBufferLines++;
-                LocalTime timeStamp = LocalTime.now();
-                while(portReader.ready()){
-                    System.out.println("Printer response: " + portReader.readLine());
-                    printBufferLines--;
-                    if(SECONDS.between(timeStamp, LocalTime.now()) > 2){
-                        break;
-                    }
-                }
-
             }else{
                 LocalTime timeStamp = LocalTime.now();
                 while(portReader.ready()){
                     System.out.println("Waiting on buffer being free; printer response is " + portReader.readLine().strip());
-                    if(SECONDS.between(timeStamp, LocalTime.now()) > 2){
+                    if(SECONDS.between(timeStamp, LocalTime.now()) > 1){
                         break;
                     }
                 }
