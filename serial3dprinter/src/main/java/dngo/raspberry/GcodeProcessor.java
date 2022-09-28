@@ -41,7 +41,8 @@ public class GcodeProcessor {
     List<String> bufferHistory = new ArrayList<>();
     //Buffer and buffer history size, respectively
     int bufferSize = 4;
-    int historySize = 8;
+    int printBufferLines = 0;
+    int historySize = 20;
 
     //call first
     public void setGcodeFile(File file){
@@ -118,9 +119,7 @@ public class GcodeProcessor {
                 currentLineNumber++;
                 double currentPercentage = currentLineNumber / gcodeLineCount;
                 currentPercentage = currentPercentage * 100;
-                System.out.println(currentGcodeLine);
-                System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
-                
+                System.out.println(currentGcodeLine);         
                 System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
                 //Ignores blank / commented lines.
                 while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.contains("M420"))){
@@ -163,13 +162,15 @@ public class GcodeProcessor {
             if(bufferLine.contains("M190")){ // bed temp warm command
                 handleHeatAndCool(bufferLine, "B");
                 buffer.remove(0);
-            }else if(bufferLine.contains("M104")){ // extruder warm command
+            }
+            if(bufferLine.contains("M104") || bufferLine.contains("M109")){ // extruder warm command
                 handleHeatAndCool(bufferLine, "T");
                 buffer.remove(0);
             }
             
             if(bufferLine.substring(0, 2).contentEquals("G1") || bufferLine.substring(0, 2).contentEquals("G0") 
-            || bufferLine.substring(0, 2).contentEquals("G2") || bufferLine.substring(0, 2).contentEquals("G3")){
+            || bufferLine.substring(0, 2).contentEquals("G2") || bufferLine.substring(0, 2).contentEquals("G3") 
+            && printBufferLines < bufferSize){
                 boolean okToContinue = false;
                 boolean sent = false;
                 LocalTime timeStamp = null; //Should not have any null issues - we always set this when we step into the while loop.
@@ -209,16 +210,18 @@ public class GcodeProcessor {
 
                     }else if(printerResponse.contains("ok")){
                         okToContinue = true;
-                        buffer.remove(0);
+                        printBufferLines--;
+                        System.out.println("First item in buffer removed: " + buffer.remove(0));
                     }else if(SECONDS.between(timeStamp, LocalTime.now()) > 5){
                         System.out.println("Last command sent 5 seconds ago");
                         System.out.println("continuing loop");
                         okToContinue = true;
-                        buffer.remove(0);
+                        printBufferLines--;
+                        System.out.println("First item in buffer removed: " + buffer.remove(0));
                     }
                 } 
             //else statement handles all non move gcode
-            }else{
+            }else if(printBufferLines < bufferSize){
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
@@ -228,10 +231,12 @@ public class GcodeProcessor {
                 portWriter.write(bufferLine);
                 portWriter.newLine();
                 portWriter.flush();
+                printBufferLines++;
                 buffer.remove(0);
                 LocalTime timeStamp = LocalTime.now();
                 while(portReader.ready()){
                     System.out.println("Printer response: " + portReader.readLine());
+                    printBufferLines--;
                     if(SECONDS.between(timeStamp, LocalTime.now()) > 2){
                         break;
                     }
