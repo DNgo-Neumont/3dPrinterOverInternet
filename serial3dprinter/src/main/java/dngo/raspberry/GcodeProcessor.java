@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
@@ -122,7 +123,7 @@ public class GcodeProcessor {
                 
                 System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
                 //Ignores blank / commented lines.
-                while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';')){
+                while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.contains("M420"))){
                     currentGcodeLine = gcodeReader.readLine();
                     currentLineNumber++;
                     currentPercentage = currentLineNumber / gcodeLineCount;
@@ -185,6 +186,9 @@ public class GcodeProcessor {
                     System.out.println("Printer response: " + printerResponse);
                     
                     if(printerResponse.contains("Unknown command: ")){
+                        System.out.println("Buffer contents:");
+                        System.out.println(bufferHistory);
+                        System.out.println(buffer);
                         String strippedResponse = printerResponse.replace("echo:Unknown command: ", "").strip();
                         strippedResponse = strippedResponse.replace("\"", "");
                         System.out.println("Error response: "  + strippedResponse);
