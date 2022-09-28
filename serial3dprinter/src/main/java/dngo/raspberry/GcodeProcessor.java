@@ -39,7 +39,7 @@ public class GcodeProcessor {
 
     List<String> bufferHistory = new ArrayList<>();
     //Buffer and buffer history size, respectively
-    int bufferSize = 4;
+    int bufferSize = 3;
     int printBufferLines = 0;
     int historySize = 20;
 
@@ -113,22 +113,25 @@ public class GcodeProcessor {
 
             String currentGcodeLine = gcodeReader.readLine();
             currentLineNumber++;
-            double currentPercentage = currentLineNumber / gcodeLineCount;
-            currentPercentage = currentPercentage * 100;
+            double currentPercentage = currentLineNumber * 100 / gcodeLineCount;
             System.out.println("current gcode line: " + currentGcodeLine);
             System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
-
+            
             //Filters out blank lines, comments, and the auto leveling command.
             while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.substring(0, 4).contentEquals("M420"))){
+                
+
                 currentGcodeLine = gcodeReader.readLine();
                 currentLineNumber++;
-                currentPercentage = currentLineNumber / gcodeLineCount;
-                currentPercentage = currentPercentage * 100;
+                if(currentLineNumber >= gcodeLineCount) break;
+                currentPercentage = currentLineNumber * 100 / gcodeLineCount;
                 System.out.println(currentGcodeLine);
                 System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
             }
             
+            if(currentGcodeLine == null) break;
+
             if(bufferHistory.size() < historySize){
                 bufferHistory.add(currentGcodeLine);
             }else{
