@@ -154,6 +154,17 @@ public class GcodeProcessor {
                 System.out.println("Stepped into m104 or m109 statement");
                 handleHeatAndCool(currentGcodeLine, "T");
             }
+            if(currentGcodeLine.contains("G28")){
+                LocalTime G28startTime = LocalTime.now();
+                boolean sent = false;
+                while(SECONDS.between(G28startTime,LocalTime.now()) < 8){
+                    if(!sent){
+                        System.out.println("Waiting for home command to finish");
+                    }else if(portReader.ready()){
+                        System.out.println("Printer response: " + portReader.readLine().strip());
+                    }
+                }
+            }
             
             System.out.println("Current print buffer size: " + printBufferLines);
 
