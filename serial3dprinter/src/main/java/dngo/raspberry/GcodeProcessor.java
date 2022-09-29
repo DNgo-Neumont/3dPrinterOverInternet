@@ -157,9 +157,13 @@ public class GcodeProcessor {
             if(currentGcodeLine.contains("G28")){
                 LocalTime G28startTime = LocalTime.now();
                 boolean sent = false;
-                while(SECONDS.between(G28startTime,LocalTime.now()) < 8){
+                while(SECONDS.between(G28startTime,LocalTime.now()) < 5){
                     if(!sent){
+                        portWriter.write(currentGcodeLine);
+                        portWriter.newLine();
+                        portWriter.flush();
                         System.out.println("Waiting for home command to finish");
+                        sent = true;
                     }else if(portReader.ready()){
                         System.out.println("Printer response: " + portReader.readLine().strip());
                     }
