@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 import java.util.ArrayList;
 
@@ -210,7 +211,7 @@ public class GcodeProcessor {
                                 commandFound = true;
                                 LocalTime wait = LocalTime.now();
                                 boolean sentWaitMSG = false;
-                                while(SECONDS.between(wait, LocalTime.now()) < 2){
+                                while(MILLIS.between(wait, LocalTime.now()) < 200){
                                     if(!sentWaitMSG){
                                         System.out.println("Waiting on printer to catch up with commands and redo the errored command");
                                         sentWaitMSG = true;
@@ -224,7 +225,7 @@ public class GcodeProcessor {
                         if(!commandFound){
                             LocalTime wait = LocalTime.now();
                             boolean sentWaitMSG = false;
-                            while(SECONDS.between(wait, LocalTime.now()) < 1){
+                            while(MILLIS.between(wait, LocalTime.now()) < 1){
                                 if(!sentWaitMSG){
                                     System.out.println("Waiting on printer to catch up with commands");
                                     sentWaitMSG = true;
@@ -271,7 +272,7 @@ public class GcodeProcessor {
                                 commandFound = true;
                                 LocalTime wait = LocalTime.now();
                                 boolean sentWaitMSG = false;
-                                while(SECONDS.between(wait, LocalTime.now()) < 2){
+                                while(MILLIS.between(wait, LocalTime.now()) < 200){
                                     if(!sentWaitMSG){
                                         System.out.println("Waiting on printer to catch up with commands and redo the errored command");
                                         sentWaitMSG = true;
@@ -285,7 +286,7 @@ public class GcodeProcessor {
                         if(!commandFound){
                             LocalTime wait = LocalTime.now();
                             boolean sentWaitMSG = false;
-                            while(SECONDS.between(wait, LocalTime.now()) < 1){
+                            while(MILLIS.between(wait, LocalTime.now()) < 200){
                                 if(!sentWaitMSG){
                                     System.out.println("Waiting on printer to catch up with commands");
                                     sentWaitMSG = true;

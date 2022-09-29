@@ -81,12 +81,25 @@ public class Main {
 
                 yesNo = "";
 
-                GcodeListener fileConsumer = new GcodeListener();
+                // GcodeListener fileConsumer = new GcodeListener();
 
-                PrinterSerialController controller = new PrinterSerialController();
+                // PrinterSerialController controller = new PrinterSerialController();
 
-                File file = new File("./test3dPrint.gcode");
+                System.out.println("Select the gcode file you want to use: ");
                 
+                File rootPath = new File("./");
+                
+                File[] fileList = rootPath.listFiles();
+                for(int i = 0; i < fileList.length; i++){
+                    System.out.println((i + 1) + ". " + fileList[i].getName());
+                }
+
+                System.out.print("Enter your choice now: ");
+
+                int selectedFile = Integer.parseInt(userInput.readLine()) - 1;
+                
+                File file = fileList[selectedFile];
+
                 // fileConsumer.setGcodeFile(file);
                 // portSelected.addDataListener(fileConsumer);
                 // controller.setGcodeFile(file);
