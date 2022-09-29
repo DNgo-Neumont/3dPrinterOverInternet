@@ -119,7 +119,7 @@ public class GcodeProcessor {
             System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
             
             //Filters out blank lines, comments, and the auto leveling command.
-            while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';' || currentGcodeLine.substring(0, 4).contentEquals("M420"))){
+            while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';')){ //|| currentGcodeLine.substring(0, 4).contentEquals("M420"))){
                 
 
                 currentGcodeLine = gcodeReader.readLine();
