@@ -81,6 +81,7 @@ public class GcodeProcessor {
         }
 
         while(!bedWarm){
+            boolean resent = false;
             String printerResponse = "";
             if(portReader.ready()){
                 printerResponse = portReader.readLine().strip();
@@ -91,13 +92,20 @@ public class GcodeProcessor {
             if(bedTempMatcher.find()){
                 String currentTempString = bedTempMatcher.group(0);
                 String[] splitString = currentTempString.split(" ");
-                float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));//for excluding B:
+                float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));//for excluding B:                
                 float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));//for excluding a /
+                if(desiredTemp < 20 && !resent){ // around room temp in centigrade
+                    portWriter.write(currentGcodeLine);
+                    portWriter.newLine();
+                    portWriter.flush();
+                    resent = true;
+                }
                 
                 if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
                     bedWarm = true;
                 }
             }else if(SECONDS.between(currentTime, LocalTime.now()) > 3){
+                resent = false;
                 currentTime = LocalTime.now();
                 portWriter.write("M105");// Report temperatures
                 portWriter.newLine();
