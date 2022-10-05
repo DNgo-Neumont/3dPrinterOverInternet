@@ -132,6 +132,7 @@ public class Main {
                             try {
                                 selectedPrinter = Integer.parseInt(userInput.readLine()) - 1;
                                 processor = processorList.get(selectedPrinter);
+                                correctSelection = true;
                             } catch (NumberFormatException e) {
                                 // TODO Auto-generated catch block
                                 correctSelection = false;
@@ -168,6 +169,7 @@ public class Main {
                                 selectedFile = Integer.parseInt(userInput.readLine()) - 1;
                                 file = fileList[selectedFile];
                                 processor.setGcodeFile(file);
+                                correctSelection = true;
                             } catch (NumberFormatException e) {
                                 // TODO Auto-generated catch block
                                 correctSelection = false;
