@@ -189,6 +189,10 @@ public class Main {
                     break;
                 case "3":
                     break;
+
+                case "4":
+                    exit = true;
+                    break;
                 default:
                     System.out.println("Please reenter your command - just a number from the ranges given for the menu.");
                     System.out.println(menu);
