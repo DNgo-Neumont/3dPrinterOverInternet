@@ -3,6 +3,7 @@ package dngo.raspberry;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
@@ -18,68 +19,107 @@ public class Main {
         System.out.println("!PLEASE FIND YOUR PRINTER'S SPECIFIED BAUD RATE BEFORE RUNNING THIS PROGRAM!");
         System.out.println("The printer port will most likely be a USB Serial Device or named after the printer itself.");
         
+
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("Menu: ").append("\n")
+        .append("1. Select new printer").append("\n")
+        .append("2. Monitor running printers").append("\n")
+        .append("3. Disconnect printer ").append("\n")
+        .append("4. Exit");
+
+        System.out.println(menu.toString());
+
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         
-        SerialPort[] ports = SerialPort.getCommPorts();
-        SerialPort portSelected = null;
+        String menuChoice = "";
+        try {
+            menuChoice = userInput.readLine();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
         
-        boolean fault = false;
-        while(!fault){
-            try{
-                System.out.println("Select your printer from the list of ports below.");
-                for(int i = 0; i< ports.length; i++){
-                    System.out.println( i + 1 + ". " + ports[i].getDescriptivePortName());
-                }
-                int result = Integer.valueOf(userInput.readLine()) - 1;
-
-                portSelected = ports[result];
+        switch(menuChoice){
+            case "1":
+                SerialPort[] ports = SerialPort.getCommPorts();
+                SerialPort portSelected = null;
                 
-                System.out.println("Port selected - enter the baud rate for the port now.");
-
-                int baudRate = Integer.valueOf(userInput.readLine());
-
-                portSelected.setBaudRate(baudRate);
-                portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-                portSelected.openPort();
-
-                System.out.println("Giving the printer a few seconds to initialize the connection.");
-                Thread.sleep(5000);
-                System.out.println("Attempting to read from the port now...");
-
-                BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
-
-                portWriter.write("M114");
-                portWriter.newLine();
-                portWriter.flush();
-
-                BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
-                while(portReader.ready()){
-                    System.out.println(portReader.readLine());
-                }
-
-                String yesNo = "";  
-                boolean correctPrinter = false;
-                while(!correctPrinter){
-                    yesNo = "";
-                    System.out.println("Is the port selected the printer you wanted? Y/N");
-                    yesNo = userInput.readLine();
-                    yesNo = yesNo.toLowerCase();
-                    switch(yesNo){
-                        case "y":
-                            correctPrinter = true;
-                            fault = true;
-                            
-                            break;
-                        case "n":
-                            correctPrinter = true;
-                            break;
-                        default:
-                            System.out.println("Please enter only the characters y/n: ");
-                            break;
+                boolean fault = false;
+                while(!fault){
+                    try{
+                        System.out.println("Select your printer from the list of ports below.");
+                        for(int i = 0; i< ports.length; i++){
+                            System.out.println( i + 1 + ". " + ports[i].getDescriptivePortName());
+                        }
+                        int result = Integer.valueOf(userInput.readLine()) - 1;
+        
+                        portSelected = ports[result];
+                        
+                        System.out.println("Port selected - enter the baud rate for the port now.");
+        
+                        int baudRate = Integer.valueOf(userInput.readLine());
+        
+                        portSelected.setBaudRate(baudRate);
+                        portSelected.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+                        portSelected.openPort();
+        
+                        System.out.println("Giving the printer a few seconds to initialize the connection.");
+                        Thread.sleep(5000);
+                        System.out.println("Attempting to read from the port now...");
+        
+                        BufferedWriter portWriter = new BufferedWriter(new OutputStreamWriter(portSelected.getOutputStream()));
+        
+                        portWriter.write("M114");
+                        portWriter.newLine();
+                        portWriter.flush();
+                        Thread.sleep(2000);
+                        BufferedReader portReader = new BufferedReader(new InputStreamReader(portSelected.getInputStream()));
+                        while(portReader.ready()){
+                            System.out.println(portReader.readLine());
+                        }
+        
+                        String yesNo = "";  
+                        boolean correctPrinter = false;
+                        while(!correctPrinter){
+                            yesNo = "";
+                            System.out.println("Is the port selected the printer you wanted? Y/N");
+                            yesNo = userInput.readLine();
+                            yesNo = yesNo.toLowerCase();
+                            switch(yesNo){
+                                case "y":
+                                    correctPrinter = true;
+                                    fault = true;
+                                    
+                                    break;
+                                case "n":
+                                    correctPrinter = true;
+                                    break;
+                                default:
+                                System.out.println("Please enter only the characters y/n: ");
+                                break;
+                            }
+                        }
+                        
+                        GcodeProcessor gcodeProcessor = new GcodeProcessor();
+                        gcodeProcessor.setPort(portSelected);
+                        
+                    }catch(Exception e){
+                        e.printStackTrace();
                     }
                 }
+                break;
+            case "2":
+                break;
+            case "3":
+                break;
+            default:
+                System.out.println("Please reenter your command - just a number from the ranges given for the menu.");
+                break;
+        }
 
-                yesNo = "";
+
+
+                // yesNo = "";
 
                 // GcodeListener fileConsumer = new GcodeListener();
 
@@ -96,9 +136,9 @@ public class Main {
 
                 System.out.print("Enter your choice now: ");
 
-                int selectedFile = Integer.parseInt(userInput.readLine()) - 1;
+                // int selectedFile = Integer.parseInt(userInput.readLine()) - 1;
                 
-                File file = fileList[selectedFile];
+                // File file = fileList[selectedFile];
 
                 // fileConsumer.setGcodeFile(file);
                 // portSelected.addDataListener(fileConsumer);
@@ -111,24 +151,20 @@ public class Main {
                 // fileConsumer.sendFirst();
                 // while(!fileConsumer.finishedPrinting());
 
-                GcodeProcessor gcodeProcessor = new GcodeProcessor();
                 
-                gcodeProcessor.setGcodeFile(file);
-                gcodeProcessor.setPort(portSelected);
-                gcodeProcessor.processAndSend();
+                // gcodeProcessor.setGcodeFile(file);
+                // gcodeProcessor.processAndSend();
 
-            }catch(Exception e){
-                e.printStackTrace();
-            }
 
             //TODO
-            //ADD a data listener class that queues up gcode and reports current printer echobacks to console - IN PROGRESS
-            //Multithreading and daemon shenanigans
-            //Figure out a safer way to keep the program running or have the printer initialization code run on a port being connected
-            //Work in a rabbitMQ message consumer that polls this classes' current progress or just hits this in a springboot container
-            //Figure out how to use slic3r from the java runtime and have it slice raw gcode OR - just have customers send in raw gcode to the specifications of currently connected printers.
-            //may be worth it to grab the params returned by M115
+            //ADD a data listener class that queues up gcode and reports current printer echobacks to console - IN PROGRESS/No longer viable
+            //Multithreading and daemon shenanigans - OTW
+            //Figure out a safer way to keep the program running or have the printer initialization code run on a port being connected - In progress
+            //Work in a rabbitMQ message consumer that polls this classes' current progress or just hits this in a springboot container - OTW
+            //Figure out how to use slic3r from the java runtime and have it slice raw gcode OR - just have customers send in raw gcode to the specifications of currently connected printers. - No slicing - sending OTW
+            //may be worth it to grab the params returned by M115 
             //the majority of the program is built there, I might need to look into threading for adding multiple printers.
+            //EDIT:  a month into the future and i've got so much to extend and fix
 
             //Multithreading behavior target
             //Multiple printers connected to a pi
@@ -142,7 +178,7 @@ public class Main {
             //Gotta make a listener to listen for the add function
             //(or maybe just clever writing)
 
-        }
-        
     }
+        
 }
+

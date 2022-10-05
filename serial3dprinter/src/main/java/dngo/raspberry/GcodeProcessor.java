@@ -23,13 +23,13 @@ import java.util.regex.Pattern;
 
 import com.fazecast.jSerialComm.SerialPort;
 
-public class GcodeProcessor {
+public class GcodeProcessor implements Runnable{
     File gCodeFile;
 
     BufferedReader gcodeReader;
 
     BufferedReader portReader;
-
+    
     BufferedWriter portWriter;
 
     SerialPort printerPort;
@@ -43,6 +43,17 @@ public class GcodeProcessor {
     int bufferSize = 3;
     int printBufferLines = 0;
     int historySize = 20;
+
+    @Override
+    public void run() {
+        try {
+            processAndSend();
+        } catch (Exception e) {
+            System.err.println("Error running gcode for printer: ");
+            e.printStackTrace();
+        }
+        
+    }
 
     //call first
     public void setGcodeFile(File file){
@@ -85,7 +96,7 @@ public class GcodeProcessor {
             String printerResponse = "";
             if(portReader.ready()){
                 printerResponse = portReader.readLine().strip();
-                System.out.println("Printer response: " + printerResponse);
+                // System.out.println("Printer response: " + printerResponse);
             }
             Pattern bedTempResponsePattern = Pattern.compile("("+ extruderOrBed +":\\d{1,10}\\.?\\d{1,10} /\\d{1,10}\\.?\\d{1,10})", Pattern.MULTILINE);
             Matcher bedTempMatcher = bedTempResponsePattern.matcher(printerResponse);
@@ -115,6 +126,10 @@ public class GcodeProcessor {
         }
     }
 
+    public double reportStatus(){
+        return currentLineNumber * 100 / gcodeLineCount;
+    }
+
 
     public void processAndSend() throws IOException{
         
@@ -123,8 +138,8 @@ public class GcodeProcessor {
             String currentGcodeLine = gcodeReader.readLine();
             currentLineNumber++;
             double currentPercentage = currentLineNumber * 100 / gcodeLineCount;
-            System.out.println("current gcode line: " + currentGcodeLine);
-            System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
+            // System.out.println("current gcode line: " + currentGcodeLine);
+            // System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
             
             //Filters out blank lines, comments, and the auto leveling command.
             while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';')){ //|| currentGcodeLine.substring(0, 4).contentEquals("M420"))){
@@ -134,8 +149,8 @@ public class GcodeProcessor {
                 currentLineNumber++;
                 if(currentLineNumber >= gcodeLineCount) break;
                 currentPercentage = currentLineNumber * 100 / gcodeLineCount;
-                System.out.println(currentGcodeLine);
-                System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
+                // System.out.println(currentGcodeLine);
+                // System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
             }
             
@@ -155,12 +170,12 @@ public class GcodeProcessor {
             //Will clean up later and extract into a seperate method
             //Cleaned up.
             if(currentGcodeLine.contains("M190")){ // bed temp warm command
-                System.out.println("Stepped into M190 statement");
+                // System.out.println("Stepped into M190 statement");
                 handleHeatAndCool(currentGcodeLine, "B");
             }
             if(currentGcodeLine.contains("M104") || currentGcodeLine.contains("M109")){ // extruder warm command
-                System.out.println("Current gcode line: ");
-                System.out.println("Stepped into m104 or m109 statement");
+                // System.out.println("Current gcode line: ");
+                // System.out.println("Stepped into m104 or m109 statement");
                 handleHeatAndCool(currentGcodeLine, "T");
             }
             if(currentGcodeLine.contains("G28")){
@@ -171,15 +186,15 @@ public class GcodeProcessor {
                         portWriter.write(currentGcodeLine);
                         portWriter.newLine();
                         portWriter.flush();
-                        System.out.println("Waiting for home command to finish");
+                        // System.out.println("Waiting for home command to finish");
                         sent = true;
                     }else if(portReader.ready()){
-                        System.out.println("Printer response: " + portReader.readLine().strip());
+                        // System.out.println("Printer response: " + portReader.readLine().strip());
                     }
                 }
             }
             
-            System.out.println("Current print buffer size: " + printBufferLines);
+            // System.out.println("Current print buffer size: " + printBufferLines);
 
             if(printBufferLines < bufferSize){
                 boolean okToContinue = false;
@@ -195,14 +210,14 @@ public class GcodeProcessor {
                     //System.out.println("Stepped into okToContinue loop");
                     String printerResponse = portReader.readLine();
 
-                    System.out.println("Printer response: " + printerResponse);
+                    // System.out.println("Printer response: " + printerResponse);
                     
                     if(printerResponse.contains("Unknown command: ")){
-                        System.out.println("Buffer contents:");
-                        System.out.println(bufferHistory);
+                        // System.out.println("Buffer contents:");
+                        // System.out.println(bufferHistory);
                         String strippedResponse = printerResponse.replace("echo:Unknown command: ", "").strip();
                         strippedResponse = strippedResponse.replace("\"", "");
-                        System.out.println("Error response: "  + strippedResponse);
+                        // System.out.println("Error response: "  + strippedResponse);
                         boolean commandFound = false;
                         for (String command : bufferHistory) {
                             if(strippedResponse.contains("M420")){
@@ -211,19 +226,19 @@ public class GcodeProcessor {
                                 break;
                             }
                             if(command.contains(strippedResponse)){
-                                System.out.println("Command found: " + command);
+                                // System.out.println("Command found: " + command);
                                 portWriter.write(command);
                                 portWriter.newLine();
                                 portWriter.flush();
                                 printBufferLines++;
                                 commandFound = true;
                                 LocalTime wait = LocalTime.now();
-                                boolean sentWaitMSG = false;
+                                // boolean sentWaitMSG = false;
                                 while(MILLIS.between(wait, LocalTime.now()) < 200){
-                                    if(!sentWaitMSG){
-                                        System.out.println("Waiting on printer to catch up with commands and redo the errored command");
-                                        sentWaitMSG = true;
-                                    }
+                                    // if(!sentWaitMSG){
+                                    //     System.out.println("Waiting on printer to catch up with commands and redo the errored command");
+                                    //     sentWaitMSG = true;
+                                    // }
                                 }
                                 break;
                             }
@@ -232,21 +247,21 @@ public class GcodeProcessor {
 
                         if(!commandFound){
                             LocalTime wait = LocalTime.now();
-                            boolean sentWaitMSG = false;
-                            while(MILLIS.between(wait, LocalTime.now()) < 1){
-                                if(!sentWaitMSG){
-                                    System.out.println("Waiting on printer to catch up with commands");
-                                    sentWaitMSG = true;
-                                }
+                            // boolean sentWaitMSG = false;
+                            while(MILLIS.between(wait, LocalTime.now()) < 200){
+                                // if(!sentWaitMSG){
+                                    // System.out.println("Waiting on printer to catch up with commands");
+                                    // sentWaitMSG = true;
+                                // }
                             }
-                            System.out.println("Unknown command not found; continuing");
+                            // System.out.println("Unknown command not found; continuing");
                         }
                     }else if(printerResponse.contains("ok")){
                         okToContinue = true;
                         printBufferLines--;
                     }else if(SECONDS.between(timeStamp, LocalTime.now()) > 5){
-                        System.out.println("Last command sent 5 seconds ago");
-                        System.out.println("continuing loop");
+                        // System.out.println("Last command sent 5 seconds ago");
+                        // System.out.println("continuing loop");
                         okToContinue = true;
                         printBufferLines--;
                     }
@@ -256,14 +271,14 @@ public class GcodeProcessor {
                 while(portReader.ready()){
                     String printerResponse = portReader.readLine().strip();
 
-                    System.out.println("Waiting on buffer being free; printer response is " + printerResponse);
+                    // System.out.println("Waiting on buffer being free; printer response is " + printerResponse);
                     
                     if(printerResponse.contains("Unknown command: ")){
-                        System.out.println("Buffer contents:");
-                        System.out.println(bufferHistory);
+                        // System.out.println("Buffer contents:");
+                        // System.out.println(bufferHistory);
                         String strippedResponse = printerResponse.replace("echo:Unknown command: ", "").strip();
                         strippedResponse = strippedResponse.replace("\"", "");
-                        System.out.println("Error response: "  + strippedResponse);
+                        // System.out.println("Error response: "  + strippedResponse);
                         boolean commandFound = false;
                         for (String command : bufferHistory) {
                             if(strippedResponse.contains("M420")){
@@ -272,7 +287,7 @@ public class GcodeProcessor {
                                 break;
                             }
                             if(command.contains(strippedResponse)){
-                                System.out.println("Command found: " + command);
+                                // System.out.println("Command found: " + command);
                                 portWriter.write(command);
                                 portWriter.newLine();
                                 portWriter.flush();
@@ -282,7 +297,7 @@ public class GcodeProcessor {
                                 boolean sentWaitMSG = false;
                                 while(MILLIS.between(wait, LocalTime.now()) < 200){
                                     if(!sentWaitMSG){
-                                        System.out.println("Waiting on printer to catch up with commands and redo the errored command");
+                                        // System.out.println("Waiting on printer to catch up with commands and redo the errored command");
                                         sentWaitMSG = true;
                                     }
                                 }
@@ -293,14 +308,14 @@ public class GcodeProcessor {
 
                         if(!commandFound){
                             LocalTime wait = LocalTime.now();
-                            boolean sentWaitMSG = false;
+                            // boolean sentWaitMSG = false;
                             while(MILLIS.between(wait, LocalTime.now()) < 200){
-                                if(!sentWaitMSG){
-                                    System.out.println("Waiting on printer to catch up with commands");
-                                    sentWaitMSG = true;
-                                }
+                                // if(!sentWaitMSG){
+                                //     System.out.println("Waiting on printer to catch up with commands");
+                                //     sentWaitMSG = true;
+                                // }
                             }
-                            System.out.println("Unknown command not found; continuing");
+                            // System.out.println("Unknown command not found; continuing");
                         }
                     }
                     if(SECONDS.between(timeStamp, LocalTime.now()) > 3){
@@ -311,5 +326,6 @@ public class GcodeProcessor {
             }
         }
     }
+
 
 }
