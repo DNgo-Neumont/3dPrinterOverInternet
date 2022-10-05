@@ -80,6 +80,10 @@ public class GcodeProcessor implements Runnable{
 
     }
 
+    public String getPortName(){
+        return printerPort.getDescriptivePortName();
+    }
+
     public void handleHeatAndCool(String currentGcodeLine, String extruderOrBed) throws IOException{
         portWriter.write(currentGcodeLine);
         portWriter.newLine();
@@ -217,6 +221,8 @@ public class GcodeProcessor implements Runnable{
                         // System.out.println(bufferHistory);
                         String strippedResponse = printerResponse.replace("echo:Unknown command: ", "").strip();
                         strippedResponse = strippedResponse.replace("\"", "");
+                        strippedResponse = strippedResponse.replace("G", "");
+                        strippedResponse = strippedResponse.replace("M", "");
                         // System.out.println("Error response: "  + strippedResponse);
                         boolean commandFound = false;
                         for (String command : bufferHistory) {
