@@ -37,13 +37,13 @@ public class Main {
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         
         String menuChoice = "";
-        try {
-            menuChoice = userInput.readLine();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
         boolean exit = false;
         while (!exit){
+            try {
+                menuChoice = userInput.readLine();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             switch(menuChoice){
                 case "1":
                     SerialPort[] ports = SerialPort.getCommPorts();
@@ -93,18 +93,18 @@ public class Main {
                                 switch(yesNo){
                                     case "y":
                                         correctPrinter = true;
-                                        fault = true;
                                         
                                         break;
-                                    case "n":
+                                        case "n":
                                         correctPrinter = true;
                                         break;
-                                    default:
-                                    System.out.println("Please enter only the characters y/n: ");
-                                    break;
-                                }
+                                        default:
+                                        System.out.println("Please enter only the characters y/n: ");
+                                        break;
+                                    }
                             }
-                            
+                                
+                            fault = true;
                             GcodeProcessor gcodeProcessor = new GcodeProcessor();
                             gcodeProcessor.setPort(portSelected);
                             
@@ -192,6 +192,9 @@ public class Main {
                     System.out.println(menu);
                     break;
             }
+
+            clrscr();
+            System.out.println(menu);
         }
 
 
@@ -242,6 +245,19 @@ public class Main {
             //Gotta make a listener to listen for the add function
             //(or maybe just clever writing)
 
+    }
+
+    //Pulled from https://stackoverflow.com/questions/2979383/how-to-clear-the-console 
+    //With the else statement from https://stackoverflow.com/questions/10241217/how-to-clear-console-in-java
+    public static void clrscr(){
+        //Clears Screen in java
+        try {
+            if (System.getProperty("os.name").contains("Windows"))
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            else
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+        } catch (IOException | InterruptedException ex) {}
     }
         
 }
