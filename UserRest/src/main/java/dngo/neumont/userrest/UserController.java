@@ -1,11 +1,9 @@
 package dngo.neumont.userrest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -21,5 +19,16 @@ public class UserController {
         //call to bll with ID> for getting a user
         return userBLL.getUserById(id);
     }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> createNewUser(@RequestBody User user){
+        return userBLL.addUser(user);
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, path="/{id}")
+    public ResponseEntity<Map<String, Object>> updateUserById(@PathVariable long id, @RequestBody JsonNode userDetails){
+        return userBLL.updateUser(id, userDetails);
+    }
+
 
 }
