@@ -30,5 +30,10 @@ public class UserController {
         return userBLL.updateUser(id, userDetails);
     }
 
+    @RequestMapping(method = RequestMethod.GET, path="/{id}")
+    public ResponseEntity<Map<String, Object>> deleteUserById(@PathVariable long id){
+        //call to bll with ID> for getting a user
+        return userBLL.deleteUser(id);
+    }
 
 }

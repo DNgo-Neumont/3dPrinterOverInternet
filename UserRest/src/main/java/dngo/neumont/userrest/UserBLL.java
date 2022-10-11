@@ -38,7 +38,7 @@ public class UserBLL {
 
     public ResponseEntity<Map<String, Object>> addUser(User user){
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        
+
         User savedUser = userRepository.saveAndFlush(user);
 
         Map<String, Object> response = new HashMap<>();
@@ -92,6 +92,25 @@ public class UserBLL {
             response.put("message", "user with id of " + id + "not found");
             response.put("timestamp", LocalDateTime.now());
 
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> deleteUser(long id){
+        if(userRepository.findById(id).isPresent()) { // && auth == true)
+            User userToDelete = userRepository.findById(id).get();
+            userRepository.delete(userToDelete);
+            Map<String, Object> response = new HashMap<>();
+
+            response.put("message", "User deleted");
+            response.put("user", userToDelete);
+            response.put("timestamp", LocalDateTime.now());
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }else{
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "User not found");
+            response.put("timestamp", LocalDateTime.now());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
