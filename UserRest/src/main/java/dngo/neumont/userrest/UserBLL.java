@@ -119,8 +119,12 @@ public class UserBLL {
 
 
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        User userToCheck = userRepository.findByUserName(username);
+        if(userToCheck == null){
+            throw new UsernameNotFoundException("User not found");
+        }else{
+            return userToCheck;
+        }
 
-
-        return null;
     }
 }

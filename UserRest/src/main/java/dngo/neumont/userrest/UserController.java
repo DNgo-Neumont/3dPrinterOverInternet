@@ -4,11 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,19 +45,33 @@ public class UserController {
         return userBLL.deleteUser(id);
     }
 
-    @RequestMapping(method = RequestMethod.POST, path="/auth")
-    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody JsonNode userDetails){
-        String userName = userDetails.get("user_name").asText();
-        String password = userDetails.get("password").asText();
-
-
-
-        Map<String, Object> response = new HashMap<>();
-
-
-        response.put("User details", userBLL.loadUserByUsername(userName));
-        response.put("timestamp", LocalDateTime.now());
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+// Come back to this for JWT auth - right now testing out basic auth
+//    @RequestMapping(method = RequestMethod.POST, path="/auth")
+//    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody JsonNode userDetails){
+//        String userName = userDetails.get("user_name").asText();
+//        String password = userDetails.get("password").asText();
+//
+//        User userToCheck = userBLL.loadUserByUsername(userName);
+//
+//        if(BCrypt.checkpw(password, userToCheck.getPassword())){
+//            System.out.println("Successfully logged in user: " + userName);
+//
+//            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+//            //Update with pulls from the user, not hardcoding it
+//            authorities.add(new SimpleGrantedAuthority("USER"));
+//
+//            UserDetails user = new org.springframework.security.core.userdetails.User(userToCheck.getUserName(), userToCheck.getPassword(), authorities);
+//            UserSecurityConfig.getMemUserDetailsManager();
+//            Map<String, Object> response = new HashMap<>();
+//
+//
+//
+//            response.put("timestamp", LocalDateTime.now());
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }else{
+//
+//            return null;
+//        }
+//    }
 
 }

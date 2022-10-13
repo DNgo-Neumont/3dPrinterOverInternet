@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration @EnableWebSecurity
 public class UserSecurityConfig {
 
-    private final InMemoryUserDetailsManager memoryUserDetailsManager = new InMemoryUserDetailsManager();
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
@@ -26,7 +26,8 @@ public class UserSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/user").permitAll()
                 .antMatchers(HttpMethod.GET,"/user/**").hasAnyRole("USER","ADMIN")
                 .antMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("USER","ADMIN")
-                .antMatchers(HttpMethod.DELETE,"/user/**").hasAnyRole("ADMIN");
+                .antMatchers(HttpMethod.DELETE,"/user/**").hasAnyRole("ADMIN")
+                .and().httpBasic();
 
         return http.build();
     }
@@ -39,7 +40,8 @@ public class UserSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-        return memoryUserDetailsManager;
+        return new MysqlUserDetailsService();
     }
+
 
 }
