@@ -2,9 +2,14 @@ package dngo.neumont.userrest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -34,6 +39,21 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> deleteUserById(@PathVariable long id){
         //call to bll with ID> for getting a user
         return userBLL.deleteUser(id);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path="/auth")
+    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody JsonNode userDetails){
+        String userName = userDetails.get("user_name").asText();
+        String password = userDetails.get("password").asText();
+
+
+
+        Map<String, Object> response = new HashMap<>();
+
+
+        response.put("User details", userBLL.loadUserByUsername(userName));
+        response.put("timestamp", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

@@ -4,13 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserBLL {
@@ -61,10 +63,10 @@ public class UserBLL {
                 String key = keySet.next();
                 switch(key){
                     case "user_name":
-                        userToUpdate.setUser_name(userDetails.get("user_name").asText());
+                        userToUpdate.setUserName(userDetails.get("user_name").asText());
                         break;
                     case "user_email":
-                        userToUpdate.setUser_email(userDetails.get("user_email").asText());
+                        userToUpdate.setUserEmail(userDetails.get("user_email").asText());
                         break;
                     case "password":
                         userToUpdate.setPassword(new BCryptPasswordEncoder().encode(userDetails.get("password").asText()));
@@ -78,8 +80,8 @@ public class UserBLL {
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> userDetailsMap = new HashMap<>();
 
-            userDetailsMap.put("user_name", userToUpdate.getUser_name());
-            userDetailsMap.put("user_email", userToUpdate.getUser_email());
+            userDetailsMap.put("user_name", userToUpdate.getUserName());
+            userDetailsMap.put("user_email", userToUpdate.getUserEmail());
 
             response.put("message", "user " + id + " successfully updated");
             response.put("user-details", userDetailsMap);
@@ -115,4 +117,10 @@ public class UserBLL {
         }
     }
 
+
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+
+
+        return null;
+    }
 }

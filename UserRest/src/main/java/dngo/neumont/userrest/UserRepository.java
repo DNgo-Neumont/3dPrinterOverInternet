@@ -5,4 +5,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    //Do this to avoid issues with underscored column names
+    public User findByUserName(String user_name);
+
 }
