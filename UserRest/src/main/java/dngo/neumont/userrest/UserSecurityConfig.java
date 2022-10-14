@@ -25,6 +25,7 @@ public class UserSecurityConfig {
         http.authorizeHttpRequests()
                 .antMatchers(HttpMethod.POST, "/user/auth").permitAll()
                 .antMatchers(HttpMethod.POST, "/user").permitAll()
+                .antMatchers(HttpMethod.GET, "/user/refreshAuth").permitAll()
                 .antMatchers(HttpMethod.GET,"/user/**").hasAnyRole("USER","ADMIN")
                 .antMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("USER","ADMIN")
                 .antMatchers(HttpMethod.DELETE,"/user/**").hasAnyRole("ADMIN")
@@ -39,11 +40,11 @@ public class UserSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return new MysqlUserDetailsService();
-    }
+//Used for BAUTH
+//    @Bean
+//    public UserDetailsService userDetailsService(){
+//        return new MysqlUserDetailsService();
+//    }
 
 
 }

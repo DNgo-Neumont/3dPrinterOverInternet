@@ -14,6 +14,8 @@ public class User {
     private String userEmail;
 
     private String password;
+    //To be filled with strings that are like so: ROLE_USER, ROLE_ADMIN, ROLE_SUPERUSER etc.
+    private String roles;
 
     public long getUserId() {
         return userId;
@@ -45,5 +47,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRoles() {
+        return roles;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
     }
 }

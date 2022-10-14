@@ -6,7 +6,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -30,14 +28,19 @@ public class RestAuthorizationFilter extends OncePerRequestFilter {
     private final String auth_secret = System.getenv("auth_secret");
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/user/auth/")){
+
+        //Prevents running filter on verification and refresh endpoints
+        if( request.getServletPath().equals("/user/refreshAuth") || request.getServletPath().equals("/user/auth/")){
             filterChain.doFilter(request, response);
         } else{
             String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             if(authHeader != null && authHeader.startsWith("Bearer ")){
                 try{
+                    //Will have to decrypt incoming token later - RSA is likely due to public and private keys
                     String token = authHeader.substring("Bearer ".length());
+                    //encryption algo
                     Algorithm algorithm = Algorithm.HMAC256(auth_secret.getBytes());
+                    //JWT verifier to decrypt and use the JWT
                     JWTVerifier jwtVerifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = jwtVerifier.verify(token);
                     String userName = decodedJWT.getSubject();
@@ -46,10 +49,12 @@ public class RestAuthorizationFilter extends OncePerRequestFilter {
                     for(String role : roles){
                         authorities.add(new SimpleGrantedAuthority(role));
                     }
+                    //All goes well, we verify the JWT and send the request off to whatever it needs to go to
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userName, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     filterChain.doFilter(request, response);
                 }catch (Exception e){
+                    //Exception handler that sends back whatever caused an exception to the client
                     System.err.println("Error with authentication: " + e.getMessage());
                     e.printStackTrace();
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -60,6 +65,7 @@ public class RestAuthorizationFilter extends OncePerRequestFilter {
                     new ObjectMapper().writeValue(response.getOutputStream(), errorResponse);
                 }
             }else{
+                //continue chain if no auth - meant for things like the AUTH endpoint
                 filterChain.doFilter(request, response);
             }
         }

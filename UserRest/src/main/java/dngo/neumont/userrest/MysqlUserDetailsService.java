@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+//Deprecated, used for BAUTH
 public class MysqlUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository repository;
