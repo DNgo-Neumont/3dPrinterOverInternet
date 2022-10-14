@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration @EnableWebSecurity
 public class UserSecurityConfig {
@@ -27,7 +28,8 @@ public class UserSecurityConfig {
                 .antMatchers(HttpMethod.GET,"/user/**").hasAnyRole("USER","ADMIN")
                 .antMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("USER","ADMIN")
                 .antMatchers(HttpMethod.DELETE,"/user/**").hasAnyRole("ADMIN")
-                .and().httpBasic();
+                .and()
+                .addFilterBefore(new RestAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
