@@ -76,14 +76,14 @@ public class UserController {
             String accessToken = JWT.create()
                     .withSubject(userToCheck.getUserName()) //Better way of determining expiry time
                     .withExpiresAt(Instant.from(ZonedDateTime.of(LocalDateTime.now().plusMinutes(10), ZoneId.systemDefault())))
-                    .withIssuer(request.getServletPath())
+                    .withIssuer(request.getRequestURL().toString())
                     //Change to pulling roles from DB
                     .withClaim("roles", roles)
                     .sign(algorithm);
             String refreshToken = JWT.create()
                     .withSubject(userToCheck.getUserName()) //Better way of determining expiry time
                     .withExpiresAt(Instant.from(ZonedDateTime.of(LocalDateTime.now().plusMinutes(30), ZoneId.systemDefault())))
-                    .withIssuer(request.getServletPath())
+                    .withIssuer(request.getRequestURL().toString())
                     .sign(algorithm);
             Map<String, Object> response = new HashMap<>();
 
@@ -117,7 +117,7 @@ public class UserController {
                             .withSubject(user.getUserName())
                             .withExpiresAt(Instant.from(ZonedDateTime.of(LocalDateTime.now().plusMinutes(10), ZoneId.systemDefault())))
                             .withClaim("roles", List.of("ROLE_USER"))
-                            .withIssuer(request.getServletPath())
+                            .withIssuer(request.getRequestURL().toString())
                             .sign(algorithm);
 //                    refreshToken = JWT.create()
 //                            .withSubject(user.getUserName()) //Better way of determining expiry time
