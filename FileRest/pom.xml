@@ -32,10 +32,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.azure.spring</groupId>
-            <artifactId>spring-cloud-azure-starter-storage</artifactId>
-        </dependency>
+        <!-- File sharing component import - enables SMB3 usage in app-->
+<!--        <dependency>-->
+<!--            <groupId>com.hierynomus</groupId>-->
+<!--            <artifactId>smbj</artifactId>-->
+<!--            <version>0.11.5</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -48,6 +50,10 @@
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-file-share</artifactId>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -76,6 +82,13 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-sdk-bom</artifactId>
+                <version>1.2.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
