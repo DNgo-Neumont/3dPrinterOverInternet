@@ -47,6 +47,7 @@ public class FileController {
         //Replace with Azure components because of course
         //Seriously though azure is ending up being more secure - just use these.
 
+
         System.out.println(connectionString);
 
         ShareClient azureClient = new ShareClientBuilder().endpoint(connectUrl).connectionString(connectionString).shareName(shareName).buildClient();
@@ -57,9 +58,9 @@ public class FileController {
 
         ShareDirectoryClient directoryClient = azureClient.getDirectoryClient(username);
 
-        directoryClient.createFile(file.getName(), file.getSize());
+        directoryClient.createFile(file.getOriginalFilename(), file.getSize());
 
-        ShareFileClient fileClient = azureClient.getFileClient(username + "/" + file.getName());
+        ShareFileClient fileClient = azureClient.getFileClient(username + "/" + file.getOriginalFilename());
 
         byte[] data;
 
@@ -69,31 +70,43 @@ public class FileController {
             throw new RuntimeException(e);
         }
 
-        long chunkSize = finalChunkSize;
-
-        if(data.length > chunkSize){
-            for(int offset = 0; offset < data.length; offset += chunkSize){
-                try{
-                    chunkSize = Math.min(data.length - offset, chunkSize);
-
-                    byte[] subArray = Arrays.copyOfRange(data, offset, (int) (offset + chunkSize));
-
-                    fileClient.upload(new ByteArrayInputStream(subArray), subArray.length, new ParallelTransferOptions().setBlockSizeLong(finalChunkSize));
-                }catch (RuntimeException e){
-                    e.printStackTrace();
-                    if(fileClient.exists()){
-                        fileClient.delete();
-                    }
-                    throw e;
-                }
-            }
-        }else{
-            fileClient.upload(new ByteArrayInputStream(data), data.length, new ParallelTransferOptions().setBlockSizeLong(finalChunkSize));
+//        long chunkSize = finalChunkSize;
+//
+//        if(data.length > chunkSize){
+//            for(int offset = 0; offset < data.length; offset += chunkSize){
+//                try{
+//                    chunkSize = Math.min(data.length - offset, chunkSize);
+//
+//                    byte[] subArray = Arrays.copyOfRange(data, offset, (int) (offset + chunkSize));
+//                    System.out.println(new String(subArray));
+//                    ByteArrayInputStream inputStream = new ByteArrayInputStream(subArray);
+//
+//                    fileClient.upload(inputStream, subArray.length, new ParallelTransferOptions());
+//                    inputStream.close();
+//                }catch (RuntimeException e){
+//                    e.printStackTrace();
+//                    if(fileClient.exists()){
+//                        fileClient.delete();
+//                    }
+//                    throw e;
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        }else{
+        //Never use EXPLETIVE microsoft example code again.
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+        fileClient.upload(inputStream, data.length, new ParallelTransferOptions());
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+//        }
 
         Map<String, Object> response = new HashMap<>();
 
-        response.put("message", "file " + file.getName() + "added" );
+        response.put("message", "file " + file.getOriginalFilename() + " added" );
         response.put("file_path", fileClient.getFilePath());
         response.put("file_url", fileClient.getFileUrl());
         response.put("timestamp", LocalDateTime.now());
