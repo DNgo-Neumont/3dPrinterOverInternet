@@ -13,14 +13,14 @@ import java.util.concurrent.TimeoutException;
 @SpringBootApplication
 public class RabbitMqControllerApplication {
 
-    private final static String rabbitHost = System.getProperty("RABBITMQ_HOST");
-    private final static int rabbitPort = Integer.parseInt(System.getProperty("RABBITMQ_PORT"));
+    private final static String rabbitHost = System.getenv("RABBITMQ_HOST");
+    private final static int rabbitPort = Integer.parseInt(System.getenv("RABBITMQ_PORT"));
 
-    private final static String rabbitUser = System.getProperty("RABBITMQ_USER");
+    private final static String rabbitUser = System.getenv("RABBITMQ_USER");
 
-    private final static String rabbitPass = System.getProperty("RABBITMQ_PASS");
+    private final static String rabbitPass = System.getenv("RABBITMQ_PASS");
 
-    private final static String rabbitVhost = System.getProperty("RABBITMQ_VHOST");
+    private final static String rabbitVhost = System.getenv("RABBITMQ_VHOST");
 
     private static ConnectionFactory connectionFactory = null;
 
@@ -40,8 +40,12 @@ public class RabbitMqControllerApplication {
     }
 
     public static Channel getNewChannel() throws IOException, TimeoutException {
-        try (Connection connection = connectionFactory.newConnection()) {
+        try{
+            Connection connection = connectionFactory.newConnection();
             return connection.createChannel();
+        }catch(Exception e){
+            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 
