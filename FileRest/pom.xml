@@ -11,7 +11,7 @@
     <groupId>dngo.neumont</groupId>
     <artifactId>FileRest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+<!--    <packaging>war</packaging>-->
     <name>FileRest</name>
     <description>FileRest</description>
     <properties>

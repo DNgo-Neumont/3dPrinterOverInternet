@@ -13,6 +13,7 @@ import com.fazecast.jSerialComm.*;
 
 public class Main {
 
+    public static final String exchange_name = "command-exchange";
     public static void main(String[] args){
         List<GcodeProcessor> processorList = new ArrayList<GcodeProcessor>();
         //Simple intro
@@ -95,10 +96,10 @@ public class Main {
                                         correctPrinter = true;
                                         
                                         break;
-                                        case "n":
+                                    case "n":
                                         correctPrinter = true;
                                         break;
-                                        default:
+                                    default:
                                         System.out.println("Please enter only the characters y/n: ");
                                         break;
                                     }
@@ -133,11 +134,7 @@ public class Main {
                                 selectedPrinter = Integer.parseInt(userInput.readLine()) - 1;
                                 processor = processorList.get(selectedPrinter);
                                 correctSelection = true;
-                            } catch (NumberFormatException e) {
-                                // TODO Auto-generated catch block
-                                correctSelection = false;
-                                e.printStackTrace();
-                            } catch (IOException e) {
+                            } catch (NumberFormatException | IOException e) {
                                 // TODO Auto-generated catch block
                                 correctSelection = false;
                                 e.printStackTrace();
@@ -170,15 +167,11 @@ public class Main {
                                 file = fileList[selectedFile];
                                 processor.setGcodeFile(file);
                                 correctSelection = true;
-                            } catch (NumberFormatException e) {
+                            } catch (NumberFormatException | IOException e) {
                                 // TODO Auto-generated catch block
                                 correctSelection = false;
                                 e.printStackTrace();
-                            } catch (IOException e) {
-                                // TODO Auto-generated catch block
-                                correctSelection = false;
-                                e.printStackTrace();
-                            }catch(IndexOutOfBoundsException e){
+                            } catch(IndexOutOfBoundsException e){
                                 correctSelection = false;
                                 e.printStackTrace();
                             }

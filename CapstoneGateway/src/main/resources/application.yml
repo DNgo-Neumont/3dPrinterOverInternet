@@ -1,0 +1,32 @@
+server:
+  port: 80
+  #address: {MSServerIP}
+  ssl:
+    certificate: classpath:certificate.crt
+    certificate-private-key: classpath:private.key
+    trust-certificate: classpath:ca_bundle.crt
+
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-route
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+        - id: file-route
+          uri: lb://file-service
+          predicates:
+            - Path=/file/**
+        - id: rabbit-route
+          uri: lb://rabbit-service
+          predicates:
+            - Path=/rabbit/**
+eureka:
+  client:
+    service-url:
+      #replace with environment variable
+      defaultZone: http://eureka:8761/eureka
+
+

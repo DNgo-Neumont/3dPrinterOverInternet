@@ -22,11 +22,11 @@ public class RabbitMqControllerApplication {
 
     private final static String rabbitVhost = System.getenv("RABBITMQ_VHOST");
 
-    private static ConnectionFactory connectionFactory = null;
+    private static ConnectionFactory connectionFactory = new ConnectionFactory();
 
 
     public static void main(String[] args) {
-        connectionFactory = new ConnectionFactory();
+
         connectionFactory.setConnectionTimeout(10000);
         connectionFactory.setAutomaticRecoveryEnabled(true);
 
@@ -45,7 +45,7 @@ public class RabbitMqControllerApplication {
             return connection.createChannel();
         }catch(Exception e){
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.toString());
         }
     }
 

@@ -96,7 +96,6 @@ public class GcodeProcessor implements Runnable{
         }
 
         while(!bedWarm){
-            boolean resent = false;
             String printerResponse = "";
             if(portReader.ready()){
                 printerResponse = portReader.readLine().strip();
@@ -109,18 +108,16 @@ public class GcodeProcessor implements Runnable{
                 String[] splitString = currentTempString.split(" ");
                 float currentTempFloat = Float.parseFloat(splitString[0].substring(2, splitString[0].length()));//for excluding B:                
                 float desiredTemp = Float.parseFloat(splitString[1].substring(1, splitString[1].length()));//for excluding a /
-                if(desiredTemp < 20 && !resent){ // around room temp in centigrade
+                if(desiredTemp < 20){ // around room temp in centigrade
                     portWriter.write(currentGcodeLine);
                     portWriter.newLine();
                     portWriter.flush();
-                    resent = true;
                 }
                 
                 if(currentTempFloat >= desiredTemp - 1.00 && currentTempFloat < desiredTemp + 1.00){
                     bedWarm = true;
                 }
             }else if(SECONDS.between(currentTime, LocalTime.now()) > 3){
-                resent = false;
                 currentTime = LocalTime.now();
                 portWriter.write("M105");// Report temperatures
                 portWriter.newLine();
@@ -131,7 +128,7 @@ public class GcodeProcessor implements Runnable{
     }
 
     public double reportStatus(){
-        return currentLineNumber * 100 / gcodeLineCount;
+        return currentLineNumber * 100.00 / gcodeLineCount;
     }
 
 
@@ -141,7 +138,7 @@ public class GcodeProcessor implements Runnable{
 
             String currentGcodeLine = gcodeReader.readLine();
             currentLineNumber++;
-            double currentPercentage = currentLineNumber * 100 / gcodeLineCount;
+            double currentPercentage = currentLineNumber * 100.00 / gcodeLineCount;
             // System.out.println("current gcode line: " + currentGcodeLine);
             // System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
             
@@ -152,7 +149,7 @@ public class GcodeProcessor implements Runnable{
                 currentGcodeLine = gcodeReader.readLine();
                 currentLineNumber++;
                 if(currentLineNumber >= gcodeLineCount) break;
-                currentPercentage = currentLineNumber * 100 / gcodeLineCount;
+                currentPercentage = currentLineNumber * 100.00 / gcodeLineCount;
                 // System.out.println(currentGcodeLine);
                 // System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 

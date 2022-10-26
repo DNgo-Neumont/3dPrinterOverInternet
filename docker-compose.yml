@@ -1,0 +1,84 @@
+version: '3.9'
+services:
+
+  rabbitMq:
+    build:
+      context: ./RabbitMQController
+      dockerfile: RabbitMQDockerfile.dockerfile
+    container_name: rabbitMQcapstone
+    image: simplprintrabbit
+    ports:
+      - "5672"
+      - "15672:15672"
+    networks:
+      - base-net
+
+  userSQLDb:
+    image: "mysql:latest"
+    container_name: userSQLDb
+    environment:
+      - MYSQL_DATABASE=capstone_user_db
+      - MYSQL_USER=capstone-user
+      - MYSQL_PASSWORD=Nu200139254
+      - MYSQL_ROOT_PASSWORD=Nu200139254
+    ports:
+      - "3306"
+    networks:
+      - base-net
+  
+  rabbit-service:
+    build: 
+      context: ./RabbitMQController
+    image: simplprintrabbitapi
+    ports:
+      - "8080"
+    networks:
+      - base-net
+    restart:
+      on-failure: 20
+
+  file-service:
+    build: 
+      context: ./FileRest
+    image: simplprintfileapi
+    ports:
+      - "8080"
+    networks:
+      - base-net
+
+  user-service:
+    build:
+      context: ./UserRest
+    image: simplprintuserapi
+    depends_on:
+      - userSQLDb
+    ports: 
+      - "8080"
+    networks:
+      - base-net
+    restart:
+      on-failure: 20
+
+  eureka-server:
+    container_name: eureka
+    build: 
+      context: ./CapstoneEureka
+    image: simplprinteureka
+    ports:
+      - "8761:8761"
+    networks:
+      - base-net
+
+  gateway:
+    container_name: capstone_gateway
+    build:
+      context: ./CapstoneGateway
+    image: simplprintgateway
+    ports:
+      - "80:80"
+    networks:
+      - base-net
+
+networks:
+  base-net:
+    name: capstonenetwork
