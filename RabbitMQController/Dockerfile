@@ -2,7 +2,7 @@ FROM amazoncorretto:11.0.17
 
 ENV EUREKA_HOST=eureka
 ENV auth_secret=bruh
-ENV RABBITMQ_HOST=rabbitMQcapstone
+ENV RABBITMQ_HOST=rabbitmqcapstone
 ENV RABBITMQ_PORT=5672
 ENV RABBITMQ_USER=exchangeuser
 ENV RABBITMQ_PASS=exchangepass23a@

@@ -1,0 +1,63 @@
+version: '3.9'
+services:
+  rabbitmqcapstone:
+    image: "dngoneumont/capstone:rabbit"
+    container_name: rabbitmqcapstone
+    ports:
+      - "5672"
+    networks:
+      - base-net
+    restart: on-failure
+
+  userSQLDb:
+    image: "dngoneumont/capstone:mysql"
+    container_name: userSQLDb
+    ports:
+      - "3306"
+    networks:
+      - base-net
+    restart: on-failure
+
+  rabbit-service:
+    image: "dngoneumont/capstone:rabbitapi"
+    ports:
+      - "8080"
+    networks:
+      - base-net
+    restart: on-failure
+
+  file-service:
+    image: "dngoneumont/capstone:fileapi"
+    ports:
+      - "8080"
+    networks:
+      - base-net
+    restart: on-failure
+
+  user-service:
+    image: "dngoneumont/capstone:userapi"
+    ports:
+      - "8080"
+    networks:
+      - base-net
+    restart: on-failure
+
+  eureka:
+    image: "dngoneumont/capstone:eureka"
+    ports:
+      - "8761"
+    networks:
+      - base-net
+    restart: on-failure
+
+  gateway:
+    image: "dngoneumont/capstone:gateway"
+    ports:
+      - "80:80"
+    networks:
+      - base-net
+    restart: on-failure
+
+networks:
+  base-net:
+    name: capstonenetwork

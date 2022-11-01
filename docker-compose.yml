@@ -5,7 +5,7 @@ services:
     build:
       context: ./RabbitMQController
       dockerfile: RabbitMQDockerfile.dockerfile
-    container_name: rabbitMQcapstone
+    container_name: rabbitmqcapstone
     image: simplprintrabbit
     ports:
       - "5672"
@@ -14,13 +14,16 @@ services:
       - base-net
 
   userSQLDb:
-    image: "mysql:latest"
+    build: 
+      context: ./UserRest
+      dockerfile: mysqldockerfile.dockerfile
+    image: simplprintmysql
     container_name: userSQLDb
-    environment:
-      - MYSQL_DATABASE=capstone_user_db
-      - MYSQL_USER=capstone-user
-      - MYSQL_PASSWORD=Nu200139254
-      - MYSQL_ROOT_PASSWORD=Nu200139254
+    # environment:
+    #   - MYSQL_DATABASE=capstone_user_db
+    #   - MYSQL_USER=capstone-user
+    #   - MYSQL_PASSWORD=Nu200139254
+    #   - MYSQL_ROOT_PASSWORD=Nu200139254
     ports:
       - "3306"
     networks:
@@ -34,8 +37,7 @@ services:
       - "8080"
     networks:
       - base-net
-    restart:
-      on-failure: 20
+    restart: on-failure
 
   file-service:
     build: 
@@ -56,8 +58,7 @@ services:
       - "8080"
     networks:
       - base-net
-    restart:
-      on-failure: 20
+    restart: on-failure
 
   eureka-server:
     container_name: eureka

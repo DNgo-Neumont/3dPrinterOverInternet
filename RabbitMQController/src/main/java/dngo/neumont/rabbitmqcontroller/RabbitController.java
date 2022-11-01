@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
+
 @RestController
 @RequestMapping(path= "/rabbit")
 public class RabbitController {
@@ -29,9 +31,10 @@ public class RabbitController {
         try {
             rabbitChannel = RabbitMqControllerApplication.getNewChannel();
             rabbitChannel.exchangeDeclare(exchange_name, BuiltinExchangeType.DIRECT, true);
-        } catch (IOException | TimeoutException e) {
-            e.printStackTrace();
-            logger.error("Failed to connect to RabbitMQ server! Stacktrace provided");
+        } catch (IOException e) {
+            logger.error("IO Exception creating exchange: ");
+            logger.error(e.getLocalizedMessage());
+
             throw new RuntimeException(e);
         }
     }
