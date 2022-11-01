@@ -41,6 +41,15 @@ public class UserBLL {
     public ResponseEntity<Map<String, Object>> addUser(User user){
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
 
+        if(userRepository.findByUserName(user.getUserName()) != null){
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "user with username " + user.getUserName() + " already exists");
+            response.put("user", user);
+            response.put("timestamp", LocalDateTime.now());
+
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
         User savedUser = userRepository.saveAndFlush(user);
 
         Map<String, Object> response = new HashMap<>();
