@@ -75,8 +75,12 @@ public class ByteBufferProcessor implements Runnable{
 
     @Override
     public void run() {
-        // TODO Auto-generated method stub
-        
+        try {
+            processAndSend();
+        } catch (Exception e) {
+            System.err.println("Error running gcode for printer: ");
+            e.printStackTrace();
+        } 
     }
 
     public String getPortName(){
@@ -233,6 +237,7 @@ public class ByteBufferProcessor implements Runnable{
                 
                 if(response.contains("ok") || matcher.find()){
                     currentBytesSent -= bufferHistory.get(0).getBytes().length;
+                    System.out.println("Removed " + bufferHistory.remove(0) + " from list");
                 }
 
             }
