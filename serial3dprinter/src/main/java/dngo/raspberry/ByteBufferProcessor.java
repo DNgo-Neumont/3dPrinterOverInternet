@@ -177,18 +177,18 @@ public class ByteBufferProcessor implements Runnable{
                 if(!((currentBytesSent + currentGcodeLine.getBytes().length) > maxBytesToSend)){
                     
                     
-                    if(currentGcodeLine.contains("M190")){ // bed temp warm command
-                        // System.out.println("Stepped into M190 statement");
-                    handleHeatAndCool(currentGcodeLine, "B");
-                    currentBytesSent += currentGcodeLine.getBytes().length;
-                    bufferHistory.add(currentGcodeLine);
-                }else if(currentGcodeLine.contains("M104") || currentGcodeLine.contains("M109")){ // extruder warm command
-                    // System.out.println("Current gcode line: ");
-                    // System.out.println("Stepped into m104 or m109 statement");
-                    handleHeatAndCool(currentGcodeLine, "T");
-                    currentBytesSent += currentGcodeLine.getBytes().length;
-                    bufferHistory.add(currentGcodeLine);
-                }else if(currentGcodeLine.contains("G28")){
+                //     if(currentGcodeLine.contains("M190")){ // bed temp warm command
+                //         // System.out.println("Stepped into M190 statement");
+                //     handleHeatAndCool(currentGcodeLine, "B");
+                //     currentBytesSent += currentGcodeLine.getBytes().length;
+                //     bufferHistory.add(currentGcodeLine);
+                // }else if(currentGcodeLine.contains("M104") || currentGcodeLine.contains("M109")){ // extruder warm command
+                //     // System.out.println("Current gcode line: ");
+                //     // System.out.println("Stepped into m104 or m109 statement");
+                //     handleHeatAndCool(currentGcodeLine, "T");
+                //     currentBytesSent += currentGcodeLine.getBytes().length;
+                //     bufferHistory.add(currentGcodeLine);
+                if(currentGcodeLine.contains("G28")){
                     LocalTime G28startTime = LocalTime.now();
                     boolean sent = false;
                     while(SECONDS.between(G28startTime,LocalTime.now()) < 5){
@@ -226,6 +226,10 @@ public class ByteBufferProcessor implements Runnable{
                 // errors. 
                 
                 if(SECONDS.between(startRead, LocalTime.now()) > 5){
+                    if(bufferHistory.size() > 0){
+                        System.out.println("fail safe hit - removing " + bufferHistory.get(0) + " from bytes sent");
+                        currentBytesSent -= bufferHistory.remove(0).getBytes().length;
+                    }
                     break;
                 }
 
