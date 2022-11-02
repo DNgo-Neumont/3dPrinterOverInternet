@@ -235,7 +235,7 @@ public class ByteBufferProcessor implements Runnable{
 
                 Matcher matcher = coordPattern.matcher(response.strip()); 
                 
-                if(response.contains("ok") || matcher.find()){
+                if((response.contains("ok") || matcher.find()) && bufferHistory.size() > 0){
                     currentBytesSent -= bufferHistory.get(0).getBytes().length;
                     System.out.println("Removed " + bufferHistory.remove(0) + " from list");
                 }
