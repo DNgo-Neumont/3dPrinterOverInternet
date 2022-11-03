@@ -26,6 +26,9 @@ public class Main {
         System.out.println("The printer port will most likely be a USB Serial Device or named after the printer itself.");
         
 
+        RabbitMQConsumerThread rabbitConsumer = new RabbitMQConsumerThread();
+
+
         StringBuilder menu = new StringBuilder();
 
         menu.append("Menu: ").append("\n")
