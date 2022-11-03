@@ -15,8 +15,8 @@ public class Main {
 
     public static final String exchange_name = "command-exchange";
     public static void main(String[] args){
-        // List<GcodeProcessor> processorList = new ArrayList<GcodeProcessor>();
-        List<ByteBufferProcessor> processorList = new ArrayList<>();
+        List<GcodeProcessor> processorList = new ArrayList<GcodeProcessor>();
+        // List<ByteBufferProcessor> processorList = new ArrayList<>();
         //Simple intro
         String ver = "1.0";
         String author = "David V. Ngo";
@@ -25,6 +25,9 @@ public class Main {
         System.out.println("!PLEASE FIND YOUR PRINTER'S SPECIFIED BAUD RATE BEFORE RUNNING THIS PROGRAM!");
         System.out.println("The printer port will most likely be a USB Serial Device or named after the printer itself.");
         
+
+        RabbitMQConsumerThread rabbitConsumer = new RabbitMQConsumerThread();
+
 
         StringBuilder menu = new StringBuilder();
 
@@ -107,11 +110,11 @@ public class Main {
                             }
                                 
                             fault = true;
-                            // GcodeProcessor gcodeProcessor = new GcodeProcessor();
-                            // gcodeProcessor.setPort(portSelected);
-                            
-                            ByteBufferProcessor gcodeProcessor = new ByteBufferProcessor();
+                            GcodeProcessor gcodeProcessor = new GcodeProcessor();
                             gcodeProcessor.setPort(portSelected);
+                            
+                            // ByteBufferProcessor gcodeProcessor = new ByteBufferProcessor();
+                            // gcodeProcessor.setPort(portSelected);
 
                             processorList.add(gcodeProcessor);
     
@@ -130,7 +133,8 @@ public class Main {
                         
                         boolean correctSelection = false;
     
-                        ByteBufferProcessor processor = null;
+                        // ByteBufferProcessor processor = null;
+                        GcodeProcessor processor = null;
                         int selectedPrinter = 0;
                         while(!correctSelection){
                             

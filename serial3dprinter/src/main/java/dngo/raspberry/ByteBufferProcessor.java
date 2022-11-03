@@ -130,16 +130,16 @@ public class ByteBufferProcessor implements Runnable{
             }
         }
     }
-
+    
     public void processAndSend() throws Exception{
         while(currentLineNumber != gcodeLineCount){
             //Create a rabbitMQ producer here and send data back to frontend
             //This class will be wrapped into another rabbitMQ consumer thread that will queue up prints
             //and print them according to whatever it consumes.
             String currentGcodeLine = "";
-
+            
             if(waitingLine.isBlank()){
-
+                
                 currentGcodeLine = gcodeReader.readLine();
                 currentLineNumber++;
                 // double currentPercentage = currentLineNumber * 100.00 / gcodeLineCount;
@@ -149,45 +149,46 @@ public class ByteBufferProcessor implements Runnable{
                 //Filters out blank lines, comments, and the auto leveling command.
                 while((currentGcodeLine.isBlank() || currentGcodeLine.charAt(0) == ';')){ //|| currentGcodeLine.substring(0, 4).contentEquals("M420"))){
                     
-    
+                    
                     currentGcodeLine = gcodeReader.readLine();
                     currentLineNumber++;
                     if(currentLineNumber >= gcodeLineCount) break;
                     // currentPercentage = currentLineNumber * 100.00 / gcodeLineCount;
                     // System.out.println(currentGcodeLine);
                     // System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
-    
+                    
                 }
+                
+                System.out.println("current line: " + currentGcodeLine);
                 
                 if(currentGcodeLine == null) break;
             }else{
                 currentGcodeLine = waitingLine;
             }
             
-            System.out.println("current line: " + currentGcodeLine);
-
+            
             // if(bufferHistory.size() < historySize){
             //     bufferHistory.add(currentGcodeLine);
             // }else{
-            //     bufferHistory.remove(0);
-            //     bufferHistory.add(currentGcodeLine);
-            // }
-
-            if(!((currentBytesSent + currentGcodeLine.getBytes().length) > maxBytesToSend)){
+                //     bufferHistory.remove(0);
+                //     bufferHistory.add(currentGcodeLine);
+                // }
                 
-
-                if(currentGcodeLine.contains("M190")){ // bed temp warm command
-                    // System.out.println("Stepped into M190 statement");
-                    handleHeatAndCool(currentGcodeLine, "B");
-                    currentBytesSent += currentGcodeLine.getBytes().length;
-                    bufferHistory.add(currentGcodeLine);
-                }else if(currentGcodeLine.contains("M104") || currentGcodeLine.contains("M109")){ // extruder warm command
-                    // System.out.println("Current gcode line: ");
-                    // System.out.println("Stepped into m104 or m109 statement");
-                    handleHeatAndCool(currentGcodeLine, "T");
-                    currentBytesSent += currentGcodeLine.getBytes().length;
-                    bufferHistory.add(currentGcodeLine);
-                }else if(currentGcodeLine.contains("G28")){
+                if(!((currentBytesSent + currentGcodeLine.getBytes().length) > maxBytesToSend)){
+                    
+                    
+                //     if(currentGcodeLine.contains("M190")){ // bed temp warm command
+                //         // System.out.println("Stepped into M190 statement");
+                //     handleHeatAndCool(currentGcodeLine, "B");
+                //     currentBytesSent += currentGcodeLine.getBytes().length;
+                //     bufferHistory.add(currentGcodeLine);
+                // }else if(currentGcodeLine.contains("M104") || currentGcodeLine.contains("M109")){ // extruder warm command
+                //     // System.out.println("Current gcode line: ");
+                //     // System.out.println("Stepped into m104 or m109 statement");
+                //     handleHeatAndCool(currentGcodeLine, "T");
+                //     currentBytesSent += currentGcodeLine.getBytes().length;
+                //     bufferHistory.add(currentGcodeLine);
+                if(currentGcodeLine.contains("G28")){
                     LocalTime G28startTime = LocalTime.now();
                     boolean sent = false;
                     while(SECONDS.between(G28startTime,LocalTime.now()) < 5){
@@ -225,6 +226,10 @@ public class ByteBufferProcessor implements Runnable{
                 // errors. 
                 
                 if(SECONDS.between(startRead, LocalTime.now()) > 5){
+                    if(bufferHistory.size() > 0){
+                        System.out.println("fail safe hit - removing " + bufferHistory.get(0) + " from bytes sent");
+                        currentBytesSent -= bufferHistory.remove(0).getBytes().length;
+                    }
                     break;
                 }
 
@@ -235,7 +240,7 @@ public class ByteBufferProcessor implements Runnable{
 
                 Matcher matcher = coordPattern.matcher(response.strip()); 
                 
-                if(response.contains("ok") || matcher.find()){
+                if((response.contains("ok") || matcher.find()) && bufferHistory.size() > 0){
                     currentBytesSent -= bufferHistory.get(0).getBytes().length;
                     System.out.println("Removed " + bufferHistory.remove(0) + " from list");
                 }
