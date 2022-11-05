@@ -19,10 +19,16 @@
   </properties>
 
   <dependencies>
-    <dependency>
+    <!-- <dependency>
         <groupId>com.rabbitmq</groupId>
         <artifactId>amqp-client</artifactId>
         <version>5.16.0</version>
+    </dependency> -->
+    <!-- https://mvnrepository.com/artifact/io.socket/socket.io-client -->
+    <dependency>
+      <groupId>io.socket</groupId>
+      <artifactId>socket.io-client</artifactId>
+      <version>2.1.0</version>
     </dependency>
     <dependency>
       <groupId>com.fazecast</groupId>

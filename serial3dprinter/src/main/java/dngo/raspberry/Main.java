@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import com.fazecast.jSerialComm.*;
 
 public class Main {
@@ -26,7 +27,11 @@ public class Main {
         System.out.println("The printer port will most likely be a USB Serial Device or named after the printer itself.");
         
 
-        RabbitMQConsumerThread rabbitConsumer = new RabbitMQConsumerThread();
+
+        // RabbitMQConsumerThread rabbitConsumer = new RabbitMQConsumerThread();
+        // No longer using rabbitMQ - current azure hosting scheme makes it impractical
+
+
 
 
         StringBuilder menu = new StringBuilder();
