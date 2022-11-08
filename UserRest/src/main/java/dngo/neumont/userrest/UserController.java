@@ -110,6 +110,12 @@ public class UserController {
                 JWTVerifier jwtVerifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = jwtVerifier.verify(refreshToken);
                 String userName = decodedJWT.getSubject();
+                List<String> rolesOfJWT = (List<String>) decodedJWT.getClaim("roles");
+
+                if(rolesOfJWT.contains("PI_USER")){
+                    throw new IllegalArgumentException("Cannot refresh with tokens meant for the consumer program!");
+                }
+
                 User user = userBLL.loadUserByUsername(userName);
 
                 if(user != null){
@@ -164,4 +170,47 @@ public class UserController {
         }
     }
 
+    @RequestMapping(method = RequestMethod.POST, path="/piAuth")
+    public ResponseEntity<Map<String, Object>> raspberryPiAuth(HttpServletRequest request, @RequestBody JsonNode userDetails){
+        String userName = userDetails.get("user_name").asText();
+        String password = userDetails.get("password").asText();
+
+        User userToCheck = userBLL.loadUserByUsername(userName);
+
+        if(BCrypt.checkpw(password, userToCheck.getPassword())){
+            System.out.println("Successfully logged in user (PI): " + userName);
+
+            String rawRoles = userToCheck.getRoles();
+            //This whole mess splits the CS values and strips them of whitespace to collect into a list for sending.
+//            List<String> roles = Arrays.stream(rawRoles.split(",")).map((String s) -> {s = s.strip(); return s;}).collect(Collectors.toList());
+
+            List<String> roles = List.of("ROLE_PI_USER");
+
+            Algorithm algorithm = Algorithm.HMAC256(auth_secret.getBytes());
+            String accessToken = JWT.create()
+                    .withSubject(userToCheck.getUserName()) //Better way of determining expiry time
+                    .withExpiresAt(Instant.from(ZonedDateTime.of(LocalDateTime.now().plusDays(10), ZoneId.systemDefault())))
+                    .withIssuer(request.getRequestURL().toString())
+                    //Change to pulling roles from DB
+                    .withClaim("roles", roles)
+                    .sign(algorithm);
+            String refreshToken = JWT.create()
+                    .withSubject(userToCheck.getUserName()) //Better way of determining expiry time
+                    .withExpiresAt(Instant.from(ZonedDateTime.of(LocalDateTime.now().plusDays(30), ZoneId.systemDefault())))
+                    .withIssuer(request.getRequestURL().toString())
+                    .sign(algorithm);
+            Map<String, Object> response = new HashMap<>();
+
+            response.put("access_token", accessToken);
+            response.put("refreshToken", refreshToken);
+            response.put("timestamp", LocalDateTime.now());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }else{
+            Map<String, Object> response = new HashMap<>();
+
+            response.put("message", "Invalid credentials");
+            response.put("timestamp", LocalDateTime.now());
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        }
+    }
 }

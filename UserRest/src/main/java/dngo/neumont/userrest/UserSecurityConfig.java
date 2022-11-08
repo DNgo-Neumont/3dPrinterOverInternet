@@ -24,6 +24,7 @@ public class UserSecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeHttpRequests()
                 .antMatchers(HttpMethod.POST, "/user/auth").permitAll()
+                .antMatchers(HttpMethod.POST, "/user/piAuth").permitAll()
                 .antMatchers(HttpMethod.POST, "/user").permitAll()
                 .antMatchers(HttpMethod.GET, "/user/refreshAuth").permitAll()
                 .antMatchers(HttpMethod.GET,"/user/**").hasAnyRole("USER","ADMIN")

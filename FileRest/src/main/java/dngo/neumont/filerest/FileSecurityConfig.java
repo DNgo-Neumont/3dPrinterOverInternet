@@ -18,6 +18,7 @@ public class FileSecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeHttpRequests()
                 .antMatchers(HttpMethod.POST, "/file/addFile").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/file/{username}/{filename}").hasAnyRole("USER", "ADMIN", "PI_USER")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new ClientJWTFilter(), UsernamePasswordAuthenticationFilter.class);

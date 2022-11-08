@@ -70,6 +70,15 @@ services:
     networks:
       - base-net
 
+  socket-service:
+    build:
+      context: ./djangoSocketServer
+    image: simplprintsocketserver
+    ports:
+      - "8080"
+    networks:
+      - base-net
+
   gateway:
     container_name: capstone_gateway
     build:

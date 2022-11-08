@@ -1,0 +1,6 @@
+Django
+djangorestframework
+eventlet
+py-eureka-client
+python-socketio
+pyjwt

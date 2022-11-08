@@ -19,14 +19,21 @@ spring:
           uri: lb://file-service
           predicates:
             - Path=/file/**
-        - id: rabbit-route
-          uri: lb://rabbit-service
+#        - id: rabbit-route
+#          uri: lb://rabbit-service
+#          predicates:
+#            - Path=/rabbit/**
+#        Rabbit mq is deprecated for right now until I can figure out a use for it besides the original consumer purpose
+#        - id: rabbit-server
+#          uri: amqp://rabbitmqcapstone:5672
+#          predicates:
+#            - Path=/rabbitserver/**
+        - id: django-socket-server
+          uri: lb://django-socket-server
           predicates:
-            - Path=/rabbit/**
-        - id: rabbit-server
-          uri: amqp://rabbitmqcapstone:5672
-          predicates:
-            - Path=/rabbitserver/**
+            - Path=/socket/**, /socket.io/**
+          filters:
+            - RewritePath=/socket/(?<segment>.*), /$\{segment}
 eureka:
   client:
     service-url:
