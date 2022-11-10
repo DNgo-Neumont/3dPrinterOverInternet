@@ -1,10 +1,9 @@
 version: '3.9'
 services:
-  rabbitmqcapstone:
-    image: "dngoneumont/capstone:rabbit"
-    container_name: rabbitmqcapstone
+  socket-service:
+    image: "dngoneumont/capstone:socketapi"
     ports:
-      - "5672"
+      - "8080"
     networks:
       - base-net
     restart: on-failure
@@ -18,13 +17,6 @@ services:
       - base-net
     restart: on-failure
 
-  rabbit-service:
-    image: "dngoneumont/capstone:rabbitapi"
-    ports:
-      - "8080"
-    networks:
-      - base-net
-    restart: on-failure
 
   file-service:
     image: "dngoneumont/capstone:fileapi"

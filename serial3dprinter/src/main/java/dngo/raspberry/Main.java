@@ -2,13 +2,22 @@ package dngo.raspberry;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.fazecast.jSerialComm.*;
 
@@ -28,6 +37,9 @@ public class Main {
         
 
 
+
+
+
         // RabbitMQConsumerThread rabbitConsumer = new RabbitMQConsumerThread();
         // No longer using rabbitMQ - current azure hosting scheme makes it impractical
 
@@ -39,7 +51,7 @@ public class Main {
         menu.append("Menu: ").append("\n")
         .append("1. Select new printer").append("\n")
         .append("2. Run gcode on selected printers").append("\n")
-        .append("3. Monitor printers ").append("\n")
+        .append("3. Sign in and connect to services ").append("\n")
         .append("4. Exit");
 
         System.out.println(menu.toString());
@@ -194,6 +206,56 @@ public class Main {
                         printerThread.start();
                     break;
                 case "3":
+
+                    try {
+                        System.out.println("Enter your username: ");
+                        String username = userInput.readLine();
+                        System.out.println("Enter your password: ");
+                        String password = userInput.readLine();
+
+                        String url = "https://simplprint3d.com/user/piAuth";
+
+                        URL authUrl = new URL(url);
+
+                        HttpsURLConnection connection = (HttpsURLConnection) authUrl.openConnection();
+                        connection.setRequestMethod("POST");
+                        
+                        // Map<String, String> requestBody = new HashMap<>();
+                        // requestBody.put("user_name", username);
+                        // requestBody.put("password", password);
+                        
+                        String requestBody = "{\"user_name\" : \""+ username + "\", \"password\":\"" + password + "\" }";
+                    
+                        System.out.println(requestBody);
+
+                        connection.setRequestProperty("Content-Type", "application/json");
+                        connection.setRequestProperty("Content-length", String.valueOf(requestBody.toString().length()));
+                        connection.setDoOutput(true);
+                        connection.setDoInput(true);
+
+                        DataOutputStream httpsStream = new DataOutputStream(connection.getOutputStream());
+                        httpsStream.writeBytes(requestBody.toString());
+                        httpsStream.close();
+
+                        System.out.println("Response message: " + connection.getResponseMessage());
+
+                        DataInputStream readStream = new DataInputStream(connection.getInputStream());
+
+                        String result = new String(readStream.readAllBytes());
+
+                        System.out.println("Response: " + new JSONObject(result));
+
+                        SocketIOConsumerThread socketTest = new SocketIOConsumerThread(new JSONObject(result).get("access_token").toString());
+
+                    
+                    } catch (IOException | JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
                     break;
 
                 case "4":
@@ -205,7 +267,7 @@ public class Main {
                     break;
             }
 
-            clrscr();
+            // clrscr();
             System.out.println(menu);
         }
 

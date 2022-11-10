@@ -1,19 +1,31 @@
 from datetime import datetime
+import os
 import traceback
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from socketservercapstone.wsgi import sio, authSecret
+from socketservercapstone.sioinit import sio as baseSocketServer
+# from socketservercapstone.wsgi import sio, authSecret
 import jwt
 # Create your views here.
+
+authSecret = os.environ["JWT_SECRET"]
+sio = baseSocketServer
+
 
 validIssuers = ["https://simplprint.azurewebsites.net/user/auth", "https://simplprint3d.com/user/auth"]
 
 @api_view(("POST",))
 def queuePrint(request, *args, **kwargs):
     
-    requestToken = request.auth
+    requestToken = request.META["HTTP_AUTHORIZATION"]
     
+    requestToken = str(requestToken).replace("Bearer", "").strip()
+
+    print("Incoming req token")
+    print(requestToken)
+
+
     print(request.data)
 
     requestData = dict(request.data)
@@ -27,8 +39,9 @@ def queuePrint(request, *args, **kwargs):
 
 
     try:
-        decodedToken = jwt.decode(requestToken, authSecret, ["HS256"])
+        decodedToken = jwt.decode(requestToken, key=authSecret, algorithms=["HS256"])
 
+        print("Decoded token: ")
         print(decodedToken)
 
         if(not(validIssuers[0] in decodedToken.get("iss") or validIssuers[1] in decodedToken.get("iss"))):

@@ -31,9 +31,13 @@ spring:
         - id: django-socket-server
           uri: lb://django-socket-server
           predicates:
-            - Path=/socket/**, /socket.io/**
+            - Path=/socket/**
           filters:
             - RewritePath=/socket/(?<segment>.*), /$\{segment}
+        - id: django-socket-route
+          uri: lb:wss://django-socket-server
+          predicates:
+            - Path=/socket.io/**
 eureka:
   client:
     service-url:
