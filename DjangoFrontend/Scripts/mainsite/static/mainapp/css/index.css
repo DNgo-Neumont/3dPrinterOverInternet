@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css?family=Sarabun:400");
+/* Intro font */
+@import url("https://fonts.googleapis.com/css?family=Epilogue:400");
+
+.intro_text{
+    margin: 0;
+    font-family: Sarabun;
+    color: #FFFFFF;
+    font-size: 3em;
+    padding-left: 20px;
+    /* text-align: center; */
+    position: absolute;
+    top: 60%;
+    transform: translate(0, -10%);
+    z-index: 1;
+}
+
+.intro_video{
+    height: 100%;
+    width: 100%;
+}
+
+
+.description{
+    margin: 1em;
+    background-color: #30475E;
+}
+
+.description h2{
+    padding: 1em;
+    font-family: Sarabun;
+    color: #FFFFFF;
+}
+
+.description p{
+    padding: 1em;
+    font-family: Epilogue;
+    color: #FFFFFF;
+
+}

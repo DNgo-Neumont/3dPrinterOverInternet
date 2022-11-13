@@ -1,0 +1,29 @@
+{% extends "./base.html" %}
+{% load static %}
+
+<!-- {# these are comments for the template engine #} -->
+<!-- {#{% block title %} test changing title {% endblock %}#} -->
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'mainapp/css/index.css' %}">
+{% endblock %}
+
+<!-- <link rel="icon" href="./images/simplPrintIcon.png"> -->
+{% block content %}
+    <div class="intro_background">
+        <video autoplay muted loop class="intro_video" >
+            <source src="{% static 'mainapp/3dprinterStockvideo.mp4' %}" type="video/mp4">
+        </video>
+        <h1 class="intro_text">
+            Control your 3D printers from a hotel in Venice.
+        </h1>
+    </div>
+    <div class="description">
+        <h2>
+            Simplprint is a cloud hosted, remotely accessible suite of software for controlling and printing to 3d printers from anywhere in the world, as long as you have an internet connection. 
+        </h2>
+        <p>
+            No complicated setups, no port forwarding, nothing. Just download our executable and plug in your printer and you're good to go. Once you've signed up, you can print whatever you want whether you're out and about or you just don't want to walk upstairs. 
+        </p>
+    </div>
+{% endblock %}

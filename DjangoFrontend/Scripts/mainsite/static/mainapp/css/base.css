@@ -1,0 +1,91 @@
+/*  Link font */
+@import url("https://fonts.googleapis.com/css?family=Kanit:300,400");
+
+
+/*import some decent fonts*/
+html{
+    margin: 0;
+    padding: 0;
+}
+
+
+body{
+    margin: 0;
+    padding: 0;
+    background-color: #2C3333;
+}
+
+.header_div {
+    background-color: #30475E;
+    height: 8.2em;
+    margin: 0;
+    overflow: vertical;
+    /* width: 100%; */
+    display: block;
+}
+
+.main_link_list{
+    margin: 0;
+    float: right;
+    margin-right: 20px;
+    text-align: center;
+}
+
+.main_link_list li{
+    padding: 10px;
+    font-size: 26px;
+    /* background-color: #DDDDDD; */
+    color: #A5C9CA;
+    border-radius: 2px;
+    list-style: none;
+    margin: 35px;
+}
+
+.main_link_list a{
+
+    font-family: Kanit;
+    text-decoration: none;
+    color: #A5C9CA;
+    padding: 1em;
+}
+
+.main_link_list a:visited{
+    color: #A5C9CA
+}
+
+.main_link_list a:hover{
+    color: #DDDDDD;
+    background-color: rgba(255, 255, 255,.3);
+    border-radius: 5px;
+}
+
+
+.logo_background {
+    background-color: #DDDDDD;
+    max-width: 240px;
+    float: left;
+    /* margin-top: 13px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    padding: 10px 10px 10px 10px; */
+    margin-top: 1.2em;
+    margin-left: 1em;
+    padding: .4em;
+    border-radius: 5px;
+    /* flex: auto; */
+}
+
+.logo_image{
+    height: 100%;
+    width: 100%;
+    
+    /* padding: 10px 10px 10px 10px; */
+    /* margin:10px 10px 10px 10px; */
+}
+
+.footer_h2{
+    float: left;
+    color: #FFFFFF;
+    font-family: Kanit;
+    padding: 1em;
+}

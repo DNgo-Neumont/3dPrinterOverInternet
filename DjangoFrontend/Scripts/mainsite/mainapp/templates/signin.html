@@ -1,0 +1,39 @@
+{% extends "./base.html" %}
+{% load static %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'mainapp/css/signin.css' %}"> 
+    {% endblock %}
+    
+    {% block content %}
+    
+    <div class="form_container">
+        <div class="login_form">
+            <form>
+                <div>
+                    <label for="username">Username </label>
+                </div>
+                <div>
+                    <input type="text" id="username" name="username">
+                </div>
+                <div>
+                    <label for="password">Password </label>
+                </div>
+                <div>
+                    <input type="password" id="password" name="password">
+                </div>
+                <div>
+                    <div class="submit_button" id="submit_button">
+                        Sign in
+                    </div>
+                </div>
+  
+            </form>
+        </div>
+    </div>
+    
+    <script src="{% static 'mainapp/js/signin.js' %}"></script>
+    {% endblock %}
+    
+
+    

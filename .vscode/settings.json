@@ -2,6 +2,7 @@
     "java.configuration.updateBuildConfiguration": "automatic",
     "python.analysis.typeCheckingMode": "off",
     "python.analysis.extraPaths": [
-        "./djangoSocketServer/Scripts/socketservercapstone"
+        "./djangoSocketServer/Scripts/socketservercapstone",
+        "./DjangoFrontend/Scripts/mainsite"
     ]
 }
