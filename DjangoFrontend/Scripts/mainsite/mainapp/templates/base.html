@@ -6,7 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SimplPrint - Remote 3D Printing{% endblock %}</title>
-    <link rel="icon" href="{% static 'mainapp/simplPrintIcon.png' %}">
+    <link rel="icon" href="{% get_media_prefix %}{{'mainapp/simplPrintIcon.png'}}">
+    <!-- <link rel="icon" href="media/mainapp/simplPrintIcon.png"> -->
     <link rel="stylesheet" href="{% static 'mainapp/css/base.css'%}">
     {% block stylesheet %}
     {% endblock %}
@@ -14,17 +15,30 @@
     <body>
         <div class="header_div">
             <div class="logo_background">
-                <img class="logo_image" src="{% static 'mainapp/SimplPrintLogo_final_cropped.png' %}">
+                <!-- to get this to work - use {#% get_media_prefix %#} -->
+                <img class="logo_image" src="{% get_media_prefix %}{{'mainapp/simplPrintLogo_final_cropped.png'}}">
+                <!-- <img class="logo_image" src="media/mainapp/simplPrintLogo_final_cropped.png"> -->
             </div>
             <nav>
                 <ul class="main_link_list">
+                    {% if auth %}
                     <li>
+                        <a href="/{{ username }}">{{ username }}</a>
                         <a href="/">Home</a>
                         <a href="/">Downloads</a>
                         <a href="/">Dashboard</a>
                         <a href="/">About</a>
-                        <a href="/login/">Login</a>
+                        <a href="/logout">Log out</a>
                     </li>
+                    {% else %}
+                    <li>
+                        <a href="/">Home</a>
+                        <a href="/">Downloads</a>
+                        <!-- <a href="/">Dashboard</a> -->
+                        <a href="/">About</a>
+                        <a href="/login/">Log in</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>

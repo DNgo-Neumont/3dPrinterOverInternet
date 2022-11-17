@@ -38,6 +38,10 @@ spring:
           uri: lb:wss://django-socket-server
           predicates:
             - Path=/socket.io/**
+        - id: django-frontend
+          uri: lb://django-frontend
+          predicates:
+            - Path=/**
 eureka:
   client:
     service-url:

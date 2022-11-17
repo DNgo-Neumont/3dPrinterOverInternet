@@ -1,17 +1,17 @@
 version: '3.9'
 services:
 
-  rabbitMq:
-    build:
-      context: ./RabbitMQController
-      dockerfile: RabbitMQDockerfile.dockerfile
-    container_name: rabbitmqcapstone
-    image: simplprintrabbit
-    ports:
-      - "5672"
-      - "15672:15672"
-    networks:
-      - base-net
+  # rabbitMq:
+  #   build:
+  #     context: ./RabbitMQController
+  #     dockerfile: RabbitMQDockerfile.dockerfile
+  #   container_name: rabbitmqcapstone
+  #   image: simplprintrabbit
+  #   ports:
+  #     - "5672"
+  #     - "15672:15672"
+  #   networks:
+  #     - base-net
 
   userSQLDb:
     build: 
@@ -29,15 +29,15 @@ services:
     networks:
       - base-net
   
-  rabbit-service:
-    build: 
-      context: ./RabbitMQController
-    image: simplprintrabbitapi
-    ports:
-      - "8080"
-    networks:
-      - base-net
-    restart: on-failure
+  # rabbit-service:
+  #   build: 
+  #     context: ./RabbitMQController
+  #   image: simplprintrabbitapi
+  #   ports:
+  #     - "8080"
+  #   networks:
+  #     - base-net
+  #   restart: on-failure
 
   file-service:
     build: 
@@ -67,6 +67,16 @@ services:
     image: simplprinteureka
     ports:
       - "8761:8761"
+    networks:
+      - base-net
+
+
+  django-frontend:
+    build:
+      context: ./DjangoFrontend
+    image: simplprintdjangofrontend
+    ports: 
+      - "8000"
     networks:
       - base-net
 

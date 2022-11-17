@@ -56,6 +56,23 @@
     border-color: #888888;
 }
 
+.login_form a{
+    font-family: Sarabun;
+    text-decoration: none;
+    color: white;
+    padding: .25em;
+}
+
+.login_form  a:visited{
+    color: white;
+}
+
+.login_form h6{
+    display: none;
+    font-family: Sarabun;
+    color: red;
+}
+
 .submit_button{
     margin-top: .5em;
     padding: .75em;

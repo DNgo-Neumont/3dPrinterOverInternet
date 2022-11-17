@@ -21,12 +21,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-t0xrtez0rxz)o)b2ir8-dxd26%-8s6gz6+cxa73f$x%lx2o7#p'
+# SECRET_KEY = 'django-insecure-t0xrtez0rxz)o)b2ir8-dxd26%-8s6gz6+cxa73f$x%lx2o7#p'
+
+key = ""
+
+with open(os.path.join(BASE_DIR, "sessionkey.txt")) as file:
+    key = file.readline().strip()
+
+SECRET_KEY = key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -120,10 +127,23 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+print(os.path.join(BASE_DIR, 'static/'))
+
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'static/'),
 )
+# Doing this to try and resolve path errors when django serves an image
+# PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+
+# STATICFILES_DIRS = (
+#     os.path.join(PROJECT_ROOT, 'static'),
+# )
+
 # STATIC_ROOT = "static/"
+print(os.path.join(BASE_DIR,"media/"))
+
+MEDIA_ROOT = os.path.join(BASE_DIR,"media/")
+MEDIA_URL = 'media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

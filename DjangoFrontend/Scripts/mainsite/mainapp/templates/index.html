@@ -12,7 +12,8 @@
 {% block content %}
     <div class="intro_background">
         <video autoplay muted loop class="intro_video" >
-            <source src="{% static 'mainapp/3dprinterStockvideo.mp4' %}" type="video/mp4">
+            <source src="{% get_media_prefix %}{{'mainapp/3dprinterStockvideo.mp4'}}" type="video/mp4">
+            <!-- <source src="media/mainapp/3dprinterStockvideo.mp4" type="video/mp4"> -->
         </video>
         <h1 class="intro_text">
             Control your 3D printers from a hotel in Venice.

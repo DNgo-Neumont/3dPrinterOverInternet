@@ -1,0 +1,31 @@
+{% extends "./base.html" %}
+{% load static %}
+
+
+{% block content %}
+    <div class="container">
+        <div>
+            <h1>Username: {{ username }}</h1>
+            <label for="change_username">New username: </label>
+            <input type="text" name="change_username" id="change_username">
+        </div>
+        <div>
+            <h1>Email: {{ email }}</h1>
+            <label for="change_email">New email: </label>
+            <input type="text" name="change_email" id="change_email">
+        </div>
+        <div>
+            <label for="change_password">New password: </label>
+            <input type="text" name="change_password" id="change_password">
+        </div>
+        <div>
+            <label for="confirm_password">Retype new password: </label>
+            <input type="text" name="confirm_password" id="confirm_password">
+        </div>
+        <div>
+            <div id="submit_button">
+                Update user information
+            </div>
+        </div>
+    </div>
+{% endblock %}

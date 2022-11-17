@@ -1,0 +1,44 @@
+{% extends "./base.html" %}
+{% load static %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'mainapp/css/register.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="form_body">
+            <div>
+                <h6 id="error_message">You've entered a nonunique username. Please change it.</h6>
+            </div>
+            <div>
+                <label for="username">Username: </label>
+            </div>
+            <div>
+                <input type="text" id="username" name="username">
+            </div>
+            <div>
+                <label for="email">Email: </label>
+            </div>
+            <div>
+                <input type="text" id="email" name="email">
+            </div>
+            <div>
+                <label for="password">Password: </label>
+            </div>
+            <div>
+                <input type="password" id="password" name="password">
+            </div>
+            <div>
+                <div class="submit_button" id="submit_button">
+                    Submit
+                </div>
+            </div>
+            <div>
+                <a href="/login/">Already have an account? Log in here.</a>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'mainapp/js/register.js' %}"></script>
+{% endblock %}

@@ -110,11 +110,11 @@ public class UserController {
                 JWTVerifier jwtVerifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = jwtVerifier.verify(refreshToken);
                 String userName = decodedJWT.getSubject();
-                List<String> rolesOfJWT = (List<String>) decodedJWT.getClaim("roles");
+//                List<String> rolesOfJWT = (List<String>) decodedJWT.getClaim("roles");
 
-                if(rolesOfJWT.contains("PI_USER")){
-                    throw new IllegalArgumentException("Cannot refresh with tokens meant for the consumer program!");
-                }
+//                if(rolesOfJWT.contains("PI_USER")){
+//                    throw new IllegalArgumentException("Cannot refresh with tokens meant for the consumer program!");
+//                }
 
                 User user = userBLL.loadUserByUsername(userName);
 
@@ -125,11 +125,11 @@ public class UserController {
                             .withClaim("roles", List.of("ROLE_USER"))
                             .withIssuer(request.getRequestURL().toString())
                             .sign(algorithm);
-//                    refreshToken = JWT.create()
-//                            .withSubject(user.getUserName()) //Better way of determining expiry time
-//                            .withExpiresAt(Instant.from(ZonedDateTime.of(LocalDateTime.now().plusMinutes(10), ZoneId.systemDefault())))
-//                            .withIssuer(request.getContextPath())
-//                            .sign(algorithm);
+                    refreshToken = JWT.create()
+                            .withSubject(user.getUserName()) //Better way of determining expiry time
+                            .withExpiresAt(Instant.from(ZonedDateTime.of(LocalDateTime.now().plusMinutes(30), ZoneId.systemDefault())))
+                            .withIssuer(request.getContextPath())
+                            .sign(algorithm);
                     Map<String, Object> tokenResponse = new HashMap<>();
 
                     tokenResponse.put("access_token", accessToken);
@@ -213,4 +213,28 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
     }
+
+    @RequestMapping(method = RequestMethod.GET, path="/userLookup/{username}")
+    public ResponseEntity<Map<String, Object>> getUserByUsername(@PathVariable String username){
+        //call to bll with username> for getting a user
+//        return userBLL.loadUserByUsername(username);
+
+        User foundUser = userBLL.loadUserByUsername(username);
+        Map<String, Object> response = new HashMap<>();
+
+        if(foundUser != null){
+            response.put("message", "User found");
+            response.put("user",foundUser);
+            response.put("timestamp", LocalDateTime.now());
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }else{
+            response.put("message", "User not found");
+            response.put("timestamp", LocalDateTime.now());
+
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+    }
+
 }
