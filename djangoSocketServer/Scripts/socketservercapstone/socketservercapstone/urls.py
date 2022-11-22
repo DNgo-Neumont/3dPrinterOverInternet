@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from socketcomponents.views import queuePrint
+from socketcomponents.views import queuePrint, requestStatus
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("queuePrint/", queuePrint)
+    path("queuePrint/", queuePrint),
+    path("getStatus/", requestStatus)
 ]

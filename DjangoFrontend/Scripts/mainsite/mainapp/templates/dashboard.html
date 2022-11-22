@@ -1,0 +1,32 @@
+{% extends "./base.html" %}
+{% load static %}
+
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'mainapp/css/dashboard.css' %}">
+{% endblock %}
+
+
+
+
+{% block content %}
+<div class="container">
+    <div class="header_container">
+        <nav class="user_options">
+            <ul class="user_link_list">
+                <li>
+                    <a href="/">Files</a>
+                    <a href="/">Printers</a>
+                    <a href="/">Consumers</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div>
+
+    </div>
+
+</div>
+
+
+{% endblock %}

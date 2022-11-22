@@ -65,6 +65,8 @@ def login_render(request, *args, **kwargs):
 
             resJson = json.loads(res)
 
+            print("response json(login): ", resJson)
+
             tokens = {}
             access_token = resJson["access_token"]
             refresh_token = resJson["refreshToken"]
@@ -86,7 +88,6 @@ def login_render(request, *args, **kwargs):
             
             return JsonResponse(responseData)
 
-        template = loader.get_template("index.html")
         # return HttpResponse(template.render(), tokens)
         responseData = {
             "message" : "ok"
@@ -131,69 +132,22 @@ def registerUser(request, *args, **kwargs):
         
 @api_view(("GET", "POST"))
 def user_update(request, *args, **kwargs):
-    try:
-
-        headerDef = {
-            "Authorization": "Bearer " + request.session["auth_tokens"]["access_token"]
-        }
-
-        print(headerDef)
-
-        res = eureka_client.do_service("USER-SERVICE", "/user/userLookup/" + kwargs["username"], method="GET", headers=headerDef)
-        
-        resJson = json.loads(res)
-
-        formattedUser = resJson["user"]
-
-        user = {
-            # "username": request.session["username"],
-            "username": formattedUser["userName"],
-            "auth": request.session["auth"],
-            "email": formattedUser["userEmail"]
-        }
-
-        print(user.get("username"))
-
-        return render(request, "user.html", context=user)
-    except HTTPError as httpError:
-        if(httpError.code == 403 or httpError.code == 500):
-            print(httpError.code)
-
-
-            headerDef = {
-                "Authorization": "Bearer " + request.session["auth_tokens"]["refresh_token"]
-            }            
-            print(headerDef)
-            print("old tokens")
-            print(request.session["auth_tokens"])
-
-            print("doing refresh call")
-            res = eureka_client.do_service("USER-SERVICE", "/user/refreshAuth", method="GET", headers=headerDef)
-
-            print("successful refresh call")
-            authJson = json.loads(res)
-
-            print("json response: ", authJson)
-            tokens =  {
-                "access_token": authJson["access_token"],
-                #FOR SOME REASON THIS ONE COMES IN WITH A UNDERSCORE.
-                "refresh_token": authJson["refresh_token"]
-            }
-
-            request.session["auth_tokens"] = None
-
-            print(request.session["auth_tokens"])
-            request.session["auth_tokens"] = tokens
-            print("new tokens: ")
-            print(request.session["auth_tokens"])
+    if(request.method == "GET"):
+        try:
 
             headerDef = {
                 "Authorization": "Bearer " + request.session["auth_tokens"]["access_token"]
             }
 
+            # print(headerDef)
+
             res = eureka_client.do_service("USER-SERVICE", "/user/userLookup/" + kwargs["username"], method="GET", headers=headerDef)
+            
             resJson = json.loads(res)
+
             formattedUser = resJson["user"]
+
+            request.session["user_id"] = formattedUser["userId"]
 
             user = {
                 # "username": request.session["username"],
@@ -201,14 +155,173 @@ def user_update(request, *args, **kwargs):
                 "auth": request.session["auth"],
                 "email": formattedUser["userEmail"]
             }
-            return render(request, "user.html", context=user)
-    except Exception as exception:
-        traceback.print_exception(Exception, exception, exception.__traceback__)
-        
-        # response = {
-        #     "message": "failed to sign up - duplicate username",
-        #     "status": 400
-        # }
 
-        return render(request, "signin.html")
+            print(user.get("username"))
+
+            return render(request, "user.html", context=user)
+        except HTTPError as httpError:
+            if(httpError.code == 403 or httpError.code == 500):
+                try:
+                    print(httpError.code)
+
+
+                    headerDef = {
+                        "Authorization": "Bearer " + request.session["auth_tokens"]["refresh_token"]
+                    }            
+                    # print(headerDef)
+                    # print("old tokens")
+                    # print(request.session["auth_tokens"])
+
+                    print("doing refresh call")
+                    res = eureka_client.do_service("USER-SERVICE", "/user/refreshAuth", method="GET", headers=headerDef)
+
+                    print("successful refresh call")
+                    authJson = json.loads(res)
+
+                    print("json response: ", authJson)
+                    tokens =  {
+                        "access_token": authJson["access_token"],
+                        #FOR SOME REASON THIS ONE COMES IN WITH A UNDERSCORE.
+                        "refresh_token": authJson["refresh_token"]
+                    }
+
+                    request.session["auth_tokens"] = None
+
+                    # print(request.session["auth_tokens"])
+                    request.session["auth_tokens"] = tokens
+                    # print("new tokens: ")
+                    # print(request.session["auth_tokens"])
+
+                    headerDef = {
+                        "Authorization": "Bearer " + request.session["auth_tokens"]["access_token"]
+                    }
+
+                    res = eureka_client.do_service("USER-SERVICE", "/user/userLookup/" + kwargs["username"], method="GET", headers=headerDef)
+                    resJson = json.loads(res)
+                    formattedUser = resJson["user"]
+
+                    user = {
+                        # "username": request.session["username"],
+                        "username": formattedUser["userName"],
+                        "auth": request.session["auth"],
+                        "email": formattedUser["userEmail"]
+                    }
+                    return render(request, "user.html", context=user)
+                except Exception as exception:
+                    traceback.print_exception(Exception, exception, exception.__traceback__)
+                    contextData = {
+                        "timeout": True
+                    }
+                    return render(request, "signin.html", context=contextData)
+
+        except Exception as exception:
+            traceback.print_exception(Exception, exception, exception.__traceback__)
+            
+            # response = {
+            #     "message": "failed to sign up - duplicate username",
+            #     "status": 400
+            # }
+
+            return render(request, "signin.html")
+    elif(request.method == "POST"):
+        print(request.data)
+
+        postBody = {}
+
+        if("change_email" in request.data):
+            postBody["user_email"] = request.data["change_email"]
+        if("change_username" in request.data):
+            postBody["user_name"] = request.data["change_username"]
+        if("change_password" in request.data):
+            postBody["password"] = request.data["change_password"]
+
+        try:
+
+            headerDef = {
+                "Authorization": "Bearer " + request.session["auth_tokens"]["access_token"],
+                "Content-Type": "application/json"
+            }
+
+            # print(headerDef)
+
+            userId = str(request.session["user_id"])
+
+            res = eureka_client.do_service("USER-SERVICE", "/user/" + userId + "/", method="PUT", headers=headerDef, data=postBody)
+            
+            resJson = json.loads(res)
+
+            # formattedUser = resJson["user-details"]
+
+            # user = {
+            #     # "username": request.session["username"],
+
+            #     "user": formattedUser
+            # }
+            # print("response from update call")
+            # print(resJson)
+
+            request.session["username"] = resJson["user-details"]["user_name"]
+
+            return JsonResponse(resJson)
+        except HTTPError as httpError:
+            if(httpError.code == 403 or httpError.code == 500):
+                try:
+                    print(httpError.code)
+
+
+                    headerDef = {
+                        "Authorization": "Bearer " + request.session["auth_tokens"]["refresh_token"],
+                        "Content-Type": "application/json"
+                    }            
+                    # print(headerDef)
+                    # print("old tokens")
+                    # print(request.session["auth_tokens"])
+
+                    print("doing refresh call")
+                    res = eureka_client.do_service("USER-SERVICE", "/user/refreshAuth", method="GET", headers=headerDef)
+
+                    print("successful refresh call")
+                    authJson = json.loads(res)
+
+                    # print("json response: ", authJson)
+                    tokens =  {
+                        "access_token": authJson["access_token"],
+                        #FOR SOME REASON THIS ONE COMES IN WITH A UNDERSCORE.
+                        "refresh_token": authJson["refresh_token"]
+                    }
+
+                    request.session["auth_tokens"] = None
+
+                    # print(request.session["auth_tokens"])
+                    request.session["auth_tokens"] = tokens
+                    # print("new tokens: ")
+                    # print(request.session["auth_tokens"])
+
+                    headerDef = {
+                        "Authorization": "Bearer " + request.session["auth_tokens"]["access_token"],
+                        "Content-Type": "application/json"
+                    }
+
+                    res = eureka_client.do_service("USER-SERVICE", "/user/" + request.session["user_id"], method="PUT", headers=headerDef, data=postBody)
+                    resJson = json.loads(res)
+                    # formattedUser = resJson["user-details"]
+                    # print("response from update call")
+                    # print(resJson)
+                    request.session["username"] = resJson["user-details"]["user_name"]
+
+                    return JsonResponse(resJson)
+                except Exception as exception:
+                    traceback.print_exception(Exception, exception, exception.__traceback__)
+                    responseBody = {
+                        "message":"failed",
+                        "exc": traceback.format_exc()
+                    }
+                    return JsonResponse(responseBody)
+
+
+@api_view(("GET",))
+def userDash(request, *args, **kwargs):
+    print("hit userdash endpoint")
+
+    return render(request, "dashboard.html")
 

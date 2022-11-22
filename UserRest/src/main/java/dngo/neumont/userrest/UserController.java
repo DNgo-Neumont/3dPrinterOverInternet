@@ -14,7 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+// import javax.servlet.http.HttpServletResponse;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -180,7 +180,7 @@ public class UserController {
         if(BCrypt.checkpw(password, userToCheck.getPassword())){
             System.out.println("Successfully logged in user (PI): " + userName);
 
-            String rawRoles = userToCheck.getRoles();
+            // String rawRoles = userToCheck.getRoles();
             //This whole mess splits the CS values and strips them of whitespace to collect into a list for sending.
 //            List<String> roles = Arrays.stream(rawRoles.split(",")).map((String s) -> {s = s.strip(); return s;}).collect(Collectors.toList());
 

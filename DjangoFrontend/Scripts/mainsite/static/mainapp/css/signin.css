@@ -73,6 +73,11 @@
     color: red;
 }
 
+.login_form h2{
+    font-family: Sarabun;
+    color: white;
+}
+
 .submit_button{
     margin-top: .5em;
     padding: .75em;

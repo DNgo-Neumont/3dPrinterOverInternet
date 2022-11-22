@@ -10,9 +10,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+// import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+// import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -246,6 +246,9 @@ public class Main {
                         System.out.println("Response: " + new JSONObject(result));
 
                         SocketIOConsumerThread socketTest = new SocketIOConsumerThread(new JSONObject(result).get("access_token").toString());
+
+                        socketTest.setProcessorList(processorList);
+                        socketTest.setUsername(username);
 
                     
                     } catch (IOException | JSONException e) {

@@ -19,7 +19,7 @@ body{
     background-color: #30475E;
     height: 8.2em;
     margin: 0;
-    overflow: vertical;
+    overflow: clip;
     /* width: 100%; */
     display: block;
 }

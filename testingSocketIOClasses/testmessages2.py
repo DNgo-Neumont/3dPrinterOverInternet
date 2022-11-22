@@ -23,7 +23,7 @@ def disconnectMessage():
 def messsageRecieved(data):
     print(data)
 
-sio.connect("http://localhost:80/", auth={"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0VXNlcjA0Iiwicm9sZXMiOlsiUk9MRV9QSV9VU0VSIl0sImlzcyI6Imh0dHBzOi8vc2ltcGxwcmludC5henVyZXdlYnNpdGVzLm5ldC91c2VyL3BpQXV0aCIsImV4cCI6MTY2ODkxMjY4OH0.rA4oIqSMG5OwdVfbEh5d-VLCgL1Po5wPck9LYj_92lQ"})
+sio.connect("http://localhost:80/", auth={"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0VXNlcjA0Iiwicm9sZXMiOlsiUk9MRV9QSV9VU0VSIl0sImlzcyI6Imh0dHBzOi8vc2ltcGxwcmludC5henVyZXdlYnNpdGVzLm5ldC91c2VyL3BpQXV0aCIsImV4cCI6MTY2OTkxMDIwN30.IqqRpJj2gCKHTdEDyLS-soRuokfGjfoODmsPgHzIy1g"})
 
 
 @sio.on("room-response")

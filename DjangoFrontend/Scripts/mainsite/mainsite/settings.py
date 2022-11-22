@@ -87,6 +87,19 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'djongo',
+        # 'NAME': "userprints",
+        # 'ENFORCE_SCHEMA': False,
+        # #comment out for local use
+        # 'CLIENT': {
+        #     'host': os.environ.get("MONGO_HOST"),
+        #     'port': int(os.environ.get("MONGO_PORT")),
+            # 'username': os.environ.get("MONGO_USER"),
+            # 'password': os.environ.get("MONGO_PASS"),
+            # 'authSource': os.environ.get("MONGO_DB_NAME"),
+            # 'authMechanism': 'SCRAM-SHA-1'
+        # },
+        #Update with proper connection info once we get docker going.
     }
 }
 

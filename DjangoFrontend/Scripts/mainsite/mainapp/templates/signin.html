@@ -10,6 +10,11 @@
     <div class="form_container">
         <div class="login_form">
             <form>
+                {% if timeout %}
+                <div>
+                    <h2>You have been signed out due to inactivity. Please sign in again.</h2>
+                </div>
+                {% endif %}
                 <div>
                     <h6 id="error_message">The info you entered doesn't match our records. Please try again.</h6>
                 </div>

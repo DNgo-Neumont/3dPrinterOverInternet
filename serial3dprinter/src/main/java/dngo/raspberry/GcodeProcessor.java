@@ -26,6 +26,8 @@ import com.fazecast.jSerialComm.SerialPort;
 public class GcodeProcessor implements Runnable{
     File gCodeFile;
 
+    boolean stop = false;
+
     BufferedReader gcodeReader;
 
     BufferedReader portReader;
@@ -136,9 +138,13 @@ public class GcodeProcessor implements Runnable{
         
         while(currentLineNumber != gcodeLineCount){
 
+            if(stop){
+                break;
+            }
+
             String currentGcodeLine = gcodeReader.readLine();
             currentLineNumber++;
-            double currentPercentage = currentLineNumber * 100.00 / gcodeLineCount;
+            // double currentPercentage = currentLineNumber * 100.00 / gcodeLineCount;
             // System.out.println("current gcode line: " + currentGcodeLine);
             // System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
             
@@ -149,7 +155,7 @@ public class GcodeProcessor implements Runnable{
                 currentGcodeLine = gcodeReader.readLine();
                 currentLineNumber++;
                 if(currentLineNumber >= gcodeLineCount) break;
-                currentPercentage = currentLineNumber * 100.00 / gcodeLineCount;
+                // currentPercentage = currentLineNumber * 100.00 / gcodeLineCount;
                 // System.out.println(currentGcodeLine);
                 // System.out.println("Line " + currentLineNumber + " of " + gcodeLineCount + "; " + currentPercentage + "% complete");
 
@@ -330,5 +336,8 @@ public class GcodeProcessor implements Runnable{
         }
     }
 
+    public void requestStop(){
+        stop = true;
+    }
 
 }

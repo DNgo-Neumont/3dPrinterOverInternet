@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.core.authority.SimpleGrantedAuthority;
+// import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,6 +64,7 @@ public class UserBLL {
     public ResponseEntity<Map<String, Object>> updateUser(long id, JsonNode userDetails){
 //        if(userRepository.findById(userDetails.get("id").asLong()).isPresent()){
 //            User userToUpdate = userRepository.findById(userDetails.get("id").asLong()).get();
+
         if(userRepository.findById(id).isPresent()){
             User userToUpdate = userRepository.findById(id).get();
             Iterator<String> keySet = userDetails.fieldNames();
@@ -72,6 +73,15 @@ public class UserBLL {
                 String key = keySet.next();
                 switch(key){
                     case "user_name":
+                        if(userRepository.findByUserName(userDetails.get("user_name").asText()) != null){
+                            Map<String, Object> response = new HashMap<>();
+                            User user = userRepository.findByUserName(userDetails.get("user_name").asText());
+                            response.put("message", "user with username " + user.getUserName() + " already exists");
+                            response.put("user", user);
+                            response.put("timestamp", LocalDateTime.now());
+
+                            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                        }
                         userToUpdate.setUserName(userDetails.get("user_name").asText());
                         break;
                     case "user_email":

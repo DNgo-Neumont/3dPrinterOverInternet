@@ -81,6 +81,7 @@ services:
       - base-net
 
   socket-service:
+    container_name: socket-service
     build:
       context: ./djangoSocketServer
     image: simplprintsocketserver

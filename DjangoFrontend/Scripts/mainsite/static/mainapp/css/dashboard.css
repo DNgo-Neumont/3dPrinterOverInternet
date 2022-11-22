@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css?family=Kanit:300,400");
+
+
+.user_options {
+    background-color: #30475E;
+    height: 8.2em;
+    margin-top: 1em;
+    overflow: clip;
+    /* width: 100%; */
+    display: block;
+}
+
+.user_options li{
+    padding: 10px;
+    font-size: 26px;
+    /* background-color: #DDDDDD; */
+    color: #A5C9CA;
+    border-radius: 2px;
+    list-style: none;
+    margin: 35px;
+}
+
+.user_options a{
+
+    font-family: Kanit;
+    text-decoration: none;
+    color: #A5C9CA;
+    padding: 1em;
+    background-color: #22333B;
+    border-radius: 5px;
+}
+
+.user_options a:visited{
+    color: #A5C9CA
+}
+
+.user_options a:hover{
+    color: #DDDDDD;
+    background-color: rgba(255, 255, 255,.5);
+    border-radius: 5px;
+}
+
+
+
+.container{
+    /* background-color: #E7F6F2; */
+    position: relative;
+    z-index: 1;
+    background-color: #A5C9CA;
+    /* background-color: #395B64; */
+    height: 12em;
+    /* margin-top: 2em; */
+}
+
+.header_container{
+    position: absolute;
+    bottom: 20px;
+    margin-top: 2em;
+}

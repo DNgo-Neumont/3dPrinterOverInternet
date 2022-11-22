@@ -70,3 +70,48 @@ def queuePrint(request, *args, **kwargs):
     return JsonResponse(response, status=200)
 
 
+@api_view(("GET",))
+def requestStatus(request, *args, **kwargs):
+
+    requestToken = request.META["HTTP_AUTHORIZATION"]
+    
+    requestToken = str(requestToken).replace("Bearer", "").strip()
+
+    print("Incoming req token")
+    print(requestToken)
+
+
+    print(request.data)
+
+    requestData = dict(request.data)
+
+    print(requestData)
+
+    try:
+        decodedToken = jwt.decode(requestToken, key=authSecret, algorithms=["HS256"])
+
+        print("Decoded token: ")
+        print(decodedToken)
+
+        if(not(validIssuers[0] in decodedToken.get("iss") or validIssuers[1] in decodedToken.get("iss"))):
+            raise Exception("Invalid issuer for token, refusing connection")
+
+    except Exception as exception:
+        traceback.print_exception(Exception, exception, exception.__traceback__)
+        #return proper response here
+        response = {
+            "message":"Auth token provided invalid",
+            "timestamp": datetime.now()
+        }
+        return JsonResponse(response, status=403)
+    
+    username = decodedToken.get("sub")
+
+    sio.emit("request-update", None, username)
+
+    response = {
+        "message":"Update request sent",
+        "timestamp": datetime.now()
+    }
+
+    return JsonResponse(response, status=200)

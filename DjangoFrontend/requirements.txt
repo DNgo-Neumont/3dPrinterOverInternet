@@ -1,3 +1,7 @@
 django
 djangorestframework
 py-eureka-client
+python-socketio
+python-socketio[client]
+djongo
+pymongo==3.12.1

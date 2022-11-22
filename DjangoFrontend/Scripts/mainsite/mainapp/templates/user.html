@@ -1,31 +1,48 @@
 {% extends "./base.html" %}
 {% load static %}
 
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'mainapp/css/user.css' %}">
+{% endblock %}
+
 
 {% block content %}
     <div class="container">
-        <div>
-            <h1>Username: {{ username }}</h1>
-            <label for="change_username">New username: </label>
-            <input type="text" name="change_username" id="change_username">
-        </div>
-        <div>
-            <h1>Email: {{ email }}</h1>
-            <label for="change_email">New email: </label>
-            <input type="text" name="change_email" id="change_email">
-        </div>
-        <div>
-            <label for="change_password">New password: </label>
-            <input type="text" name="change_password" id="change_password">
-        </div>
-        <div>
-            <label for="confirm_password">Retype new password: </label>
-            <input type="text" name="confirm_password" id="confirm_password">
-        </div>
-        <div>
-            <div id="submit_button">
-                Update user information
+        <div class="form_body">
+            <div>
+                <h6 id="error_message">The username you entered is already taken. Please try again.</h6>
+            </div>
+            <div>
+                <h1 id="username_display">Username: {{ username }}</h1>
+            </div>
+            <div>
+                <label for="change_username">New username: </label>
+                <input type="text" name="change_username" id="change_username">
+            </div>
+            <div>
+                <h1>Email: {{ email }}</h1>
+            </div>
+            <div>
+                <label for="change_email">New email: </label>
+                <input type="text" name="change_email" id="change_email">
+            </div>
+            <div>
+                <h6 id="error_password">Your passwords do not match - please enter them again.</h6>
+            </div>
+            <div>
+                <label for="change_password">New password: </label>
+                <input type="password" name="change_password" id="change_password">
+            </div>
+            <div>
+                <label for="confirm_password">Retype new password: </label>
+                <input type="password" name="confirm_password" id="confirm_password">
+            </div>
+            <div>
+                <div class="submit_button" id="submit_button">
+                    Update user information
+                </div>
             </div>
         </div>
     </div>
+    <script src="{% static 'mainapp/js/user.js' %}"></script>
 {% endblock %}

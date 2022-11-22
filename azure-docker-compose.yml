@@ -8,6 +8,13 @@ services:
       - base-net
     restart: on-failure
 
+  django-frontend:
+    image: "dngoneumont/capstone:frontend"
+    ports:
+      - "8000"
+    networks:
+      - base-net
+
   userSQLDb:
     image: "dngoneumont/capstone:mysql"
     container_name: userSQLDb

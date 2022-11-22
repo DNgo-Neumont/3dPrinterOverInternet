@@ -42,22 +42,26 @@ def authenticate(sid, connectionDetails,  data):
     print("sid: ",sid)
     token = data["token"]
 
+    # Change to a file at some point - or have it handled in 
+    # settings.py
     validIssuers = ["https://simplprint.azurewebsites.net/user/auth", "https://simplprint3d.com/user/auth", "https://simplprint3d.com/user/piAuth", "https://simplprint.azurewebsites.net/user/piAuth"]
 
     try:
         decodedToken = jwt.decode(token, key=authSecret, algorithms=["HS256"])
         print(decodedToken)
 
-        validIssuer = False
+        # validIssuer = False
+
+        # commented out for local docker testing - do not deploy
+        # without uncommenting
+        # for issuer in validIssuers:
+        #     if((issuer in decodedToken.get("iss"))):# or validIssuers[1] in decodedToken.get("iss"))):
+        #         validIssuer = True
         
-        for issuer in validIssuers:
-            if((issuer in decodedToken.get("iss"))):# or validIssuers[1] in decodedToken.get("iss"))):
-                validIssuer = True
-            
-        if(not validIssuer):
-            sio.disconnect(sid=sid)
-            # logger.error("Invalid token issuer")
-            raise Exception("Invalid issuer for token, refusing connection")
+        # if(not validIssuer):
+        #     sio.disconnect(sid=sid)
+        #     # logger.error("Invalid token issuer")
+        #     raise Exception("Invalid issuer for token, refusing connection")
         
         sio.enter_room(sid, decodedToken.get("sub"))
 
@@ -75,7 +79,7 @@ def onPrint( sid, data):
     # logger.debug("Status response recieved: "  + str(data))
     #Sends data back to our frontend, which will parse out the current status and stick it in a database or something
     #be sure to include the username in the data packet to determine origin
-    sio.emit("status-handler", data, "frontend-status")
+    sio.emit("status-handler", data, "frontend-server")
 
 eurekaHost = os.environ["EUREKA_HOST"]
 eurekaPort = os.environ["EUREKA_PORT"]
