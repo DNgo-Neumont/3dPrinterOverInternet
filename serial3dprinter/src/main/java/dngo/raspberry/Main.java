@@ -125,11 +125,17 @@ public class Main {
                                         break;
                                     }
                             }
-                                
+                            
+
+                            System.out.println("Enter a more readable name for this printer");
+                            String printerName = userInput.readLine();
+                            
+
                             fault = true;
                             GcodeProcessor gcodeProcessor = new GcodeProcessor();
                             gcodeProcessor.setPort(portSelected);
-                            
+                            gcodeProcessor.setDefinedName(printerName);
+
                             // ByteBufferProcessor gcodeProcessor = new ByteBufferProcessor();
                             // gcodeProcessor.setPort(portSelected);
 
@@ -211,7 +217,7 @@ public class Main {
                         System.out.println("Enter your username: ");
                         String username = userInput.readLine();
                         System.out.println("Enter your password: ");
-                        String password = userInput.readLine();
+                        String password = new String(System.console().readPassword());//userInput.readLine();
 
                         String url = "https://simplprint3d.com/user/piAuth";
 
@@ -226,7 +232,7 @@ public class Main {
                         
                         String requestBody = "{\"user_name\" : \""+ username + "\", \"password\":\"" + password + "\" }";
                     
-                        System.out.println(requestBody);
+                        // System.out.println(requestBody);
 
                         connection.setRequestProperty("Content-Type", "application/json");
                         connection.setRequestProperty("Content-length", String.valueOf(requestBody.toString().length()));
