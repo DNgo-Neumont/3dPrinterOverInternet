@@ -211,3 +211,5 @@ DjangoFrontend/Scripts/mainsite/static/rest_framework/js/default.js
 DjangoFrontend/Scripts/mainsite/static/rest_framework/js/jquery-3.5.1.min.js
 DjangoFrontend/Scripts/mainsite/static/rest_framework/js/prettify-min.js
 DjangoFrontend/Scripts/mainsite/sessionkey.txt
+DjangoFrontend/Scripts/normalizer.exe
+DjangoFrontend/Scripts/wsdump.exe
