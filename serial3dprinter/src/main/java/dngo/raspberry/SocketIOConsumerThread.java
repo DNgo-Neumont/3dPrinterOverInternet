@@ -1,14 +1,27 @@
 package dngo.raspberry;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.channels.Channels;
+// import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 // import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 // import java.util.concurrent.TimeUnit;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 // import javax.net.ssl.HostnameVerifier;
 // import javax.net.ssl.SSLContext;
@@ -109,8 +122,64 @@ public class SocketIOConsumerThread {
                 public void call(Object... args) {
                     System.out.println(args[0]);
                     // Map<String, Object> testConversion = new HashMap<>(args[0]);
-                    // URL url = new URL("https://")
-                    // ReadableByteChannel channel = Channels.newChannel
+                    JSONObject testConversion = (JSONObject) args[0];
+                    
+                    System.out.println(testConversion);
+                    try {
+                        String filename = testConversion.getString("file");
+                        String printer = testConversion.getString("printer");
+                        // URL url = new URL("https://simplprint.azurewebsites.net/file/" + username + "/" + filename +"/");
+                        URL url = new URL("http://localhost:80/file/getFile/" + username + "/" + filename);
+                        
+                        URLConnection properConnection = url.openConnection();
+
+                        String bearerString = "Bearer " + token;
+
+                        System.out.println(bearerString);
+
+                        properConnection.setRequestProperty("Authorization", bearerString);
+                        ReadableByteChannel channel = Channels.newChannel(properConnection.getInputStream());
+                        if(!Files.exists(Path.of("./tempFiles"))){
+                            Files.createDirectory(Path.of("./tempFiles"));
+                        }
+                        if(!Files.exists(Path.of("./tempFiles/" + filename))){
+                            Files.createFile(Path.of("./tempFiles/" + filename));
+                        }
+
+                        Path localDirectory = Path.of("./tempFiles");
+                        Path createdFile = Path.of(localDirectory + "/" + filename);
+                        
+
+                        FileOutputStream fileOutputStream = new FileOutputStream(createdFile.toString());
+                        // FileChannel fileChannel = fileOutputStream.getChannel();
+
+                        fileOutputStream.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+                        fileOutputStream.close();
+
+                        boolean printerFound = false;
+                        //Iterate through our processor list and queue a file
+                        for(GcodeProcessor processor : processorList){
+                            if(processor.getDefinedName().toLowerCase().equals(printer.toLowerCase())){
+                                processor.setGcodeFile(createdFile.toFile());
+                                Thread printerThread = new Thread(processor);
+                                printerThread.start();
+                                printerFound = true;
+                            }
+                        }
+
+                        if(!printerFound){
+                            System.out.println("No printer was found with that name.");
+                            Files.delete(createdFile);
+                        }
+
+
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
 
                     
                 }
@@ -171,6 +240,19 @@ public class SocketIOConsumerThread {
         //If we have running processors, request their stops
         for(GcodeProcessor processor: processorList){
             processor.requestStop();
+        }
+
+        //Clear out our files
+        try {
+            Path path = Path.of("./tempFiles");
+            if(Files.exists(path)){
+                //Pulled from Baeldung: https://www.baeldung.com/java-delete-directory
+                Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+            }
+            Files.createDirectory(path);
+        } catch (IOException e) {
+            System.err.println("Failed to clear temporary file storage - please check permissions");
+            e.printStackTrace();
         }
         // stop = true;
     }

@@ -40,6 +40,8 @@ public class GcodeProcessor implements Runnable{
 
     long currentLineNumber = 0;
 
+    String definedName = "";
+
     List<String> bufferHistory = new ArrayList<>();
     //Buffer and buffer history size, respectively
     int bufferSize = 3;
@@ -334,6 +336,14 @@ public class GcodeProcessor implements Runnable{
                 printBufferLines--;
             }
         }
+    }
+
+    public String getDefinedName(){
+        return definedName;
+    }
+
+    public void setDefinedName(String newName){
+        definedName = newName;
     }
 
     public void requestStop(){
