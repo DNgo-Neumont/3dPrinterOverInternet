@@ -128,8 +128,8 @@ public class SocketIOConsumerThread {
                     try {
                         String filename = testConversion.getString("file");
                         String printer = testConversion.getString("printer");
-                        // URL url = new URL("https://simplprint.azurewebsites.net/file/" + username + "/" + filename +"/");
-                        URL url = new URL("http://localhost:80/file/getFile/" + username + "/" + filename);
+                        URL url = new URL("https://simplprint.azurewebsites.net/file/getFile/" + username + "/" + filename +"/");
+                        // URL url = new URL("http://localhost:80/file/getFile/" + username + "/" + filename);
                         
                         URLConnection properConnection = url.openConnection();
 

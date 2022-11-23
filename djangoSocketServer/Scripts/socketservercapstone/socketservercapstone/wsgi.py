@@ -50,18 +50,18 @@ def authenticate(sid, connectionDetails,  data):
         decodedToken = jwt.decode(token, key=authSecret, algorithms=["HS256"])
         print(decodedToken)
 
-        # validIssuer = False
+        validIssuer = False
 
         # commented out for local docker testing - do not deploy
         # without uncommenting
-        # for issuer in validIssuers:
-        #     if((issuer in decodedToken.get("iss"))):# or validIssuers[1] in decodedToken.get("iss"))):
-        #         validIssuer = True
+        for issuer in validIssuers:
+            if((issuer in decodedToken.get("iss"))):# or validIssuers[1] in decodedToken.get("iss"))):
+                validIssuer = True
         
-        # if(not validIssuer):
-        #     sio.disconnect(sid=sid)
-        #     # logger.error("Invalid token issuer")
-        #     raise Exception("Invalid issuer for token, refusing connection")
+        if(not validIssuer):
+            sio.disconnect(sid=sid)
+            # logger.error("Invalid token issuer")
+            raise Exception("Invalid issuer for token, refusing connection")
         
         sio.enter_room(sid, decodedToken.get("sub"))
 
