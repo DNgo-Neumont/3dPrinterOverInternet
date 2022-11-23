@@ -38,7 +38,7 @@ public class GcodeProcessor implements Runnable{
 
     long gcodeLineCount = 0;
 
-    long currentLineNumber = 1;
+    long currentLineNumber = 0;
 
     String definedName = "";
 
@@ -132,7 +132,11 @@ public class GcodeProcessor implements Runnable{
     }
 
     public double reportStatus(){
-        return currentLineNumber * 100.00 / gcodeLineCount;
+        if(currentLineNumber == 0 && gcodeLineCount == 0 ){
+            return 0.00;
+        }else{
+            return currentLineNumber * 100.00 / gcodeLineCount;
+        }
     }
 
 
