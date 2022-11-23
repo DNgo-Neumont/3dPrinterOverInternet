@@ -190,18 +190,30 @@ public class SocketIOConsumerThread {
                 @Override
                 public void call(Object... args) {
 
-                    List<Map<String, Object>> processorStatuses = new ArrayList<>();
-
+                    // List<Map<String, Object>> processorStatuses = new ArrayList<>();
+                    List<JSONObject> processorStatuses = new ArrayList<>();
                     // System.out.println(processorList.size());
 
                     for (GcodeProcessor processor : processorList) {
                         // System.out.println(processor.getDefinedName());
                         // System.out.println(processor.getPortName());
                         // System.out.println(processor.reportStatus());
-                        Map<String, Object> processorStatus = new HashMap<>();
-                        processorStatus.put("printer-name", processor.getDefinedName());
-                        processorStatus.put("printer-progress", processor.reportStatus());
+                        // Map<String, Object> processorStatus = new HashMap<>();
 
+                        JSONObject processorStatus = new JSONObject();
+
+                        try {
+                            processorStatus.append("printer-name", processor.getDefinedName());
+                            processorStatus.append("printer-progress", processor.reportStatus());
+
+                        } catch (JSONException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        // processorStatus.put("printer-name", processor.getDefinedName());
+                        // processorStatus.put("printer-progress", processor.reportStatus());
+                        
                         System.out.println(processorStatus);
                         processorStatuses.add(processorStatus);
                     }
