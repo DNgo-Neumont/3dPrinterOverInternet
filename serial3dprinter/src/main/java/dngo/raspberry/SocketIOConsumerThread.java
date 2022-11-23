@@ -203,8 +203,10 @@ public class SocketIOConsumerThread {
                         JSONObject processorStatus = new JSONObject();
 
                         try {
-                            processorStatus.append("printer-name", processor.getDefinedName());
-                            processorStatus.append("printer-progress", processor.reportStatus());
+                            // processorStatus.append("printer-name", processor.getDefinedName());
+                            processorStatus.put("printer-name", processor.getDefinedName());
+                            // processorStatus.append("printer-progress", processor.reportStatus());
+                            processorStatus.put("printer-progress", processor.reportStatus());
 
                         } catch (JSONException e) {
                             // TODO Auto-generated catch block
