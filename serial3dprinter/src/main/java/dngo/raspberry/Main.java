@@ -26,6 +26,9 @@ public class Main {
     public static final String exchange_name = "command-exchange";
     public static void main(String[] args){
         List<GcodeProcessor> processorList = new ArrayList<GcodeProcessor>();
+
+        SocketIOConsumerThread socketTest = null;
+
         // List<ByteBufferProcessor> processorList = new ArrayList<>();
         //Simple intro
         String ver = "1.0";
@@ -251,7 +254,7 @@ public class Main {
 
                         System.out.println("Response: " + new JSONObject(result));
 
-                        SocketIOConsumerThread socketTest = new SocketIOConsumerThread(new JSONObject(result).get("access_token").toString());
+                        socketTest = new SocketIOConsumerThread(new JSONObject(result).get("access_token").toString());
 
                         socketTest.setProcessorList(processorList);
                         socketTest.setUsername(username);
@@ -269,6 +272,10 @@ public class Main {
 
                 case "4":
                     exit = true;
+                    if(socketTest != null){
+                        socketTest.requestStop();
+                    }
+
                     break;
                 default:
                     System.out.println("Please reenter your command - just a number from the ranges given for the menu.");
