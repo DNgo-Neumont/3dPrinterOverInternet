@@ -50,8 +50,8 @@ public class SocketIOConsumerThread {
     // String socketHost = "http://localhost:80/socket";
     // Stripping out the /socket because socket.io has been properly mapped now
     // String secondarySocketHost = "https://simplprint.azurewebsites.net/socket";
-    // String secondarySocketHost = "https://simplprint.azurewebsites.net/";
-    String secondarySocketHost = "http://localhost:80/";
+    String secondarySocketHost = "https://simplprint.azurewebsites.net/";
+    // String secondarySocketHost = "http://localhost:80/";
     
     io.socket.client.Socket connectionSocket;
     
