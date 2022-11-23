@@ -201,6 +201,8 @@ public class SocketIOConsumerThread {
                         Map<String, Object> processorStatus = new HashMap<>();
                         processorStatus.put("printer-name", processor.getDefinedName());
                         processorStatus.put("printer-progress", processor.reportStatus());
+
+                        System.out.println(processorStatus);
                         processorStatuses.add(processorStatus);
                     }
 
