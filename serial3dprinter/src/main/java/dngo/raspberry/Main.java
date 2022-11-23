@@ -23,9 +23,11 @@ import com.fazecast.jSerialComm.*;
 
 public class Main {
 
+    private static List<GcodeProcessor> processorList = new ArrayList<GcodeProcessor>();
+
     public static final String exchange_name = "command-exchange";
     public static void main(String[] args){
-        List<GcodeProcessor> processorList = new ArrayList<GcodeProcessor>();
+        
 
         SocketIOConsumerThread socketTest = null;
 
