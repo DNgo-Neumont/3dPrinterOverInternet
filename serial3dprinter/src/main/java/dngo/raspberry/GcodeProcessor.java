@@ -38,7 +38,7 @@ public class GcodeProcessor implements Runnable{
 
     long gcodeLineCount = 0;
 
-    long currentLineNumber = 0;
+    long currentLineNumber = 1;
 
     String definedName = "";
 
