@@ -192,15 +192,16 @@ public class SocketIOConsumerThread {
 
                     List<Map<String, Object>> processorStatuses = new ArrayList<>();
 
-                    System.out.println(processorList.size());
+                    // System.out.println(processorList.size());
 
                     for (GcodeProcessor processor : processorList) {
-                        System.out.println(processor.getDefinedName());
-                        System.out.println(processor.getPortName());
-                        System.out.println(processor.reportStatus());
+                        // System.out.println(processor.getDefinedName());
+                        // System.out.println(processor.getPortName());
+                        // System.out.println(processor.reportStatus());
                         Map<String, Object> processorStatus = new HashMap<>();
                         processorStatus.put("printer-name", processor.getDefinedName());
                         processorStatus.put("printer-progress", processor.reportStatus());
+                        processorStatuses.add(processorStatus);
                     }
 
                     Map<String, Object> response = new HashMap<>();
