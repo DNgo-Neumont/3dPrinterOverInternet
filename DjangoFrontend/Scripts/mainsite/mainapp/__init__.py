@@ -18,11 +18,10 @@ eureka_client.init(f"http://{eurekaHost}:{eurekaPort}", app_name="django-fronten
 
 # set up socketIO listener here for usage to serialize user DB info - in terms of user consumers and connected printers
 
-sio = socketio.Client()
 
 hasToken = False
 
-authTokens = {}
+serverAuthTokens = {}
 
 while(not hasToken):
 
@@ -71,7 +70,7 @@ while(not hasToken):
         resAuth = eureka_client.do_service("USER-SERVICE", "/user/piAuth", method="POST", data=json.dumps(authPostData), headers=headerDef)
 
         resAuthTokens = json.loads(resAuth)
-        authTokens = resAuthTokens
+        serverAuthTokens = resAuthTokens
     except HTTPError as httpExcept:
         print(httpExcept.code)
         if(httpExcept.code == 503):
@@ -87,17 +86,3 @@ while(not hasToken):
 
     hasToken = True
 
-@sio.on("status-handler")
-def storeUpdate(data):
-    print(data)
-    # serialize and update data for user here
-
-@sio.on("connect")
-def connected():
-    print("successful connection to socketio server")
-
-@sio.on("disconnect")
-def disconnected():
-    print("Lost connection to server - consider checking sent auth tokens")
-
-sio.connect("http://socket-service:8080", auth={"token":authTokens["access_token"]})

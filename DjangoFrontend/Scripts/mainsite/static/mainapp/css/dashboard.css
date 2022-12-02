@@ -3,57 +3,120 @@
 
 .user_options {
     background-color: #30475E;
-    height: 8.2em;
-    margin-top: 1em;
-    overflow: clip;
-    /* width: 100%; */
-    display: block;
+    height: 7.5em;
+    border-top: #A5C9CA;
+    border-width: 20px;
+    border-top-style: solid;
+    clear: both;
+}
+.user_options ul{
+    margin: 0;
+    float: left;
 }
 
-.user_options li{
+/* .option{
+    /* display: inline-block; */
+    /* float: left;
+    padding: 10px;
+} */
+
+.option_list{
+    float: left;
+    list-style: none;
+    font-family: Kanit;
+    margin-top: 7px;
+    color:#A5C9CA;
+    padding: 20px;
+    transition: .5s;
+}
+
+.option_list:hover{
+    cursor: pointer;
+    background-color: #DDDDDD;
+    transition: .5s;
+    border-radius: 5px;
+}
+
+/* .user_options li{
     padding: 10px;
     font-size: 26px;
-    /* background-color: #DDDDDD; */
+    /* background-color: #DDDDDD; 
     color: #A5C9CA;
     border-radius: 2px;
     list-style: none;
     margin: 35px;
-}
-
-.user_options a{
-
-    font-family: Kanit;
-    text-decoration: none;
-    color: #A5C9CA;
-    padding: 1em;
-    background-color: #22333B;
-    border-radius: 5px;
-}
-
-.user_options a:visited{
-    color: #A5C9CA
-}
-
-.user_options a:hover{
-    color: #DDDDDD;
-    background-color: rgba(255, 255, 255,.5);
-    border-radius: 5px;
-}
-
-
+} */
 
 .container{
     /* background-color: #E7F6F2; */
-    position: relative;
-    z-index: 1;
+    /* position: relative; */
+    /* z-index: 1; */
     background-color: #A5C9CA;
     /* background-color: #395B64; */
-    height: 12em;
+    /* height: 11em; */
     /* margin-top: 2em; */
 }
 
-.header_container{
+.printer_box_container{
+    background-color: #30475E;
+    clear: both;
+}
+
+.printer_box{
+    margin: 7px;
+    /* float: left; */
+    display: inline-block;
+    background-color: #52697F;
+    border-radius: 10px;
+    width: min-content;
+    text-align: center;
+    color: #A5C9CA;
+    font-family: Kanit;
+    padding: 10px;
+}
+
+.printer_files{
+    font-family: Kanit;
+}
+
+.display_container{
+    background-color: #30475E;
+    padding: 5px;
+    /* border-radius: 5px; */
+}
+
+.display_item{
+    list-style: none;
+    margin: 5px;
+    background-color: #41586F;
+    color:#A5C9CA;
+    font-family: 'Trebuchet MS';
+    padding: 5px;
+    border-radius: 5px;
+    width: min-content;
+}
+
+
+.button{
+    text-align: center;
+    margin-top: .5em;
+    padding: .75em;
+    font-family: Kanit;
+    color: white;
+    background-color: #41586F;
+    width: 75%;
+    border-radius: 50px;
+    transition: .5s;
+    margin-bottom: .5em;
+}
+
+.button:hover{
+    cursor: pointer;
+    background-color: #52697F;
+}
+
+/* .header_container{
     position: absolute;
     bottom: 20px;
-    margin-top: 2em;
-}
+    margin-top: 2em; 
+} */

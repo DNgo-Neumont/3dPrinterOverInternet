@@ -12,7 +12,7 @@ import jwt
 authSecret = os.environ["JWT_SECRET"]
 sio = baseSocketServer
 
-
+# Issuer check ends up screwing up half our front end functions so it's out.
 validIssuers = ["https://simplprint.azurewebsites.net/user/auth", "https://simplprint3d.com/user/auth"]
 
 @api_view(("POST",))
@@ -44,8 +44,9 @@ def queuePrint(request, *args, **kwargs):
         print("Decoded token: ")
         print(decodedToken)
 
-        if(not(validIssuers[0] in decodedToken.get("iss") or validIssuers[1] in decodedToken.get("iss"))):
-            raise Exception("Invalid issuer for token, refusing connection")
+        # Remember to uncomment once you push it
+        # if(not(validIssuers[0] in decodedToken.get("iss") or validIssuers[1] in decodedToken.get("iss"))):
+        #     raise Exception("Invalid issuer for token, refusing connection")
 
     except Exception as exception:
         traceback.print_exception(Exception, exception, exception.__traceback__)
@@ -93,8 +94,9 @@ def requestStatus(request, *args, **kwargs):
         print("Decoded token: ")
         print(decodedToken)
 
-        if(not(validIssuers[0] in decodedToken.get("iss") or validIssuers[1] in decodedToken.get("iss"))):
-            raise Exception("Invalid issuer for token, refusing connection")
+        # Make sure to uncomment when pushing
+        # if(not(validIssuers[0] in decodedToken.get("iss") or validIssuers[1] in decodedToken.get("iss"))):
+        #     raise Exception("Invalid issuer for token, refusing connection")
 
     except Exception as exception:
         traceback.print_exception(Exception, exception, exception.__traceback__)

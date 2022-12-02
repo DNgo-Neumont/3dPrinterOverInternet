@@ -10,23 +10,59 @@
 
 
 {% block content %}
-<div class="container">
-    <div class="header_container">
-        <nav class="user_options">
-            <ul class="user_link_list">
-                <li>
-                    <a href="/">Files</a>
-                    <a href="/">Printers</a>
-                    <a href="/">Consumers</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-    <div>
+<div class="container" id="container">
 
+    <div class="user_options">
+        <ul>
+            <li class="option_list">
+                <div class="option" id="option_files">
+                    <h3>Your Files</h3>
+                </div>
+            </li>
+            <li class="option_list">
+                <div class="option" id="option_printers">
+                    <h3>Your Printers</h3>
+                </div>
+            </li>
+        </ul>
     </div>
+
+    <div class="printer_display" id="printer_display">
+        {# { status } #}
+
+        {% if status %}
+            <ul class="display_container">
+                {% for item in status %}
+                    <li class="display_item">{{ item.printer_name }}</li>
+                    <li class="display_item">{{ item.printer_progress }}</li>
+                {% endfor %}
+            </ul>
+            <div class="button" id="queue_print">Start a print</div>
+        {% else %}
+            <h2>You have no printers registered. Add some!</h2>
+        {% endif %}
+    </div>
+    <div class="file_display" id="file_display">
+        {# { files } #}
+
+
+        {% if files %}
+            <ul class="display_container">
+                {% for item in files %}
+                    <li class="display_item">{{ item }}</li>
+                {% endfor %}
+            </ul>
+            <div class="button" id="add_file_button">Add files</div>
+            <div class="button" id="delete_file_button">Delete files</div>
+        {% else %}
+            <h2>You have no files uploaded. Add some!</h2>
+            <div class="button" id="add_file_button">Add files</div>
+            <div class="button" id="delete_file_button">Delete files</div>
+        {% endif %}
+    </div>
+
 
 </div>
-
+<script src="{% static 'mainapp/js/dashboard.js' %}"></script>
 
 {% endblock %}

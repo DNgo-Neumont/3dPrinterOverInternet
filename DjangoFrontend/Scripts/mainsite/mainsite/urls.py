@@ -15,19 +15,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from mainapp.views import index, login_render, logoutUser, registerUser, user_update, userDash
+from mainapp.views import index, login_render, logoutUser, registerUser, user_update, userDash, getUserFileList, getUserPrinterList, queuePrint, addFileForUser, deleteFile
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     path('', index, name="home"),
     path('login/', login_render, name="login"),
     path('logout/', logoutUser, name="logout"),
     path('register/', registerUser, name="register"),
+    path("getUserFileList/", getUserFileList, name="getuserfiles"),
+    path("getUserPrinters/", getUserPrinterList, name="getuserprinters"),
+    path("queuePrint/", queuePrint, name="queueprint"),
+    path("addFile/", addFileForUser, name="addfile"),
+    path("deleteFile/", deleteFile, name="deletefile"),
+    # path("addFile/", FileAdd.post, name="addfile"),
     path('<str:username>/', user_update, name="userupdate"),
-    path('<str:username>/dashboard/', userDash, name="userdash")
+    path('<str:username>/dashboard/', userDash, name="userdash"),
     # path('login/')
     # path('favi')
 ]

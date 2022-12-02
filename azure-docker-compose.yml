@@ -15,6 +15,14 @@ services:
     networks:
       - base-net
 
+  printerdb:
+    image: mongo:latest
+    container_name: printerdb
+    ports:
+      - "27017"
+    networks:
+      - base-net
+
   userSQLDb:
     image: "dngoneumont/capstone:mysql"
     container_name: userSQLDb

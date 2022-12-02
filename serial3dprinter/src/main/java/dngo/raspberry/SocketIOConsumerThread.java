@@ -55,6 +55,8 @@ public class SocketIOConsumerThread {
     
     io.socket.client.Socket connectionSocket;
     
+    List<Thread> printerThreads = new ArrayList<>();
+
     public SocketIOConsumerThread(String token) throws Exception{
 
         Map<String, String> tokenMap = new HashMap<>();
@@ -111,7 +113,7 @@ public class SocketIOConsumerThread {
             connectionSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener(){
                 @Override
                 public void call(Object... args) {
-                    System.out.println(connectionSocket.connected());
+                    // System.out.println(connectionSocket.connected());
                     System.out.println("Socket connected successfully.");
                 }
             });
@@ -120,11 +122,11 @@ public class SocketIOConsumerThread {
     
                 @Override
                 public void call(Object... args) {
-                    System.out.println(args[0]);
+                    // System.out.println(args[0]);
                     // Map<String, Object> testConversion = new HashMap<>(args[0]);
                     JSONObject testConversion = (JSONObject) args[0];
                     
-                    System.out.println(testConversion);
+                    // System.out.println(testConversion);
                     try {
                         String filename = testConversion.getString("file");
                         String printer = testConversion.getString("printer");
@@ -135,7 +137,7 @@ public class SocketIOConsumerThread {
 
                         String bearerString = "Bearer " + token;
 
-                        System.out.println(bearerString);
+                        // System.out.println(bearerString);
 
                         properConnection.setRequestProperty("Authorization", bearerString);
                         ReadableByteChannel channel = Channels.newChannel(properConnection.getInputStream());
@@ -160,9 +162,24 @@ public class SocketIOConsumerThread {
                         //Iterate through our processor list and queue a file
                         for(GcodeProcessor processor : processorList){
                             if(processor.getDefinedName().toLowerCase().equals(printer.toLowerCase())){
+                                for(Thread thread : printerThreads){
+                                    if(thread.getName().contentEquals(printer.toLowerCase())){
+                                        try {
+                                            thread.join();
+                                            System.out.println("Waiting on running printer thread to finish");
+                                        } catch (InterruptedException e) {
+                                            // TODO Auto-generated catch block
+                                            e.printStackTrace();
+                                            System.out.println("Failed to wait for printer to finish");
+                                        }
+                                    }
+                                }
+
                                 processor.setGcodeFile(createdFile.toFile());
                                 Thread printerThread = new Thread(processor);
+                                printerThread.setName(printer.toLowerCase());
                                 printerThread.start();
+                                printerThreads.add(printerThread);
                                 printerFound = true;
                             }
                         }
@@ -216,7 +233,7 @@ public class SocketIOConsumerThread {
                         // processorStatus.put("printer-name", processor.getDefinedName());
                         // processorStatus.put("printer-progress", processor.reportStatus());
                         
-                        System.out.println(processorStatus);
+                        // System.out.println(processorStatus);
                         processorStatuses.add(processorStatus);
                     }
 

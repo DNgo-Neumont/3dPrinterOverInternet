@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
+// import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -55,7 +55,7 @@ public class Main {
 
         menu.append("Menu: ").append("\n")
         .append("1. Select new printer").append("\n")
-        .append("2. Run gcode on selected printers").append("\n")
+        .append("2. Reset printers for next print").append("\n")
         .append("3. Sign in and connect to services ").append("\n")
         .append("4. Exit");
 
@@ -132,9 +132,35 @@ public class Main {
                             }
                             
 
-                            System.out.println("Enter a more readable name for this printer");
-                            String printerName = userInput.readLine();
-                            
+                            if(yesNo.contentEquals("n")){
+                                continue;
+                            }
+
+
+                            boolean correctName = false;
+                            String printerName = "";
+                            while(!correctName){
+
+                                System.out.println("Enter a more readable name for this printer.");
+                                printerName = userInput.readLine();
+
+                                yesNo = "";
+                                System.out.println("Is the port selected the printer you wanted? Y/N");
+                                yesNo = userInput.readLine();
+                                yesNo = yesNo.toLowerCase();
+                                switch(yesNo){
+                                    case "y":
+                                        correctName = true;
+                                        
+                                        break;
+                                    case "n":
+                                        correctName = false;
+                                        break;
+                                    default:
+                                        System.out.println("Please enter only the characters y/n: ");
+                                        break;
+                                    }
+                            }
 
                             fault = true;
                             GcodeProcessor gcodeProcessor = new GcodeProcessor();
@@ -152,8 +178,10 @@ public class Main {
                     }
                     break;
                     case "2":
-    
-                        System.out.println("Select the printer you want to use.");
+
+                        
+
+                        System.out.println("Select the printer you want to reset.");
     
                         for(int i = 0; i< processorList.size(); i++){
                             System.out.println((i+ 1) + ". " + processorList.get(i).getPortName());
@@ -180,41 +208,52 @@ public class Main {
                             }
     
                         }  
+
+                        processor.setGcodeFile(null);
+                        processor.setGcodeLineCount(0);
+                        processor.setCurrentLineNumber(0);
                         
-                        System.out.println("Select the gcode file you want to use: ");
+
+                        processorList.remove(selectedPrinter);
+                        processorList.add(selectedPrinter, processor);
+
+                        System.out.println("Printer reset - good for printing");
+                        System.out.println("MAKE SURE YOUR PRINT BED IS CLEAN AND READY.");
+
+                        // System.out.println("Select the gcode file you want to use: ");
                         
-                        File rootPath = new File("./");
+                        // File rootPath = new File("./");
                         
-                        File[] fileList = rootPath.listFiles();
-                        for(int i = 0; i < fileList.length; i++){
-                            System.out.println((i + 1) + ". " + fileList[i].getName());
-                        }
+                        // File[] fileList = rootPath.listFiles();
+                        // for(int i = 0; i < fileList.length; i++){
+                        //     System.out.println((i + 1) + ". " + fileList[i].getName());
+                        // }
                 
-                        System.out.print("Enter your choice now: ");
+                        // System.out.print("Enter your choice now: ");
                 
     
-                        correctSelection = false;
-                        int selectedFile = 0;
-                        File file = null;
-                        while(!correctSelection){
+                        // correctSelection = false;
+                        // int selectedFile = 0;
+                        // File file = null;
+                        // while(!correctSelection){
                             
-                            try {
-                                selectedFile = Integer.parseInt(userInput.readLine()) - 1;
-                                file = fileList[selectedFile];
-                                processor.setGcodeFile(file);
-                                correctSelection = true;
-                            } catch (NumberFormatException | IOException e) {
-                                // TODO Auto-generated catch block
-                                correctSelection = false;
-                                e.printStackTrace();
-                            } catch(IndexOutOfBoundsException e){
-                                correctSelection = false;
-                                e.printStackTrace();
-                            }
-                        }
+                        //     try {
+                        //         selectedFile = Integer.parseInt(userInput.readLine()) - 1;
+                        //         file = fileList[selectedFile];
+                        //         processor.setGcodeFile(file);
+                        //         correctSelection = true;
+                        //     } catch (NumberFormatException | IOException e) {
+                        //         // TODO Auto-generated catch block
+                        //         correctSelection = false;
+                        //         e.printStackTrace();
+                        //     } catch(IndexOutOfBoundsException e){
+                        //         correctSelection = false;
+                        //         e.printStackTrace();
+                        //     }
+                        // }
                         
-                        Thread printerThread = new Thread(processor);
-                        printerThread.start();
+                        // Thread printerThread = new Thread(processor);
+                        // printerThread.start();
                     break;
                 case "3":
 
@@ -248,13 +287,13 @@ public class Main {
                         httpsStream.writeBytes(requestBody.toString());
                         httpsStream.close();
 
-                        System.out.println("Response message: " + connection.getResponseMessage());
+                        // System.out.println("Response message: " + connection.getResponseMessage());
 
                         DataInputStream readStream = new DataInputStream(connection.getInputStream());
 
                         String result = new String(readStream.readAllBytes());
 
-                        System.out.println("Response: " + new JSONObject(result));
+                        // System.out.println("Response: " + new JSONObject(result));
 
                         socketTest = new SocketIOConsumerThread(new JSONObject(result).get("access_token").toString());
 
@@ -285,7 +324,7 @@ public class Main {
                     break;
             }
 
-            // clrscr();
+            clrscr();
             System.out.println(menu);
         }
 

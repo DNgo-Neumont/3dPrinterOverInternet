@@ -35,6 +35,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+# Attempt this to fix the file upload issue
+# CSRF_TRUSTED_ORIGIN = ["*"]
+
+# Still trying to fix this issue - goddamned weird headers...
+# anyway, trying this out
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# These both didn't work - time to rework the file upload endpoint. Yay.
 
 # Application definition
 
@@ -79,26 +87,39 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mainsite.wsgi.application'
 
+# Attempting to use default parsers to handle this straight up.
+# REST_FRAMEWORK = {
+#     'DEFAULT_PARSER_CLASSES': [
+#         'rest_framework.parsers.MultiPartParser',
+#         'rest_framework.parsers.FormParser'
+#     ]
+# }
+
+# Nope.
+# Could I fix this? yes. Do I want to right now? No.
+# Before presentation day get a bunch of test files to showcase.
+# Clean up your CSS a bit, I'll be damned before I get caught with Times New Roman
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        # 'ENGINE': 'djongo',
-        # 'NAME': "userprints",
-        # 'ENFORCE_SCHEMA': False,
-        # #comment out for local use
-        # 'CLIENT': {
-        #     'host': os.environ.get("MONGO_HOST"),
-        #     'port': int(os.environ.get("MONGO_PORT")),
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': "userprints",
+        'ENFORCE_SCHEMA': False,
+        #comment out for local use
+        # don't need to worry about pass and user - internal unreachable mongo database in use
+        'CLIENT': {
+            'host': os.environ.get("MONGO_HOST", "localhost"),
+            'port': int(os.environ.get("MONGO_PORT", 27017)),
             # 'username': os.environ.get("MONGO_USER"),
             # 'password': os.environ.get("MONGO_PASS"),
             # 'authSource': os.environ.get("MONGO_DB_NAME"),
             # 'authMechanism': 'SCRAM-SHA-1'
-        # },
+        },
         #Update with proper connection info once we get docker going.
     }
 }

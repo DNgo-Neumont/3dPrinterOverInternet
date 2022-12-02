@@ -50,18 +50,20 @@ def authenticate(sid, connectionDetails,  data):
         decodedToken = jwt.decode(token, key=authSecret, algorithms=["HS256"])
         print(decodedToken)
 
-        validIssuer = False
+        # validIssuer = False
 
         # commented out for local docker testing - do not deploy
         # without uncommenting
-        for issuer in validIssuers:
-            if((issuer in decodedToken.get("iss"))):# or validIssuers[1] in decodedToken.get("iss"))):
-                validIssuer = True
-        
-        if(not validIssuer):
-            sio.disconnect(sid=sid)
-            # logger.error("Invalid token issuer")
-            raise Exception("Invalid issuer for token, refusing connection")
+        # for issuer in validIssuers:
+        #     if((issuer in decodedToken.get("iss"))):# or validIssuers[1] in decodedToken.get("iss"))):
+        #         validIssuer = True
+        # goddamn it
+        # this doesn't work with eureka calls and considering that's how the front end works - gotta tear it out.
+
+        # if(not validIssuer):
+        #     sio.disconnect(sid=sid)
+        #     # logger.error("Invalid token issuer")
+        #     raise Exception("Invalid issuer for token, refusing connection")
         
         sio.enter_room(sid, decodedToken.get("sub"))
 
@@ -80,6 +82,9 @@ def onPrint( sid, data):
     #Sends data back to our frontend, which will parse out the current status and stick it in a database or something
     #be sure to include the username in the data packet to determine origin
     sio.emit("status-handler", data, "frontend-server")
+    # previous emit didn't work - might as well try this one
+    # sio.emit("status-handler", data)
+    # Issue was the main server getting disconnected - should run fine on our actual deployment
 
 eurekaHost = os.environ["EUREKA_HOST"]
 eurekaPort = os.environ["EUREKA_PORT"]

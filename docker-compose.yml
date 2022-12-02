@@ -13,6 +13,15 @@ services:
   #   networks:
   #     - base-net
 
+
+  printerdb:
+    image: mongo:latest
+    container_name: printerdb
+    ports:
+      - "27018:27017"
+    networks:
+      - base-net
+
   userSQLDb:
     build: 
       context: ./UserRest

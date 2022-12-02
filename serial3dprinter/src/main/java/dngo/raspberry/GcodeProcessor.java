@@ -38,7 +38,23 @@ public class GcodeProcessor implements Runnable{
 
     long gcodeLineCount = 0;
 
+    public long getGcodeLineCount() {
+        return gcodeLineCount;
+    }
+
+    public void setGcodeLineCount(long gcodeLineCount) {
+        this.gcodeLineCount = gcodeLineCount;
+    }
+
     long currentLineNumber = 0;
+
+    public long getCurrentLineNumber() {
+        return currentLineNumber;
+    }
+
+    public void setCurrentLineNumber(long currentLineNumber) {
+        this.currentLineNumber = currentLineNumber;
+    }
 
     String definedName = "";
 
