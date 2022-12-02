@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 // import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -209,9 +210,9 @@ public class Main {
     
                         }  
 
-                        processor.setGcodeFile(null);
                         processor.setGcodeLineCount(0);
                         processor.setCurrentLineNumber(0);
+                        processor.setGcodeFile(new File(""));
                         
 
                         processorList.remove(selectedPrinter);
