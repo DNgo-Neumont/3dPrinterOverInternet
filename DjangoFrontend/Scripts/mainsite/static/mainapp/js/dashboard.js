@@ -32,7 +32,7 @@ function queuePrintCallback(){
 
     var selectItems = document.createElement("SELECT");
     selectItems.className = "printer_files"
-    selectItems.id = "printer_file_select"
+    // selectItems.id = "printer_file_select"
 
     fileRequest.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
