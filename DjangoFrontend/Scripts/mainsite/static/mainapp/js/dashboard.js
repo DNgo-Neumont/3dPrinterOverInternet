@@ -32,7 +32,7 @@ function queuePrintCallback(){
 
     var selectItems = document.createElement("SELECT");
     selectItems.className = "printer_files"
-    // selectItems.id = "printer_file_select"
+    selectItems.id = "printer_file_select"
 
     fileRequest.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
@@ -195,9 +195,10 @@ function queuePrintCallback(){
                         displayBox.append(ackMessage);
                     })
                     printerName.innerHTML = printerList[i];
-                    selectItems.id = "printer_file_select" + "_" + printerList[i];
+                    // selectItems.id = "printer_file_select" + "_" + printerList[i];
+                    var cloneSelectItems = selectItems.cloneNode(true)
                     printerDiv.appendChild(printerName);
-                    printerDiv.appendChild(selectItems);
+                    printerDiv.appendChild(cloneSelectItems);
                     printerDiv.appendChild(printerButton);
                     containerDiv.appendChild(printerDiv);
                 }

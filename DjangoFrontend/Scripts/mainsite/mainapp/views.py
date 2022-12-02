@@ -43,6 +43,8 @@ def storeUpdate(data):
             }
             printers.append(printerStatus)
 
+        
+
         userToUpdate.consumers = printers
 
         userToUpdate.save()
@@ -59,8 +61,8 @@ def storeUpdate(data):
                 "printer_name": printer["printer-name"],
                 "printer_progress": printer["printer-progress"]
             }
+            printers.append(printerStatus)
 
-        printers.append(printerStatus)
         userToSave = mainapp.models.User(username=username, consumers=printers)
         userToSave.save()
         serializer = mainapp.models.UserSerializer(userToSave)
